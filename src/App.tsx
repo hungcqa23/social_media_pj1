@@ -1,3 +1,8 @@
+import { useState } from 'react';
+
+const arr = ['cc'];
 export default function App() {
-  return <div>App</div>;
+  const [show, setShow] = useState(arr);
+  console.log('Rendered again');
+  return <button onClick={() => setShow([...arr, 'ss'])}>{show}</button>;
 }
