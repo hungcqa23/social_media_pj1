@@ -19,7 +19,7 @@ export default function Input(props: Props) {
       className={
         className
           ? className
-          : 'rounded-lg border-2 p-4 text-base font-medium text-gray-700 focus:text-gray-700'
+          : 'w-full rounded-lg border p-4 text-base font-medium text-gray-700 outline-none focus:text-gray-700 focus:shadow'
       }
       required={required ? required : false}
       value={value}

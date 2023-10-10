@@ -21,21 +21,28 @@ export default function Login() {
 
       <form action='/submit-action' className='flex flex-col gap-12'>
         <div className='flex flex-col gap-4'>
-          <Input
-            placeholder='Email'
-            type='text'
-            isFocus={true}
-            required={true}
-            value={email}
-            onChange={onChangeName}
-          />
-          <Input
-            placeholder='Password'
-            type='password'
-            required={true}
-            value={password}
-            onChange={onChangePassword}
-          />
+          <div>
+            <Input
+              placeholder='Email'
+              type='text'
+              isFocus={true}
+              required={true}
+              value={email}
+              onChange={onChangeName}
+            />
+            <p className='ml-1 mt-1 min-h-[1rem] text-sm font-medium text-red-600'>
+              {/* Invalid username. */}
+            </p>
+          </div>
+          <div>
+            <Input
+              placeholder='Password'
+              type='password'
+              required={true}
+              value={password}
+              onChange={onChangePassword}
+            />
+          </div>
           <Link
             to={'/forgot-password'}
             className='self-end text-base font-semibold italic text-black hover:underline'
