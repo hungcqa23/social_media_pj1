@@ -1,7 +1,7 @@
 import { useRoutes } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import AuthPage from './layouts/AuthPage';
+import AuthLayout from './layouts/AuthLayout';
 import ForgotPassword from './pages/Forgot Password';
 // import { loginAction } from './pages/Login/Login';
 import ResetPassword from './pages/ResetPassword';
@@ -9,7 +9,7 @@ import ResetPassword from './pages/ResetPassword';
 export default function useRouteElement() {
   const routeElement = useRoutes([
     {
-      element: <AuthPage />,
+      element: <AuthLayout />,
       children: [
         {
           path: '/',
