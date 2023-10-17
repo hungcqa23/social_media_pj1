@@ -17,12 +17,12 @@ export default function ButtonNav(props: Props) {
 
   const isActive = useLocation().pathname === to;
 
-  let lgClassName = 'lg:h-12 lg:justify-normal lg:border-none';
+  let lgNavLink = 'lg:h-12 lg:justify-normal lg:border-none lg:w-48';
   let lgImg = 'lg:ml-2 lg:w-5';
   let lgP = 'lg:block';
 
   if (shorten) {
-    lgClassName = '';
+    lgNavLink = '';
     lgImg = '';
     lgP = '';
   }
@@ -30,9 +30,9 @@ export default function ButtonNav(props: Props) {
     <NavLink
       to={to}
       className={({ isActive }) =>
-        `${isActive ? 'border border-gray-300 font-medium' : ''} flex h-12 items-center 
+        `${isActive ? 'border border-gray-300 font-medium' : ''} flex h-12 w-12 items-center 
         justify-center gap-2 rounded-lg 
-        transition-all hover:bg-gray-200 ${lgClassName} active:bg-gray-100 ${
+        transition-all hover:bg-gray-200 ${lgNavLink} active:bg-gray-100 ${
           className ? className : ''
         }`
       }
