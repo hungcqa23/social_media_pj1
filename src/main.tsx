@@ -5,10 +5,10 @@ import { BrowserRouter } from 'react-router-dom';
 import Navigation from './components/Nav';
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
-    {/* <App /> */}
+    <App />
 
-    <div className='flex'>
+    {/* <div className='flex'>
       <Navigation />
-    </div>
+    </div> */}
   </BrowserRouter>
 );

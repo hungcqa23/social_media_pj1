@@ -1,47 +1,60 @@
-import { Form, Link, useSubmit } from 'react-router-dom';
-import { useState } from 'react';
-import Input from 'src/components/Input';
-import Button from 'src/components/Button';
+import { Link } from 'react-router-dom';
+import Button from 'src/components/Button/Button';
+import { useForm } from 'react-hook-form';
+import { getRules } from 'src/utils/rules';
+
+interface FormData {
+  email: string;
+  password: string;
+}
 
 export default function Login() {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors }
+  } = useForm<FormData>();
 
-  const onChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
+  const rules = getRules();
 
-  const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
+  const onSubmit = handleSubmit(data => {
+    console.log(data);
+  });
   return (
     <>
       <h1 className='text-center text-6xl font-semibold drop-shadow-font'>Instataolao</h1>
 
-      <form action='/submit-action' className='flex flex-col gap-12'>
+      <form onSubmit={onSubmit} className='flex flex-col gap-12' noValidate>
         <div className='flex flex-col gap-4'>
           <div>
-            <Input
-              placeholder='Email'
+            <input
               type='text'
-              isFocus={true}
-              required={true}
-              value={email}
-              onChange={onChangeName}
+              className='w-full rounded-lg border p-4 text-base font-medium text-gray-700 outline-none focus:text-gray-700 focus:shadow'
+              autoFocus={true}
+              placeholder='Email'
+              minLength={0}
+              maxLength={255}
+              {...register('email', rules.email)}
             />
-            <p className='ml-1 mt-1 min-h-[1rem] text-sm font-medium text-red-600'>
-              {/* Invalid username. */}
+            <p className='ml-1 mt-1 min-h-[1.25rem] text-sm font-medium text-red-600'>
+              {errors.email?.message}
             </p>
           </div>
+
           <div>
-            <Input
-              placeholder='Password'
+            <input
               type='password'
-              required={true}
-              value={password}
-              onChange={onChangePassword}
+              className='w-full rounded-lg border p-4 text-base font-medium text-gray-700 outline-none focus:text-gray-700 focus:shadow'
+              autoComplete='on'
+              placeholder='Password'
+              minLength={0}
+              maxLength={255}
+              {...register('password', rules.password)}
             />
+            <p className='ml-1 mt-1 min-h-[1.25rem] text-sm font-medium text-red-600'>
+              {errors.password?.message}
+            </p>
           </div>
           <Link
             to={'/forgot-password'}
@@ -50,6 +63,7 @@ export default function Login() {
             Forget password?
           </Link>
         </div>
+
         <Button className='rounded-lg bg-black px-44 py-5 text-base font-semibold text-white'>
           Log in
         </Button>

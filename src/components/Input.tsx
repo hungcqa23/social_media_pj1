@@ -1,6 +1,6 @@
 import { HTMLInputTypeAttribute, InputHTMLAttributes } from 'react';
 
-interface Props {
+interface Props extends InputHTMLAttributes<HTMLInputElement> {
   value: string;
   placeholder: string;
   className?: string;
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function Input(props: Props) {
-  const { placeholder, className, isFocus, type, required, value, onChange } = props;
+  const { placeholder, className, isFocus, type, required, value, onChange, ...rest } = props;
   return (
     <input
       type={type}
@@ -27,7 +27,7 @@ export default function Input(props: Props) {
       maxLength={255}
       autoFocus={isFocus ? isFocus : false}
       onChange={onChange}
-      autoComplete='current-password'
+      {...rest}
     />
   );
 }

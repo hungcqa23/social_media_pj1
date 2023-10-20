@@ -1,6 +1,6 @@
 import Input from 'src/components/Input';
 import { useState } from 'react';
-import Button from 'src/components/Button';
+import Button from 'src/components/Button/Button';
 import { Form } from 'react-router-dom';
 
 export default function ForgotPassword() {
