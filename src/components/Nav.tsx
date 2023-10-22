@@ -16,7 +16,7 @@ export default function Navigation() {
   ];
   return (
     <MainLayout>
-      <nav className={`w-17 border-r ${!openMessages ? 'lg:w-56' : ''} `}>
+      <nav className={`w-17 border-r ${!openMessages ? 'lg:w-56' : ''} h-screen overflow-y-hidden`}>
         <div className='flex h-full flex-col gap-6 px-3 py-5'>
           <Link to='/home' className='flex justify-center py-5'>
             <img

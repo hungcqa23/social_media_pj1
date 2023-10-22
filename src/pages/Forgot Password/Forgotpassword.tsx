@@ -1,34 +1,44 @@
 import Input from 'src/components/Input';
-import { useState } from 'react';
-import Button from 'src/components/Button/Button';
-import { Form } from 'react-router-dom';
+import Button from 'src/components/Button';
+import { getRules } from 'src/utils/rules';
+import { useForm } from 'react-hook-form';
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState<string>('');
+  const {
+    getValues,
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm();
 
-  const onChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
+  const onSubmit = handleSubmit(data => {
+    console.log(getValues());
+    console.log(data);
+  });
+
+  const rules = getRules(getValues);
 
   return (
     <>
-      <h1 className='-mx-60 text-center text-6xl font-semibold drop-shadow-font'>
+      <h1 className='-mx-60 mb-10 text-center text-6xl font-semibold drop-shadow-font'>
         Forgot password?
       </h1>
 
-      <form className='flex w-11/12 flex-col gap-4  self-center' onSubmit={e => e.preventDefault()}>
+      <form className='flex w-11/12 flex-col gap-4  self-center' onSubmit={onSubmit} noValidate>
         <p className='text-xl'>
           Enter the email address you used and we'll send you code to reset your password.
         </p>
+
         <Input
           placeholder='Enter your email ...'
           type='email'
-          required={true}
-          onChange={onChangeName}
-          value={email}
+          name='email'
+          register={register}
+          ruleName={rules.email}
         />
+
         <Button
-          className='rounded-lg bg-black px-44 py-5 text-base font-semibold text-white'
+          className='w-full rounded-lg bg-black py-5 text-base font-semibold text-white'
           type='submit'
         >
           Continue

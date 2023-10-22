@@ -26,7 +26,7 @@ export default function useRouteElement() {
           element: <ForgotPassword />
         },
         {
-          path: '/resset-password',
+          path: '/reset-password',
           element: <ResetPassword />
         }
       ]

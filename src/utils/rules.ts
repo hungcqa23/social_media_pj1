@@ -1,10 +1,24 @@
 import { RegisterOptions, UseFormGetValues } from 'react-hook-form';
 
 type Rules = {
-  [key in 'email' | 'password' | 'confirmPassword']?: RegisterOptions;
+  [key in 'email' | 'password' | 'confirmPassword' | 'username']?: RegisterOptions;
 };
 
 export const getRules = (getValues?: UseFormGetValues<any>): Rules => ({
+  username: {
+    required: {
+      value: true,
+      message: 'Username is required'
+    },
+    minLength: {
+      value: 5,
+      message: 'The length of username should be 5 - 100 characters'
+    },
+    maxLength: {
+      value: 100,
+      message: 'The length of username should be 5 - 100 characters'
+    }
+  },
   email: {
     required: {
       value: true,
