@@ -7,7 +7,7 @@ export default function Button(props: ButtonProps) {
   const {
     isLoading,
     children,
-    className = 'p-4 border-2 rounded-lg text-base text-gray-700 font-medium',
+    className = 'px-3 py-4 border-2 rounded-lg text-sm md:text-base text-gray-700 font-medium',
     ...rest
   } = props;
 

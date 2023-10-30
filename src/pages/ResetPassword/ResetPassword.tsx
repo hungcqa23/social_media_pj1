@@ -1,4 +1,6 @@
 import { useForm } from 'react-hook-form';
+import Button from 'src/components/Button';
+import Input from 'src/components/Input';
 import { getRules } from 'src/utils/rules';
 
 interface FormData {
@@ -26,27 +28,39 @@ export default function ResetPassword() {
 
   return (
     <>
-      <p className='text-center text-base font-normal'>
+      <h1 className='mb-8 text-center text-4xl font-semibold drop-shadow-font md:mb-10 md:text-5xl lg:-mx-40 lg:text-6xl'>
+        Reset Password
+      </h1>
+
+      <p className='mb-4 text-base font-normal'>
         Enter a new password below to change your password
       </p>
-      <form className='flex flex-col gap-6' onSubmit={onSubmit}>
-        <div>
-          <input
-            type='email'
-            placeholder='Email'
-            className='w-full rounded-lg border p-4 text-base font-medium text-gray-700 outline-none focus:text-gray-700 focus:shadow'
-          />
-          <p className='ml-1 mt-1 min-h-[1.25rem] text-sm font-medium text-red-600'></p>
-        </div>
 
-        <div>
-          <input
-            type='password'
-            placeholder='New password'
-            className='w-full rounded-lg border p-4 text-base font-medium text-gray-700 outline-none focus:text-gray-700 focus:shadow'
-          />
-          <p className='ml-1 mt-1 min-h-[1.25rem] text-sm font-medium text-red-600'></p>
-        </div>
+      <form className='flex flex-col' onSubmit={onSubmit}>
+        <Input
+          type='password'
+          name='password'
+          register={register}
+          placeholder='Enter new password...'
+          ruleName={rules.password}
+          errorMessage={errors.password?.message}
+        />
+
+        <Input
+          type='password'
+          name='confirmPassword'
+          register={register}
+          placeholder='Confirm password...'
+          ruleName={rules.confirmPassword}
+          errorMessage={errors.confirmPassword?.message}
+        />
+
+        <Button
+          className='w-full rounded-lg bg-black px-4 py-3 text-sm font-normal text-white md:text-base md:font-semibold'
+          type='submit'
+        >
+          Continue
+        </Button>
       </form>
     </>
   );

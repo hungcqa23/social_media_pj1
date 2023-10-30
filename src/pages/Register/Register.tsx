@@ -33,11 +33,11 @@ export default function Register() {
 
   return (
     <>
-      <h1 className='mb-12 text-center text-4xl font-semibold drop-shadow-font lg:text-5xl'>
+      <h1 className='mb-8 text-center text-4xl font-semibold drop-shadow-font md:mb-10 md:text-5xl lg:-mx-40 lg:text-6xl'>
         Create account
       </h1>
 
-      <form className='flex flex-col gap-6' onSubmit={onSubmit} noValidate>
+      <form className='flex flex-col' onSubmit={onSubmit} noValidate>
         <Input
           type='text'
           placeholder='Username'
@@ -74,11 +74,11 @@ export default function Register() {
           errorMessage={errors.confirmPassword?.message}
         />
 
-        <Button className='rounded-lg border-2 bg-black p-4 text-base font-semibold text-white '>
+        <Button className='rounded-lg bg-black px-4 py-3 text-sm font-normal text-white md:px-5 md:py-4 md:text-base md:font-semibold'>
           Create account
         </Button>
 
-        <p className='text-base font-medium text-gray-400'>
+        <p className='mt-10 text-center text-sm font-medium text-gray-500 md:text-base'>
           Already have an account?{' '}
           <Link to={'/'} className='font-medium text-black hover:underline'>
             Log in

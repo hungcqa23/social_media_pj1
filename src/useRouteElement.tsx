@@ -3,9 +3,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import AuthLayout from './layouts/AuthLayout';
 import ForgotPassword from './pages/Forgot Password';
-// import { loginAction } from './pages/Login/Login';
 import ResetPassword from './pages/ResetPassword';
 import EmailSetting from './pages/EmailSetting';
+import NotFound from './pages/NotFound';
 
 export default function useRouteElement() {
   const routeElement = useRoutes([
@@ -44,6 +44,10 @@ export default function useRouteElement() {
           element: <EmailSetting />
         }
       ]
+    },
+    {
+      element: <NotFound />,
+      path: '*'
     }
   ]);
 

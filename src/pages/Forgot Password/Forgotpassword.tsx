@@ -3,45 +3,49 @@ import Button from 'src/components/Button';
 import { getRules } from 'src/utils/rules';
 import { useForm } from 'react-hook-form';
 
+interface FormData {
+  email: string;
+}
 export default function ForgotPassword() {
   const {
     getValues,
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm();
+  } = useForm<FormData>();
 
   const onSubmit = handleSubmit(data => {
     console.log(getValues());
     console.log(data);
   });
 
-  const rules = getRules(getValues);
+  const rules = getRules();
 
   return (
     <>
-      <h1 className='-mx-60 mb-10 text-center text-6xl font-semibold drop-shadow-font'>
-        Forgot password?
+      <h1 className='mb-8 text-center text-4xl font-semibold drop-shadow-font md:mb-10 md:text-5xl lg:-mx-40 lg:text-6xl'>
+        Forgot password
       </h1>
 
-      <form className='flex w-11/12 flex-col gap-4  self-center' onSubmit={onSubmit} noValidate>
-        <p className='text-xl'>
-          Enter the email address you used and we'll send you code to reset your password.
-        </p>
+      <p className='mb-4 text-sm md:text-base'>
+        Enter the email address you used and we'll send you code to reset your password.
+      </p>
 
+      <form className='flex flex-col gap-4  self-center' onSubmit={onSubmit} noValidate>
         <Input
           placeholder='Enter your email ...'
           type='email'
           name='email'
           register={register}
           ruleName={rules.email}
+          errorMessage={errors.email?.message}
         />
 
         <Button
-          className='w-full rounded-lg bg-black py-5 text-base font-semibold text-white'
+          className='mt-2 rounded-lg bg-black px-4 py-3 text-sm font-normal text-white md:px-5 md:py-4 md:text-base md:font-semibold'
           type='submit'
         >
-          Continue
+          Submit
         </Button>
       </form>
     </>
