@@ -1,3 +1,4 @@
+import Navigation from 'src/components/Navigation/Navigation';
 import Search from 'src/components/Search';
 
 interface Props {
@@ -6,9 +7,9 @@ interface Props {
 export default function MainLayout(props: Props) {
   const { children } = props;
   return (
-    <div className='flex h-screen w-screen'>
+    <div className='flex'>
+      <Navigation />
       {children}
-      <Search />
     </div>
   );
 }

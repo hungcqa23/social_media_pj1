@@ -1,4 +1,6 @@
 import { RegisterOptions, UseFormGetValues } from 'react-hook-form';
+import { object, InferType, ref } from 'yup';
+import * as yup from 'yup';
 
 type Rules = {
   [key in 'email' | 'password' | 'confirmPassword' | 'username']?: RegisterOptions;
@@ -28,12 +30,12 @@ export const getRules = (getValues?: UseFormGetValues<any>): Rules => ({
       value: /^\S+@\S+\.\S+$/,
       message: 'Invalid email'
     },
-    maxLength: {
-      value: 255,
-      message: 'The length of email should be 5 - 255 characters'
-    },
     minLength: {
       value: 5,
+      message: 'The length of email should be 5 - 255 characters'
+    },
+    maxLength: {
+      value: 255,
       message: 'The length of email should be 5 - 255 characters'
     }
   },
@@ -42,12 +44,12 @@ export const getRules = (getValues?: UseFormGetValues<any>): Rules => ({
       value: true,
       message: 'Password is required'
     },
-    maxLength: {
-      value: 255,
-      message: 'The length of password should be 5 - 255 characters'
-    },
     minLength: {
       value: 5,
+      message: 'The length of password should be 5 - 255 characters'
+    },
+    maxLength: {
+      value: 255,
       message: 'The length of password should be 5 - 255 characters'
     }
   },
@@ -56,12 +58,12 @@ export const getRules = (getValues?: UseFormGetValues<any>): Rules => ({
       value: true,
       message: 'Confirm password is required'
     },
-    maxLength: {
-      value: 255,
-      message: 'The length of confirm password should be 5 - 255 characters'
-    },
     minLength: {
       value: 5,
+      message: 'The length of confirm password should be 5 - 255 characters'
+    },
+    maxLength: {
+      value: 255,
       message: 'The length of confirm password should be 5 - 255 characters'
     },
     validate:
@@ -70,3 +72,30 @@ export const getRules = (getValues?: UseFormGetValues<any>): Rules => ({
         : undefined
   }
 });
+
+export const schema = object({
+  email: yup
+    .string()
+    .required('Email is required')
+    .email('Invalid email')
+    .min(5, 'The length of email should be 5 - 255 characters')
+    .max(255, 'The length of email should be 5 - 255 characters'),
+  username: yup
+    .string()
+    .required('Username is required')
+    .min(5, 'The length of username should be 5 - 100 characters')
+    .max(100, 'The length of username should be 5 - 100 characters'),
+  password: yup
+    .string()
+    .required('Password is required')
+    .min(5, 'The length of password should be 5 - 255 characters')
+    .max(255, 'The length of password should be 5 - 255 characters'),
+  confirmPassword: yup
+    .string()
+    .required('Confirm password is required')
+    .min(5, 'The length of confirm password should be 5 - 255 characters')
+    .max(255, 'The length of confirm password should be 5 - 255 characters')
+    .oneOf([ref('password')], 'Password confirm do not match')
+});
+
+const loginSchema = schema.omit(['confirmPassword', 'username']);

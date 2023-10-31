@@ -1,7 +1,9 @@
-import { Link, useSearchParams } from 'react-router-dom';
-import Button from 'src/components/Button/Button';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { getRules } from 'src/utils/rules';
+import { getRules, schema } from 'src/utils/rules';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import Button from 'src/components/Button';
 import Input from 'src/components/Input';
 
 interface FormData {
@@ -9,13 +11,17 @@ interface FormData {
   password: string;
 }
 
+const loginSchema = schema.pick(['email', 'password']);
+
 export default function Login() {
   const {
     register,
     handleSubmit,
     getValues,
     formState: { errors }
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    resolver: yupResolver(loginSchema)
+  });
 
   const rules = getRules();
 
@@ -36,7 +42,6 @@ export default function Login() {
             type='email'
             name='email'
             register={register}
-            ruleName={rules.email}
             errorMessage={errors.email?.message}
             autoComplete='on'
           />
@@ -46,7 +51,6 @@ export default function Login() {
             type='password'
             name='password'
             register={register}
-            ruleName={rules.password}
             errorMessage={errors.password?.message}
             autoComplete='current-password'
           />

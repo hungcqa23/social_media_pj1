@@ -5,7 +5,7 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
   errorMessage?: string;
   classNameInput?: string;
   classNameError?: string;
-  register: UseFormRegister<any>;
+  register?: UseFormRegister<any>;
   ruleName?: RegisterOptions;
   name: string;
 }
@@ -22,9 +22,11 @@ export default function Input(props: Props) {
     ...rest
   } = props;
 
+  const registerResult = register && name ? register(name, ruleName) : null;
+
   return (
     <div className={className}>
-      <input className={classNameInput} {...register(name, ruleName)} {...rest} />
+      <input className={classNameInput} {...registerResult} {...rest} />
       <p className={classNameError}>{errorMessage}</p>
     </div>
   );

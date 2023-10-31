@@ -54,30 +54,3 @@ export default function ButtonNav(props: Props) {
     </NavLink>
   );
 }
-// ${
-//   isProfile && 'rounded-full'
-// }
-
-{
-  /* <div
-className={`${isHover && 'scale-105'} ${
-  isActive && 'scale-105'
-} ${lgImg} flex h-6 w-6 items-center transition-all duration-1000`}
->
-<img
-  src={`${isActive ? svgActive : svg}`}
-  className='rounded-full transition-all'
-  alt='home'
-/>
-</div> */
-}
-
-{
-  /* <img
-src={`${isActive ? svgActive : svg}`}
-className={`rounded-full transition-all ${isHover && 'scale-105'} ${
-  isActive && 'scale-105'
-} ${lgImg} flex h-6 w-6 items-center transition-all duration-1000 `}
-alt='home'
-/> */
-}
