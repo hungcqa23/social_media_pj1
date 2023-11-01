@@ -1,2 +1,2 @@
-import SuggestList from './SuggestList';
-export default SuggestList;
+import SuggestedList from './SuggestedList';
+export default SuggestedList;

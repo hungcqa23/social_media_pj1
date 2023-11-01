@@ -12,7 +12,18 @@ interface Props {
 }
 
 export default function ButtonNav(props: Props) {
-  const { svg, text, to, svgActive, shorten, isProfile, className } = props;
+  const {
+    svg,
+    text,
+    to,
+    svgActive,
+    shorten,
+    isProfile,
+    className = ({ isActive }: { isActive: boolean }) =>
+      `${isActive ? 'border border-gray-300 font-medium' : ''} flex h-12 w-12 items-center 
+    justify-center gap-2 rounded-lg 
+    transition-all hover:bg-gray-200 ${lgNavLink} active:bg-gray-100`
+  } = props;
   const [isHover, setIsHover] = useState(false);
 
   const isActive = useLocation().pathname === to;
@@ -26,16 +37,11 @@ export default function ButtonNav(props: Props) {
     lgImg = '';
     lgP = '';
   }
+
   return (
     <NavLink
       to={to}
-      className={({ isActive }) =>
-        `${isActive ? 'border border-gray-300 font-medium' : ''} flex h-12 w-12 items-center 
-        justify-center gap-2 rounded-lg 
-        transition-all hover:bg-gray-200 ${lgNavLink} active:bg-gray-100 ${
-          className ? className : ''
-        }`
-      }
+      className={className}
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >

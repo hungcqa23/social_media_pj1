@@ -1,6 +1,6 @@
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { iconsSvg } from 'src/constants/icons';
-import ButtonNav from '../ButtonNav';
+import ButtonNav from '../ButtonNav/ButtonNav';
 import MainLayout from 'src/layouts/MainLayout';
 
 interface Props {
@@ -36,7 +36,7 @@ export default function Navigation(props: Props) {
           <p className={`hidden ${!openMessages ? 'lg:block' : ''}`}>Home</p>
         </Link>
 
-        <div className='flex flex-col gap-1'>
+        <div className='flex grow flex-col gap-1'>
           {/* <ButtonNav to='/' svg={homeSvg} text='Home' /> */}
           <ButtonNav
             to='/home'
