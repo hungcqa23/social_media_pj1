@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import Switch from 'src/components/Switch';
 
 type IndividualSwitches = {
@@ -51,8 +52,15 @@ export default function EmailSetting() {
     }));
   };
 
+  const Links = [
+    { name: 'Edit profile', path: '/accounts/profile' },
+    { name: 'Email notification', path: '/accounts/emails' },
+    { name: 'Push notifications', path: '/accounts/notifications' },
+    { name: 'Help', path: '/accounts/help' }
+  ];
+
   return (
-    <div className='h-screen w-[48rem] bg-gray-200 px-6 py-5'>
+    <>
       <h1 className='mb-5 text-xl font-normal'>Push Notifications</h1>
 
       <div className='flex flex-col gap-3'>
@@ -76,6 +84,6 @@ export default function EmailSetting() {
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }

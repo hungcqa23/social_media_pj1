@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import Profile from '../Profile';
+import Profile from '../IconProfile';
 import { useState } from 'react';
 
 interface Props {

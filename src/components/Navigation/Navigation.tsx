@@ -1,4 +1,4 @@
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useMatch } from 'react-router-dom';
 import { iconsSvg } from 'src/constants/icons';
 import ButtonNav from '../ButtonNav/ButtonNav';
 import MainLayout from 'src/layouts/MainLayout';
@@ -7,73 +7,70 @@ interface Props {
   classNameNav?: string;
 }
 export default function Navigation(props: Props) {
-  const openMessages = useLocation().pathname === '/messages';
+  const openMessages = useMatch('/messages') !== null;
   const {
     classNameNav = `w-17 border-r ${
       !openMessages ? 'lg:w-56' : ''
     } h-screen overflow-y-hidden fixed top-0 left-0 bottom-0 `
   } = props;
+
   const Links = [
-    { name: 'Home', to: '/home' },
-    { name: 'Search', to: '/search' },
-    { name: 'Notifications', to: '/notifications' },
-    { name: 'Messages', to: '/messages' },
-    { name: 'Bookmarks', to: '/bookmarks' },
-    { name: 'Lists', to: '/lists' },
-    { name: 'Profile', to: '/profile' },
-    { name: 'More', to: '/more' }
+    { name: 'house', to: '/', svg: iconsSvg.house, svgActive: iconsSvg.houseFilled },
+    {
+      name: 'Search',
+      to: '/search?type=posts',
+      svg: iconsSvg.search,
+      svgActive: iconsSvg.searchFilled
+    },
+    {
+      name: 'Messages',
+      to: '/messages',
+      svg: iconsSvg.message,
+      svgActive: iconsSvg.messageFilled
+    },
+    {
+      name: 'Notifications',
+      to: '/notifications',
+      svg: iconsSvg.notification,
+      svgActive: iconsSvg.notificationFilled
+    },
+    {
+      name: 'Profile',
+      to: '/profile?type=posts',
+      svg: iconsSvg.user,
+      svgActive: iconsSvg.user,
+      isProfile: true
+    }
   ];
 
   return (
     <nav className={classNameNav}>
       <div className='flex h-full flex-col gap-6 px-3 py-5'>
-        <Link to='/home' className='flex justify-center py-5'>
+        <Link to='/' className='flex justify-center py-5'>
           <img
             src={iconsSvg.cloud}
             alt='cloud'
             className={`w-6 ${!openMessages ? 'lg:hidden' : ''}`}
           />
-          <p className={`hidden ${!openMessages ? 'lg:block' : ''}`}>Home</p>
+          <p
+            className={`hidden ${!openMessages ? 'font-cookie text-5xl text-black lg:block' : ''}`}
+          >
+            Instacloud
+          </p>
         </Link>
 
         <div className='flex grow flex-col gap-1'>
-          {/* <ButtonNav to='/' svg={homeSvg} text='Home' /> */}
-          <ButtonNav
-            to='/home'
-            svg={iconsSvg.home}
-            text='Home'
-            svgActive={iconsSvg.homeFilled}
-            shorten={openMessages}
-          />
-          <ButtonNav
-            to='/search'
-            svg={iconsSvg.search}
-            text='Search'
-            svgActive={iconsSvg.searchFilled}
-            shorten={openMessages}
-          />
-          <ButtonNav
-            to='/messages'
-            svg={iconsSvg.message}
-            text='Messages'
-            svgActive={iconsSvg.messageFilled}
-            shorten={openMessages}
-          />
-          <ButtonNav
-            to='/notification'
-            svg={iconsSvg.notification}
-            text='Notification'
-            svgActive={iconsSvg.notificationFilled}
-            shorten={openMessages}
-          />
-          <ButtonNav
-            to='/profile'
-            svg={iconsSvg.user}
-            text='Profile'
-            svgActive={iconsSvg.user}
-            shorten={openMessages}
-            isProfile={true}
-          />
+          {Links.map(link => (
+            <ButtonNav
+              key={link.name}
+              to={link.to}
+              svg={link.svg}
+              text={link.name}
+              svgActive={link.svgActive}
+              shorten={openMessages}
+              isProfile={link?.isProfile}
+            />
+          ))}
         </div>
 
         <ButtonNav

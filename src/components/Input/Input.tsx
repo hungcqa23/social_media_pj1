@@ -7,7 +7,7 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
   classNameError?: string;
   register?: UseFormRegister<any>;
   ruleName?: RegisterOptions;
-  name: string;
+  name?: string;
 }
 
 export default function Input(props: Props) {

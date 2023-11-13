@@ -1,5 +1,5 @@
-import home from 'src/assets/icons/home.svg';
-import homeFilled from 'src/assets/icons/home-filled.svg';
+import house from 'src/assets/icons/house.svg';
+import houseFilled from 'src/assets/icons/house-filled.svg';
 import cloud from '/src/assets/icons/cloud.svg';
 import search from '/src/assets/icons/search.svg';
 import searchFilled from '/src/assets/icons/search-filled.svg';
@@ -10,11 +10,16 @@ import notificationFilled from '/src/assets/icons/notification-filled.svg';
 import more from '/src/assets/icons/more.svg';
 import moreFilled from '/src/assets/icons/more-filled.svg';
 import user from 'src/assets/images/user.jpg';
+import saved from 'src/assets/icons/saved.svg';
+import savedFilled from 'src/assets/icons/saved-filled.svg';
+import posts from 'src/assets/icons/posts.svg';
+import images from 'src/assets/icons/image.svg';
+import videos from 'src/assets/icons/video.svg';
 
 export const iconsSvg = {
   cloud: cloud,
-  home: home,
-  homeFilled: homeFilled,
+  house: house,
+  houseFilled: houseFilled,
   search: search,
   searchFilled: searchFilled,
   message: message,
@@ -23,5 +28,10 @@ export const iconsSvg = {
   notificationFilled: notificationFilled,
   more: more,
   moreFilled: moreFilled,
-  user: user
+  user: user,
+  saved: saved,
+  savedFilled: savedFilled,
+  posts: posts,
+  images: images,
+  videos: videos
 };

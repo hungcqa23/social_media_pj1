@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import Profile from '../Profile';
+import Profile from '../IconProfile';
 import SuggestedList from '../SuggestedList';
 
 export default function Suggested() {
@@ -12,7 +12,7 @@ export default function Suggested() {
             <Link to='/profile' className='text-sm font-semibold'>
               anhungwindyy
             </Link>
-            <p className='text-base leading-4 text-gray-400'>An Hưng</p>
+            <p className='text-base font-normal leading-4 text-gray-500'>An Hưng</p>
           </div>
         </div>
 

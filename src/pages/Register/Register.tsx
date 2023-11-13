@@ -80,7 +80,7 @@ export default function Register() {
 
         <p className='mt-10 text-center text-sm font-medium text-gray-500 md:text-base'>
           Already have an account?{' '}
-          <Link to={'/'} className='font-medium text-black hover:underline'>
+          <Link to={'/login'} className='font-medium text-black hover:underline'>
             Log in
           </Link>
         </p>

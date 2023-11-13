@@ -31,7 +31,7 @@ export default function Login() {
   return (
     <div>
       <h1 className='lg:md-10 mb-8 text-center text-4xl font-semibold drop-shadow-font md:text-5xl lg:text-6xl'>
-        Instataolao
+        Instacloud
       </h1>
 
       <form onSubmit={onSubmit} className='flex flex-col gap-4' noValidate>
@@ -70,7 +70,7 @@ export default function Login() {
       <p className='mt-10 text-center text-sm font-medium text-gray-500 md:text-base'>
         Don't have an account?{' '}
         <Link
-          to={'/signup'}
+          to={'/sign-up'}
           className='text-sm font-normal italic text-black hover:underline md:text-base md:font-semibold'
         >
           Sign up

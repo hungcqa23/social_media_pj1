@@ -1,15 +1,11 @@
-import Navigation from 'src/components/Navigation/Navigation';
-import Search from 'src/components/Search';
+import { Outlet } from 'react-router-dom';
+import Navigation from 'src/components/Navigation';
 
-interface Props {
-  children: React.ReactNode;
-}
-export default function MainLayout(props: Props) {
-  const { children } = props;
+export default function MainLayout() {
   return (
-    <div className='flex'>
+    <>
       <Navigation />
-      {children}
-    </div>
+      <Outlet />
+    </>
   );
 }

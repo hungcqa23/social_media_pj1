@@ -7,10 +7,16 @@ export default {
         font: '0 4px 4px rgba(0, 0, 0, 0.25)'
       },
       boxShadow: {
-        default: '0 0 4px rgba(0, 0, 0, 0.25)'
+        default: '0 0 4px rgba(0, 0, 0, 1)'
       },
       width: {
         18: '4.5rem'
+      },
+      fontFamily: {
+        cookie: ['"Cookie"', 'cursive']
+      },
+      flexGrow: {
+        2: 2
       }
     }
   },
