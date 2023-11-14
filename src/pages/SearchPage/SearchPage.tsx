@@ -2,6 +2,7 @@ import { set } from 'lodash';
 import { useState } from 'react';
 import { NavLink, useSearchParams } from 'react-router-dom';
 import Button from 'src/components/Button';
+import FilterPost from 'src/components/FilterPost';
 import IconProfile from 'src/components/IconProfile';
 import Modal from 'src/components/Modal';
 import Search from 'src/components/Search';
@@ -83,117 +84,34 @@ export default function SearchPage() {
             </div>
 
             {/* Filter Post */}
-            <div className='mt-10 px-4 pb-4'>
-              <div className='flex w-full border-b pb-4'>
-                <div className='flex-grow basis-80'>
-                  <div className='flex items-center gap-4'>
-                    <IconProfile />
-                    <span className='text-sm font-medium text-black'>AndreeeHandless</span>
-                    <span className='text-xs font-normal text-gray-300'>2 months ago</span>
-                    <button className='text-xs font-semibold text-blue-500'>Follow</button>
-                  </div>
+            <FilterPost
+              username='AndreeeHandless'
+              date='2 months'
+              description={`I'm a software engineer and a serial entrepreneur. I've started and sold
+                    multiple businesses and I'm always looking for new opportunities.`}
+              likes={10}
+              comments={5}
+            />
 
-                  <p className='mt-2 text-sm'>
-                    I'm a software engineer and a serial entrepreneur. I've started and sold
-                    multiple businesses and I'm always looking for new opportunities.
-                  </p>
+            <FilterPost
+              username='AndreeeHandless'
+              date='2 months'
+              description={`I'm a software engineer and a serial entrepreneur. I've started and sold
+                    multiple businesses and I'm always looking for new opportunities.`}
+              likes={2000}
+              comments={5000}
+              image='/src/assets/images/user.jpg'
+            />
 
-                  <div className='mt-4 flex gap-4'>
-                    <p className='text-sm text-gray-500'>2k likes</p>
-                    <p className='text-sm text-gray-500'>510 comments</p>
-                  </div>
-                </div>
-
-                {/* Images */}
-                {false && (
-                  <div className='flex flex-grow justify-end'>
-                    <img
-                      src='/src/assets/images/user.jpg'
-                      alt=''
-                      className='h-32 w-56 rounded-md object-cover'
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className='mt-5 px-4 pb-4'>
-              <div className='flex w-full border-b pb-4'>
-                <div className='basis-80'>
-                  <div className='flex items-center justify-between gap-3'>
-                    <IconProfile />
-                    <span className='text-sm font-medium text-black'>AndreeeHandless</span>
-                    <span className='text-xs font-normal text-gray-300'>2 months ago</span>
-                    <button className='text-xs font-semibold text-blue-500'>Follow</button>
-                  </div>
-
-                  <p className='mt-2 text-sm'>
-                    I'm a software engineer and a serial entrepreneur. I've started and sold
-                    multiple businesses and I'm always looking for new opportunities.
-                  </p>
-                </div>
-
-                <div className='flex flex-grow justify-end'>
-                  <img
-                    src='/src/assets/images/user.jpg'
-                    alt=''
-                    className='h-32 w-56 rounded-md object-cover'
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className='mt-5 px-4 pb-4'>
-              <div className='flex w-full border-b pb-4'>
-                <div className='basis-80'>
-                  <div className='flex items-center justify-between gap-3'>
-                    <IconProfile />
-                    <span className='text-sm font-medium text-black'>AndreeeHandless</span>
-                    <span className='text-xs font-normal text-gray-300'>2 months ago</span>
-                    <button className='text-xs font-semibold text-blue-500'>Follow</button>
-                  </div>
-
-                  <p className='mt-2 text-sm'>
-                    I'm a software engineer and a serial entrepreneur. I've started and sold
-                    multiple businesses and I'm always looking for new opportunities.
-                  </p>
-                </div>
-
-                <div className='flex flex-grow justify-end'>
-                  <img
-                    src='/src/assets/images/user.jpg'
-                    alt=''
-                    className='h-32 w-56 rounded-md object-cover'
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className='mt-5 px-4 pb-4'>
-              <div className='flex w-full border-b pb-4'>
-                <div className='basis-80'>
-                  <div className='flex items-center justify-between gap-3'>
-                    <IconProfile />
-                    <span className='text-sm font-medium text-black'>AndreeeHandless</span>
-                    <span className='text-xs font-normal text-gray-300'>2 months ago</span>
-                    <button className='text-xs font-semibold text-blue-500'>Follow</button>
-                  </div>
-
-                  <p className='mt-2 text-sm'>
-                    I'm a software engineer and a serial entrepreneur. I've started and sold
-                    multiple businesses and I'm always looking for new opportunities.
-                  </p>
-                </div>
-
-                <div className='flex flex-grow justify-end'>
-                  <img
-                    src='/src/assets/images/user.jpg'
-                    alt=''
-                    className='h-32 w-56 rounded-md object-cover'
-                  />
-                </div>
-              </div>
-            </div>
+            <FilterPost
+              username='AndreeeHandless'
+              date='2 months'
+              description={`I'm a software engineer and a serial entrepreneur. I've started and sold
+                    multiple businesses and I'm always looking for new opportunities.`}
+              likes={2000}
+              comments={5000}
+              video='https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4'
+            />
           </div>
 
           <Suggested />
