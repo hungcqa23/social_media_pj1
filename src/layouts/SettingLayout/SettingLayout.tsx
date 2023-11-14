@@ -3,8 +3,8 @@ import { NavLink, Outlet } from 'react-router-dom';
 const Links = [
   { name: 'Edit profile', path: '/accounts/profile' },
   { name: 'Email notification', path: '/accounts/emails' },
-  { name: 'Push notifications', path: '/accounts/notifications' },
-  { name: 'Help', path: '/accounts/help' }
+  { name: 'Push notifications', path: '/accounts/notifications' }
+  // { name: 'Help', path: '/accounts/help' }
 ];
 
 export default function SettingLayout() {
@@ -22,7 +22,7 @@ export default function SettingLayout() {
                 } ml-6 mr-10 rounded-md text-gray-950 hover:bg-gray-200 active:text-gray-500`
               }
             >
-              <p className='p-3 text-sm'>{link.name}</p>
+              <p className='p-3 text-sm font-normal'>{link.name}</p>
             </NavLink>
           ))}
         </div>

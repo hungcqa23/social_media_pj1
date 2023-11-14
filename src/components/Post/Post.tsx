@@ -46,7 +46,6 @@ export default function Post() {
       )}
 
       <div className='border-t border-gray-200 px-4'>
-        <div></div>
         <div className='flex gap-1 p-4'>
           <button className='flex basis-4/12 items-center justify-center rounded p-1 transition-colors hover:bg-gray-100'>
             <span className='pr-2'>

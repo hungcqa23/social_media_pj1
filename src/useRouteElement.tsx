@@ -1,4 +1,4 @@
-import { useRoutes } from 'react-router-dom';
+import { Navigate, Outlet, useRoutes } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AuthLayout from './layouts/AuthLayout';
@@ -14,6 +14,15 @@ import SettingLayout from './layouts/SettingLayout';
 import Profile from './pages/Profile';
 import NotificationBar from './components/NotificationBar';
 import SearchPage from './pages/SearchPage';
+
+const isAuthenticated = true;
+function ProtectedRoute() {
+  return isAuthenticated ? <Outlet /> : <Navigate to='/login' />;
+}
+
+function RejectedRoute() {
+  return !isAuthenticated ? <Outlet /> : <Navigate to='/' />;
+}
 
 export default function useRouteElement() {
   const routeElement = useRoutes([

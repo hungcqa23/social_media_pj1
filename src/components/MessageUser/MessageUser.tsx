@@ -5,7 +5,7 @@ interface Props {
   newMessage?: boolean;
   userAvatar?: string;
 }
-export default function MessageItem({ isActive, newMessage, userAvatar }: Props) {
+export default function MessageUser({ isActive, newMessage, userAvatar }: Props) {
   return (
     <button className='flex w-full items-center px-6 py-3 hover:bg-gray-100'>
       <Profile

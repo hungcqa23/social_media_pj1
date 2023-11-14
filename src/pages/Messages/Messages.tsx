@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import Button from 'src/components/Button';
-import MessageItem from 'src/components/MessageItem';
+import MessageUser from 'src/components/MessageUser';
 
 export default function Messages() {
   return (
@@ -22,17 +22,17 @@ export default function Messages() {
           </div>
           {/* List user messages */}
           <div className='h-[calc(100%-9.5rem)] overflow-y-scroll'>
-            <MessageItem newMessage />
-            <MessageItem isActive />
-            <MessageItem userAvatar='https://images.unsplash.com/photo-1477118476589-bff2c5c4cfbb?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' />
-            <MessageItem />
-            <MessageItem />
-            <MessageItem />
-            <MessageItem />
-            <MessageItem />
-            <MessageItem />
-            <MessageItem />
-            <MessageItem />
+            <MessageUser newMessage />
+            <MessageUser isActive />
+            <MessageUser userAvatar='https://images.unsplash.com/photo-1477118476589-bff2c5c4cfbb?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' />
+            <MessageUser />
+            <MessageUser />
+            <MessageUser />
+            <MessageUser />
+            <MessageUser />
+            <MessageUser />
+            <MessageUser />
+            <MessageUser />
           </div>
         </div>
         <div className='flex flex-grow items-center justify-center bg-white'>
