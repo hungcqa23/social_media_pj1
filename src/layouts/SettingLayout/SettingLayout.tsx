@@ -21,6 +21,7 @@ export default function SettingLayout() {
                   isActive ? 'bg-gray-200 hover:bg-gray-300' : ''
                 } ml-6 mr-10 rounded-md text-gray-950 hover:bg-gray-200 active:text-gray-500`
               }
+              key={link.path}
             >
               <p className='p-3 text-sm font-normal'>{link.name}</p>
             </NavLink>

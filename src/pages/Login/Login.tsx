@@ -1,10 +1,15 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { getRules, schema } from 'src/utils/rules';
+import { schema } from 'src/utils/rules';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import Button from 'src/components/Button';
 import Input from 'src/components/Input';
+import { useMutation } from '@tanstack/react-query';
+import authApi from 'src/apis/auth.api';
+import { useAppContext } from 'src/contexts/app.contexts';
+import { isAxiosUnprocessableEntityError } from 'src/utils/utils';
+import { ErrorResponse } from 'src/types/utils.type';
 
 interface FormData {
   email: string;
@@ -14,20 +19,44 @@ interface FormData {
 const loginSchema = schema.pick(['email', 'password']);
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { setIsAuthenticated } = useAppContext();
+
   const {
     register,
     handleSubmit,
-    getValues,
-    formState: { errors }
+    formState: { errors },
+    setError
   } = useForm<FormData>({
     resolver: yupResolver(loginSchema)
   });
 
-  const rules = getRules();
+  const loginMutation = useMutation({
+    mutationFn: (body: FormData) => authApi.login(body)
+  });
 
   const onSubmit = handleSubmit(data => {
-    console.log(data);
+    loginMutation.mutate(data, {
+      onSuccess: data => {
+        setIsAuthenticated(true);
+        navigate('/');
+      },
+      onError: (error: any) => {
+        if (isAxiosUnprocessableEntityError<ErrorResponse<FormData>>(error)) {
+          const formError = error.response?.data.data;
+          if (formError) {
+            Object.keys(formError).forEach(key => {
+              setError(key as keyof FormData, {
+                message: formError[key as keyof FormData],
+                type: 'Server'
+              });
+            });
+          }
+        }
+      }
+    });
   });
+
   return (
     <div>
       <h1 className='lg:md-10 mb-8 text-center text-4xl font-semibold drop-shadow-font md:text-5xl lg:text-6xl'>

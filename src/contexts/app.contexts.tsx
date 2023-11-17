@@ -1,9 +1,34 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useState } from 'react';
+import { getAccessTokenFromLS } from 'src/utils/auth';
 
-export const AppContext = createContext({});
+interface AppContextInterface {
+  isAuthenticated: boolean;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export const AppProvider = ({ children }: { children: React.ReactNode }) => {
-  return <AppContext.Provider value={{}}>{children}</AppContext.Provider>;
+export const getInitialAppContext = (): AppContextInterface => ({
+  isAuthenticated: Boolean(getAccessTokenFromLS()),
+  setIsAuthenticated: () => null
+});
+
+const initialContext = getInitialAppContext();
+
+export const AppContext = createContext<AppContextInterface>(initialContext);
+
+export const AppProvider = ({
+  children,
+  defaultValue = initialContext
+}: {
+  children: React.ReactNode;
+  defaultValue?: AppContextInterface;
+}) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(defaultValue.isAuthenticated);
+
+  return (
+    <AppContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+      {children}
+    </AppContext.Provider>
+  );
 };
 
 export const useAppContext = () => {
