@@ -41,13 +41,14 @@ export default function Login() {
         setIsAuthenticated(true);
         navigate('/');
       },
+      // Handle error
       onError: (error: any) => {
         if (isAxiosUnprocessableEntityError<ErrorResponse<FormData>>(error)) {
           const formError = error.response?.data.data;
           if (formError) {
             Object.keys(formError).forEach(key => {
               setError(key as keyof FormData, {
-                message: formError[key as keyof FormData],
+                message: 'Invalid data',
                 type: 'Server'
               });
             });

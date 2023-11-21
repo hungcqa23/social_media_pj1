@@ -15,3 +15,7 @@ export const isAxiosUnprocessableEntityError = <FormError>(
   error: unknown
 ): error is AxiosError<FormError> =>
   isAxiosError(error) && error.response?.status === HttpStatusCode.UnprocessableEntity;
+
+export const isActiveRoute = (pathname: string, keyword: string) => {
+  return pathname.split('/')[1] === keyword;
+};

@@ -5,7 +5,7 @@ import Button from 'src/components/Button';
 
 export default function Profile() {
   return (
-    <main className='lg:w-[calc(100%-14rem)]< ml-auto w-[calc(100%-4.5rem)]'>
+    <main className='ml-auto w-[calc(100%-4.5rem)] lg:w-[calc(100%-14rem)]'>
       <div className='mx-auto max-w-4xl px-5 pt-8'>
         <header className='flex min-w-fit border-b border-gray-300 pb-10'>
           <div className='my-6 flex flex-grow justify-center'>

@@ -1,10 +1,16 @@
 import { useRef, useState } from 'react';
 import Profile from '../IconProfile';
+import ReactDOM from 'react-dom';
 
 interface Props {
   toggleModal: () => void;
 }
 export default function Modal({ toggleModal }: Props) {
+  // return ReactDOM.createPortal(
+  //   <div>Hello World!</div>,
+  //   document.querySelector('.modal') as HTMLElement
+  // );
+
   const [value, setValue] = useState<string>('');
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -45,7 +51,7 @@ export default function Modal({ toggleModal }: Props) {
           <div className='flex h-[calc(100%-3.5rem)] flex-col justify-between'>
             <div>
               <div className='mx-4 flex py-3'>
-                <Profile to='/profile' className='mr-2' />
+                <Profile to='/profile' className='mr-2 h-11 w-11' />
                 <div>
                   <div>
                     <span className='font-semibold'>An Hưng</span>

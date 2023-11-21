@@ -1,13 +1,15 @@
-import { Link, NavLink, useMatch } from 'react-router-dom';
+import { Link, useLocation, matchPath } from 'react-router-dom';
 import { iconsSvg } from 'src/constants/icons';
 import ButtonNav from '../ButtonNav/ButtonNav';
-import MainLayout from 'src/layouts/MainLayout';
+import { isActiveRoute } from 'src/utils/utils';
 
 interface Props {
   classNameNav?: string;
 }
 export default function Navigation(props: Props) {
-  const openMessages = useMatch('/messages') !== null;
+  const location = useLocation();
+  const openMessages = isActiveRoute(location.pathname, 'messages');
+
   const {
     classNameNav = `w-17 border-r ${
       !openMessages ? 'lg:w-56' : ''
@@ -15,7 +17,7 @@ export default function Navigation(props: Props) {
   } = props;
 
   const Links = [
-    { name: 'house', to: '/', svg: iconsSvg.house, svgActive: iconsSvg.houseFilled },
+    { name: 'Home', to: '/', svg: iconsSvg.house, svgActive: iconsSvg.houseFilled },
     {
       name: 'Search',
       to: '/search?type=posts',

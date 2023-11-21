@@ -1,5 +1,7 @@
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
+import authApi from 'src/apis/auth.api';
 import Button from 'src/components/Button';
 import Input from 'src/components/Input';
 import { getRules } from 'src/utils/rules';
@@ -20,11 +22,13 @@ export default function Register() {
   } = useForm<FormData>();
 
   const rules = getRules(getValues);
+  const signUpMutation = useMutation({
+    mutationFn: (body: FormData) => authApi.registerAccount(body)
+  });
 
   const onSubmit = handleSubmit(
     data => {
-      console.log(getValues());
-      console.log(data);
+      signUpMutation.mutate(data);
     },
     data => {
       console.log(data);

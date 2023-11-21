@@ -1,5 +1,6 @@
-import { NavLink, ParamParseKey, Path, useMatch } from 'react-router-dom';
+import { NavLink, ParamParseKey, Path, useLocation, useMatch } from 'react-router-dom';
 import { useState } from 'react';
+import { isActiveRoute } from 'src/utils/utils';
 
 interface Props {
   svg: string;
@@ -36,11 +37,14 @@ export default function ButtonNav(props: Props) {
   } = props;
   const [isHover, setIsHover] = useState(false);
 
-  type ParamKeys = 'type' | 'id';
-  const match = useMatch<ParamKeys, string>('/:type');
+  // type ParamKeys = 'type' | 'id';
+  // const match = useMatch<ParamKeys, string>('/:type');
+  // const first = useLocation().pathname.split('/')[1] === 'messages';
+  // console.log(first);
+  const pathname = useLocation().pathname;
+
   const isActive =
-    match?.params.type === text.toLowerCase() ||
-    (match?.params.type === undefined && text === 'house');
+    isActiveRoute(pathname, text.toLowerCase()) || (text === 'Home' && pathname === '/');
 
   if (shorten) {
     lgNavLink = '';

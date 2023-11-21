@@ -3,7 +3,8 @@ import { NavLink, Outlet } from 'react-router-dom';
 const Links = [
   { name: 'Edit profile', path: '/accounts/profile' },
   { name: 'Email notification', path: '/accounts/emails' },
-  { name: 'Push notifications', path: '/accounts/notifications' }
+  { name: 'Push notifications', path: '/accounts/notifications' },
+  { name: 'Who can see your fucking content', path: '/accounts/who_can_see_your_content' }
   // { name: 'Help', path: '/accounts/help' }
 ];
 

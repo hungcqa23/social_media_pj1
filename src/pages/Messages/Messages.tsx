@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import Button from 'src/components/Button';
 import MessageUser from 'src/components/MessageUser';
+import { Outlet } from 'react-router-dom';
 
 export default function Messages() {
   return (
@@ -35,12 +36,8 @@ export default function Messages() {
             <MessageUser />
           </div>
         </div>
-        <div className='flex flex-grow items-center justify-center bg-white'>
-          <div className='flex flex-col items-center justify-center gap-2'>
-            <p className='text-3xl font-medium text-gray-950'>SEND MESSAGES FREE. NO CENSORSHIP</p>
-            <p className='font-regular text-base text-gray-400'>Feel free to send messages!!!</p>
-          </div>
-        </div>
+
+        <div className='flex-grow bg-white'>{<Outlet />}</div>
       </div>
     </>
   );

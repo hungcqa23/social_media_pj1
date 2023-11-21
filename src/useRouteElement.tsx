@@ -1,19 +1,26 @@
 import { Navigate, Outlet, useRoutes } from 'react-router-dom';
+import path from './constants/path';
+
 import Login from './pages/Login';
 import Register from './pages/Register';
-import AuthLayout from './layouts/AuthLayout';
 import ForgotPassword from './pages/Forgot Password';
 import ResetPassword from './pages/ResetPassword';
 import EmailSetting from './pages/EmailSetting';
 import NotFound from './pages/NotFound';
-import MainLayout from './layouts/MainLayout';
 import Messages from './pages/Messages';
 import Main from './pages/Main';
 import EditProfile from './pages/EditProfile';
-import SettingLayout from './layouts/SettingLayout';
 import Profile from './pages/Profile';
-import NotificationBar from './components/NotificationBar';
 import SearchPage from './pages/SearchPage';
+import YourContent from './pages/YourContent';
+
+import NotificationBar from './components/NotificationBar';
+
+import MainLayout from './layouts/MainLayout';
+import SettingLayout from './layouts/SettingLayout';
+import AuthLayout from './layouts/AuthLayout';
+import Slogan from './components/Slogan';
+import Conversation from './components/Conversation';
 
 const isAuthenticated = true;
 function ProtectedRoute() {
@@ -30,15 +37,25 @@ export default function useRouteElement() {
       element: <MainLayout />,
       children: [
         {
-          path: '/',
+          path: path.home,
           element: <Main />
         },
         {
-          path: 'messages',
-          element: <Messages />
+          path: path.messages,
+          element: <Messages />,
+          children: [
+            {
+              element: <Slogan />,
+              index: true
+            },
+            {
+              path: ':id',
+              element: <Conversation />
+            }
+          ]
         },
         {
-          path: 'profile',
+          path: path.profile,
           element: <Profile />
         },
         {
@@ -72,6 +89,10 @@ export default function useRouteElement() {
             {
               path: 'emails',
               element: <EmailSetting />
+            },
+            {
+              path: path.who_can_see_your_content,
+              element: <YourContent />
             }
           ]
         }
@@ -81,20 +102,20 @@ export default function useRouteElement() {
       element: <AuthLayout />,
       children: [
         {
-          path: '/login',
+          path: path.login,
           element: <Login />
           // action: loginAction
         },
         {
-          path: '/sign-up',
+          path: path.register,
           element: <Register />
         },
         {
-          path: '/forgot-password',
+          path: path.forgot_password,
           element: <ForgotPassword />
         },
         {
-          path: '/reset-password',
+          path: path.reset_password,
           element: <ResetPassword />
         }
       ]

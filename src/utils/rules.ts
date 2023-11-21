@@ -2,9 +2,16 @@ import { RegisterOptions, UseFormGetValues } from 'react-hook-form';
 import { object, InferType, ref } from 'yup';
 import * as yup from 'yup';
 
-type Rules = {
-  [key in 'email' | 'password' | 'confirmPassword' | 'username']?: RegisterOptions;
-};
+// type Rules = {
+//   [key in 'email' | 'password' | 'confirmPassword' | 'username']?: RegisterOptions;
+// };
+//Convert Rules type to interface
+export interface Rules {
+  email?: RegisterOptions;
+  password?: RegisterOptions;
+  confirmPassword?: RegisterOptions;
+  username?: RegisterOptions;
+}
 
 export const getRules = (getValues?: UseFormGetValues<any>): Rules => ({
   username: {
@@ -98,4 +105,7 @@ export const schema = object({
     .oneOf([ref('password')], 'Password confirm do not match')
 });
 
-const loginSchema = schema.omit(['confirmPassword', 'username']);
+export interface Schema extends InferType<typeof schema> {}
+
+//Make rulesType to interface
+interface rulesType extends Pick<Schema, 'password' | 'confirmPassword'> {}
