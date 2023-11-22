@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import IconProfile from '../IconProfile';
+import { calculateTextWidth } from 'src/utils/utils';
 
 export default function Conversation() {
   const [value, setValue] = useState<string>('');
@@ -12,46 +13,19 @@ export default function Conversation() {
   const fontSizeTextArea = 14;
   const originalHeight = 24;
 
-  const calculateTextWidth = (elementRef: React.RefObject<HTMLTextAreaElement>) => {
-    if (!elementRef?.current) {
-      return;
-    }
-    const text = elementRef.current.value;
-
-    // Create a temporary element to measure the width
-    const tempElement = document.createElement('div');
-    tempElement.style.position = 'absolute';
-    tempElement.style.visibility = 'hidden';
-    tempElement.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
-    tempElement.innerText = text;
-
-    // Append the temporary element to the body
-    document.body.appendChild(tempElement);
-
-    // Get the width of the temporary element
-    const textWidth = tempElement.getBoundingClientRect().width;
-
-    // Remove the temporary element
-    document.body.removeChild(tempElement);
-
-    console.log('Width of text:', textWidth);
-  };
-
   const onTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
     if (textareaRef.current) {
       if (textareaRef.current) {
-        // const newHeight = Math.min(maxTextAreaHeight, textareaRef.current.scrollHeight);
+        // Check if it's only 1 line
+        const textAreaWidth = textareaRef.current.clientWidth;
+        const textWidth = calculateTextWidth(textareaRef);
+        if ((textWidth || 0) < textAreaWidth) {
+          return (textareaRef.current.style.height = `${originalHeight}px`);
+        }
+
         // Calculate the new height
         const newHeight = Math.min(maxTextAreaHeight, textareaRef.current.scrollHeight);
-        const textCurrentWidth = fontSizeTextArea * value.length;
-        console.log(calculateTextWidth(textareaRef));
-        console.log(textCurrentWidth);
-
-        // if (textAreaWidth < textCurrentWidth) {
-        //   return (textareaRef.current.style.height = `${originalHeight}px`);
-        // }
-
         // Set the new height to the textarea
         textareaRef.current.style.height = `${newHeight}px`;
 

@@ -67,7 +67,6 @@ export default function Login() {
       <form onSubmit={onSubmit} className='flex flex-col gap-4' noValidate>
         <div className='flex flex-col'>
           <Input
-            autoFocus={true}
             placeholder='Email'
             type='email'
             name='email'
@@ -98,7 +97,7 @@ export default function Login() {
       </form>
 
       <p className='mt-10 text-center text-sm font-medium text-gray-500 md:text-base'>
-        Don't have an account?{' '}
+        Don&apos;t have an account?
         <Link
           to={'/sign-up'}
           className='text-sm font-normal italic text-black hover:underline md:text-base md:font-semibold'

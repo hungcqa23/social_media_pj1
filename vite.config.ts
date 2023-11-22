@@ -7,10 +7,6 @@ import { PluginOption } from 'vite';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), visualizer() as PluginOption],
-  test: {
-    environment: 'jsdom',
-    setupFiles: path.resolve(__dirname, './vitest.setup.js')
-  },
   server: {
     port: 3000
   },

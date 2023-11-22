@@ -10,7 +10,12 @@ const path = {
   messages: 'messages',
   who_can_see_your_content: 'who_can_see_your_content',
   forgot_password: 'forgot-password',
-  reset_password: 'reset-password'
+  reset_password: 'reset-password',
+  notifications: 'notifications',
+  search: 'search',
+  accounts: 'accounts',
+  emails: 'emails',
+  all: '*'
 } as const;
 
 export default path;

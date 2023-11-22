@@ -22,108 +22,122 @@ import AuthLayout from './layouts/AuthLayout';
 import Slogan from './components/Slogan';
 import Conversation from './components/Conversation';
 
-const isAuthenticated = true;
+const isAuthenticated = false;
 function ProtectedRoute() {
+  console.log('Hello protected');
   return isAuthenticated ? <Outlet /> : <Navigate to='/login' />;
 }
 
 function RejectedRoute() {
+  console.log('Hello rejected');
   return !isAuthenticated ? <Outlet /> : <Navigate to='/' />;
 }
 
 export default function useRouteElement() {
   const routeElement = useRoutes([
+    // Main Layout
     {
-      element: <MainLayout />,
+      element: <ProtectedRoute />,
       children: [
         {
-          path: path.home,
-          element: <Main />
-        },
-        {
-          path: path.messages,
-          element: <Messages />,
+          element: <MainLayout />,
           children: [
             {
-              element: <Slogan />,
-              index: true
+              path: path.home,
+              element: <Main />
             },
             {
-              path: ':id',
-              element: <Conversation />
-            }
-          ]
-        },
-        {
-          path: path.profile,
-          element: <Profile />
-        },
-        {
-          path: 'notifications',
-          element: <NotificationBar />
-        },
-        {
-          path: 'search',
-          element: <SearchPage />
-        },
-        {
-          path: 'accounts',
-          element: <SettingLayout />,
-          children: [
-            {
-              index: true,
-              element: (
-                <h1 className='flex flex-grow items-center justify-center uppercase tracking-widest text-gray-500'>
-                  404 | Not Found
-                </h1>
-              )
+              path: path.messages,
+              element: <Messages />,
+              children: [
+                {
+                  element: <Slogan />,
+                  index: true
+                },
+                {
+                  path: ':id',
+                  element: <Conversation />
+                }
+              ]
             },
             {
-              path: 'notifications',
-              element: <EmailSetting />
+              path: path.profile,
+              element: <Profile />
             },
             {
-              path: 'profile',
-              element: <EditProfile />
+              path: path.notifications,
+              element: <NotificationBar />
             },
             {
-              path: 'emails',
-              element: <EmailSetting />
+              path: path.search,
+              element: <SearchPage />
             },
             {
-              path: path.who_can_see_your_content,
-              element: <YourContent />
+              path: path.accounts,
+              element: <SettingLayout />,
+              children: [
+                {
+                  index: true,
+                  element: (
+                    <h1 className='flex flex-grow items-center justify-center uppercase tracking-widest text-gray-500'>
+                      404 | Not Found
+                    </h1>
+                  )
+                },
+                {
+                  path: path.notifications,
+                  element: <EmailSetting />
+                },
+                {
+                  path: path.profile,
+                  element: <EditProfile />
+                },
+                {
+                  path: path.emails,
+                  element: <EmailSetting />
+                },
+                {
+                  path: path.who_can_see_your_content,
+                  element: <YourContent />
+                }
+              ]
             }
           ]
         }
       ]
     },
     {
-      element: <AuthLayout />,
+      element: <RejectedRoute />,
       children: [
         {
-          path: path.login,
-          element: <Login />
-          // action: loginAction
-        },
-        {
-          path: path.register,
-          element: <Register />
-        },
-        {
-          path: path.forgot_password,
-          element: <ForgotPassword />
-        },
-        {
-          path: path.reset_password,
-          element: <ResetPassword />
+          element: <AuthLayout />,
+          children: [
+            {
+              path: path.login,
+              element: <Login />
+              // action: loginAction
+            },
+            {
+              path: path.register,
+              element: <Register />
+            },
+            {
+              path: path.forgot_password,
+              element: <ForgotPassword />
+            },
+            {
+              path: path.reset_password,
+              element: <ResetPassword />
+            }
+          ]
         }
       ]
     },
+
     // Handle Not Found page
     {
       element: <NotFound />,
-      path: '*'
+      path: path.all
     }
   ]);
 

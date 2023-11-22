@@ -105,7 +105,9 @@ export const schema = object({
     .oneOf([ref('password')], 'Password confirm do not match')
 });
 
-export interface Schema extends InferType<typeof schema> {}
+export interface Schema extends InferType<typeof schema> {
+  confirmPassword: string;
+}
 
 //Make rulesType to interface
-interface rulesType extends Pick<Schema, 'password' | 'confirmPassword'> {}
+// export interface rulesType extends Pick<Schema, 'password' | 'confirmPassword'> {}
