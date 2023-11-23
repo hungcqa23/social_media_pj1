@@ -15,7 +15,8 @@ const path = {
   search: 'search',
   accounts: 'accounts',
   emails: 'emails',
-  all: '*'
+  all: '*',
+  messsageId: ':id'
 } as const;
 
 export default path;

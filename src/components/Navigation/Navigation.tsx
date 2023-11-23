@@ -1,4 +1,4 @@
-import { Link, useLocation, matchPath } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { iconsSvg } from 'src/constants/icons';
 import ButtonNav from '../ButtonNav/ButtonNav';
 import { isActiveRoute } from 'src/utils/utils';
@@ -81,6 +81,7 @@ export default function Navigation(props: Props) {
           text='More'
           shorten={openMessages}
           svgActive={iconsSvg.moreFilled}
+          isButton
         />
       </div>
     </nav>

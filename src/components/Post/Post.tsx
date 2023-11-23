@@ -140,7 +140,7 @@ export default function Post() {
       {comments.length >= 0 &&
         comments.map(comment => {
           return (
-            <div className='px-4 py-2'>
+            <div className='px-4 py-2' key={comment}>
               <div className='flex gap-2'>
                 <Profile className='h-8 w-8 flex-shrink-0' classNameImage='h-8 w-8' />
                 <div className='flex max-w-fit flex-grow flex-col overflow-y-hidden rounded-2xl bg-gray-100 p-2 text-sm'>

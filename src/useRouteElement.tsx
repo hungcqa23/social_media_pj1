@@ -22,19 +22,44 @@ import AuthLayout from './layouts/AuthLayout';
 import Slogan from './components/Slogan';
 import Conversation from './components/Conversation';
 
-const isAuthenticated = false;
+const isAuthenticated = true;
 function ProtectedRoute() {
-  console.log('Hello protected');
   return isAuthenticated ? <Outlet /> : <Navigate to='/login' />;
 }
 
 function RejectedRoute() {
-  console.log('Hello rejected');
   return !isAuthenticated ? <Outlet /> : <Navigate to='/' />;
 }
 
 export default function useRouteElement() {
   const routeElement = useRoutes([
+    {
+      element: <RejectedRoute />,
+      children: [
+        {
+          element: <AuthLayout />,
+          children: [
+            {
+              path: path.login,
+              element: <Login />
+              // action: loginAction
+            },
+            {
+              path: path.register,
+              element: <Register />
+            },
+            {
+              path: path.forgot_password,
+              element: <ForgotPassword />
+            },
+            {
+              path: path.reset_password,
+              element: <ResetPassword />
+            }
+          ]
+        }
+      ]
+    },
     // Main Layout
     {
       element: <ProtectedRoute />,
@@ -101,33 +126,6 @@ export default function useRouteElement() {
                   element: <YourContent />
                 }
               ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      element: <RejectedRoute />,
-      children: [
-        {
-          element: <AuthLayout />,
-          children: [
-            {
-              path: path.login,
-              element: <Login />
-              // action: loginAction
-            },
-            {
-              path: path.register,
-              element: <Register />
-            },
-            {
-              path: path.forgot_password,
-              element: <ForgotPassword />
-            },
-            {
-              path: path.reset_password,
-              element: <ResetPassword />
             }
           ]
         }
