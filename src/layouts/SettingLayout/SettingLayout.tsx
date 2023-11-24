@@ -11,7 +11,7 @@ const Links = [
 export default function SettingLayout() {
   return (
     <div className='ml-[4.5rem] flex lg:ml-56'>
-      <nav className='flex h-screen w-72 min-w-fit  flex-col border-r'>
+      <nav className='flex h-screen w-72 min-w-fit flex-col border-r'>
         <p className='mb-2 ml-9 mr-12 mt-10 text-xl font-bold text-black'>Settings</p>
         <div className='flex flex-col gap-1'>
           {Links.map(link => (
@@ -30,7 +30,7 @@ export default function SettingLayout() {
         </div>
       </nav>
 
-      <div className='h-screen flex-grow px-6 py-5'>
+      <div className='h-screen flex-grow px-10 py-10'>
         <Outlet />
       </div>
     </div>

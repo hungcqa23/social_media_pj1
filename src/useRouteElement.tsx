@@ -1,9 +1,9 @@
-import { Navigate, Outlet, useRoutes } from 'react-router-dom';
+import { Navigate, Outlet, type RouteObject, useRoutes } from 'react-router-dom';
 import path from './constants/path';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
-import ForgotPassword from './pages/Forgot Password';
+import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import EmailSetting from './pages/EmailSetting';
 import NotFound from './pages/NotFound';
@@ -19,17 +19,40 @@ import NotificationBar from './components/NotificationBar';
 import MainLayout from './layouts/MainLayout';
 import SettingLayout from './layouts/SettingLayout';
 import AuthLayout from './layouts/AuthLayout';
+
 import Slogan from './components/Slogan';
 import Conversation from './components/Conversation';
 
-const isAuthenticated = true;
+import { useAppContext } from './contexts/app.contexts';
+import BlockedAccount from './pages/BlockedAccount';
 function ProtectedRoute() {
+  const { isAuthenticated } = useAppContext();
   return isAuthenticated ? <Outlet /> : <Navigate to='/login' />;
 }
 
 function RejectedRoute() {
+  const { isAuthenticated } = useAppContext();
   return !isAuthenticated ? <Outlet /> : <Navigate to='/' />;
 }
+
+const AuthRouteChildren: RouteObject[] = [
+  {
+    path: path.login,
+    element: <Login />
+  },
+  {
+    path: path.register,
+    element: <Register />
+  },
+  {
+    path: path.forgot_password,
+    element: <ForgotPassword />
+  },
+  {
+    path: path.reset_password,
+    element: <ResetPassword />
+  }
+];
 
 export default function useRouteElement() {
   const routeElement = useRoutes([
@@ -38,25 +61,7 @@ export default function useRouteElement() {
       children: [
         {
           element: <AuthLayout />,
-          children: [
-            {
-              path: path.login,
-              element: <Login />
-              // action: loginAction
-            },
-            {
-              path: path.register,
-              element: <Register />
-            },
-            {
-              path: path.forgot_password,
-              element: <ForgotPassword />
-            },
-            {
-              path: path.reset_password,
-              element: <ResetPassword />
-            }
-          ]
+          children: AuthRouteChildren
         }
       ]
     },
@@ -124,6 +129,10 @@ export default function useRouteElement() {
                 {
                   path: path.who_can_see_your_content,
                   element: <YourContent />
+                },
+                {
+                  path: path.blocked_accounts,
+                  element: <BlockedAccount />
                 }
               ]
             }
@@ -131,7 +140,6 @@ export default function useRouteElement() {
         }
       ]
     },
-
     // Handle Not Found page
     {
       element: <NotFound />,

@@ -30,7 +30,7 @@ export default function Modal({ toggleModal }: Props) {
   return (
     <div className='fixed inset-0 h-screen w-screen'>
       <div className='relative h-full w-full'>
-        <div className='absolute inset-0 bg-slate-100 opacity-80' onClick={toggleModal}></div>
+        {/* <div className='absolute inset-0 bg-slate-100 opacity-80' onClick={toggleModal}></div> */}
         <form className='absolute left-1/2 top-1/2 mx-auto h-[30rem] w-[33rem] translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white shadow'>
           <div className='relative flex h-14 items-center justify-center border-b p-5'>
             <div className='text-xl font-bold text-black'>Create post</div>

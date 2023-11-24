@@ -1,31 +1,19 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { isActiveRoute } from 'src/utils/utils';
-import {
-  FloatingPortal,
-  autoUpdate,
-  offset,
-  shift,
-  useClick,
-  useFloating,
-  useInteractions,
-  arrow,
-  FloatingArrow,
-  useHover
-} from '@floating-ui/react';
-import { iconsSvg } from 'src/constants/icons';
 
 interface Props {
   svg: string;
-  svgActive: string;
+  svgActive?: string;
   text: string;
-  to: string;
+  to?: string;
   shorten?: boolean;
   isProfile?: boolean;
   className?: string;
   isButton?: boolean;
   classNameButton?: string;
   classNameText?: string;
+  onClick?: () => void;
 }
 
 export default function ButtonNav(props: Props) {
@@ -33,12 +21,18 @@ export default function ButtonNav(props: Props) {
   let lgImg = 'lg:ml-2 lg:w-6';
   let lgP = 'lg:block lg:font-medium lg:ml-2';
 
+  const { shorten } = props;
+  if (shorten) {
+    lgNavLink = '';
+    lgImg = '';
+    lgP = '';
+  }
+
   const {
     svg,
     text,
-    to,
+    to = '/',
     svgActive,
-    shorten,
     isProfile,
     classNameText,
     className = ({ isActive }: { isActive: boolean }) =>
@@ -48,7 +42,8 @@ export default function ButtonNav(props: Props) {
     classNameButton = `flex h-12 w-12 items-center 
     justify-center gap rounded-lg 
     transition-all hover:bg-gray-200 ${lgNavLink} active:bg-gray-100`,
-    isButton
+    isButton,
+    onClick
   } = props;
   const [isHover, setIsHover] = useState(false);
 
@@ -56,26 +51,6 @@ export default function ButtonNav(props: Props) {
 
   const isActive =
     isActiveRoute(pathname, text.toLowerCase()) || (text === 'Home' && pathname === '/');
-
-  if (shorten) {
-    lgNavLink = '';
-    lgImg = '';
-    lgP = '';
-  }
-
-  // Test Floating UI
-  const [isOpen, setIsOpen] = useState(false);
-  const arrowRef = useRef(null);
-  const { refs, floatingStyles, context } = useFloating({
-    placement: 'top',
-    open: isOpen,
-    whileElementsMounted: autoUpdate,
-    onOpenChange: setIsOpen,
-    middleware: [shift(), offset(5), arrow({ element: arrowRef })]
-  });
-  const click = useClick(context);
-  const hover = useHover(context);
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, hover]);
 
   return (
     <>
@@ -85,8 +60,7 @@ export default function ButtonNav(props: Props) {
             className={classNameButton}
             onMouseEnter={() => setIsHover(true)}
             onMouseLeave={() => setIsHover(false)}
-            ref={refs.setReference}
-            {...getReferenceProps()}
+            onClick={onClick}
           >
             <div
               className={`${isHover && 'scale-105'} ${
@@ -100,30 +74,6 @@ export default function ButtonNav(props: Props) {
               />
             </div>
             <p className={`hidden ${lgP}`}>{text}</p>
-
-            {/* test floating modal */}
-            <FloatingPortal>
-              {isOpen && (
-                <div
-                  ref={refs.setFloating}
-                  style={floatingStyles}
-                  className='rounded-lg bg-white p-2 shadow-[0px_0px_10px_0px_rgba(0,0,0,0.25)]'
-                  {...getFloatingProps()}
-                >
-                  <FloatingArrow
-                    ref={arrowRef}
-                    context={context}
-                    width={10}
-                    fill='white'
-                    staticOffset={'10%'}
-                  />
-                  <ButtonNav svg={iconsSvg.saved} svgActive='' text='Saved' to='/' />
-                  <div className='w-full border-t'>
-                    <ButtonNav svg={iconsSvg.more} svgActive='' text='Log out' to='/' isButton />
-                  </div>
-                </div>
-              )}
-            </FloatingPortal>
           </button>
         </>
       ) : (

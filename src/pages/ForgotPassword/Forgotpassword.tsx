@@ -28,7 +28,7 @@ export default function ForgotPassword() {
       </h1>
 
       <p className='mb-4 text-sm md:text-base'>
-        Enter the email address you used and we'll send you code to reset your password.
+        Enter the email address you used and we&apos;ll send you code to reset your password.
       </p>
 
       <form className='flex flex-col gap-4  self-center' onSubmit={onSubmit} noValidate>

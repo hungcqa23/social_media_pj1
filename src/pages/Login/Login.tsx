@@ -10,6 +10,7 @@ import authApi from 'src/apis/auth.api';
 import { useAppContext } from 'src/contexts/app.contexts';
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils';
 import { ErrorResponse } from 'src/types/utils.type';
+import { setAccessTokenToLS, setRefreshTokenToLS } from 'src/utils/auth';
 
 interface FormData {
   email: string;
@@ -20,6 +21,7 @@ const loginSchema = schema.pick(['email', 'password']);
 
 export default function Login() {
   const navigate = useNavigate();
+
   const { setIsAuthenticated } = useAppContext();
 
   const {
@@ -38,11 +40,13 @@ export default function Login() {
   const onSubmit = handleSubmit(data => {
     loginMutation.mutate(data, {
       onSuccess: data => {
+        setAccessTokenToLS(data.data?.data?.access_token as string);
+        setRefreshTokenToLS(data.data?.data?.refresh_token as string);
         setIsAuthenticated(true);
         navigate('/');
       },
       // Handle error
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         if (isAxiosUnprocessableEntityError<ErrorResponse<FormData>>(error)) {
           const formError = error.response?.data.data;
           if (formError) {

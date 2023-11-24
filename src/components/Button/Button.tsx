@@ -17,9 +17,10 @@ export default function Button(props: ButtonProps) {
   } = props;
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const queryStr = useQueryString()?.type;
 
   if (typeButton === 'filter') {
-    const isMatch = useQueryString()?.type === rest.value;
+    const isMatch = queryStr === rest.value;
     const handleClick = (type: string) => {
       searchParams.set('type', type);
       setSearchParams(searchParams);

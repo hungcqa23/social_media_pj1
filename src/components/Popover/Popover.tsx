@@ -9,7 +9,7 @@ import {
   autoUpdate,
   useClick,
   useInteractions,
-  useFocus
+  offset
 } from '@floating-ui/react';
 import { motion } from 'framer-motion';
 import { ElementType, useId, useRef, useState } from 'react';
@@ -26,7 +26,7 @@ export default function Popover({
   children,
   hasArrow,
   className,
-  as,
+  as: Element = 'div',
   renderPopover,
   placement = 'top'
 }: Props) {
@@ -35,44 +35,37 @@ export default function Popover({
 
   const arrowRef = useRef<SVGSVGElement>(null);
 
-  const data = useFloating({
+  const { refs, floatingStyles, context } = useFloating({
     open,
     onOpenChange: setOpen,
-    middleware: [shift(), flip(), arrow({ element: arrowRef })],
     placement,
-    whileElementsMounted: autoUpdate
+    transform: false,
+    whileElementsMounted: autoUpdate,
+    middleware: [shift(), flip(), arrow({ element: arrowRef }), offset(5)]
   });
 
-  const { refs, floatingStyles, context } = data;
-
   const click = useClick(context);
-  const focus = useFocus(context);
-
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, focus]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([click]);
 
   return (
-    <FloatingPortal id={id}>
-      {hasArrow && (
-        <FloatingArrow
-          ref={arrowRef}
-          context={context}
-          width={10}
-          fill='white'
-          staticOffset={'10%'}
-        />
-      )}
+    <Element {...getReferenceProps()} ref={refs.setReference} className={className}>
+      {children}
       {open && (
-        <motion.div
-          {...getFloatingProps()}
-          ref={refs.setReference}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          style={floatingStyles}
-        >
-          {children}
-        </motion.div>
+        <FloatingPortal id={id}>
+          <div {...getFloatingProps()} ref={refs.setFloating} style={floatingStyles}>
+            {hasArrow && (
+              <FloatingArrow
+                ref={arrowRef}
+                context={context}
+                width={10}
+                fill='white'
+                staticOffset={'10%'}
+              />
+            )}
+            {renderPopover}
+          </div>
+        </FloatingPortal>
       )}
-    </FloatingPortal>
+    </Element>
   );
 }

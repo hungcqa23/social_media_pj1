@@ -9,7 +9,7 @@ interface Props {
 }
 export default function IconProfile(props: Props) {
   const {
-    className = 'h-11 w-11 block',
+    className = 'h-11 w-11',
     classNameImage = 'h-full w-full',
     src = '/src/assets/images/user.jpg',
     to = '/',

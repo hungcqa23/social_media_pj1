@@ -51,18 +51,11 @@ export default function EmailSetting() {
     }));
   };
 
-  const Links = [
-    { name: 'Edit profile', path: '/accounts/profile' },
-    { name: 'Email notification', path: '/accounts/emails' },
-    { name: 'Push notifications', path: '/accounts/notifications' },
-    { name: 'Help', path: '/accounts/help' }
-  ];
-
   return (
     <>
       <h1 className='mb-5 text-xl font-normal'>Push Notifications</h1>
 
-      <div className='flex flex-col gap-3'>
+      <div className='flex flex-col gap-3 font-normal'>
         <div className='flex justify-between'>
           <label>Switch to {isAllChecked ? 'off' : 'on'} all</label>
           <Switch
@@ -72,8 +65,8 @@ export default function EmailSetting() {
           />
         </div>
 
-        {inputObjs.map(inputObj => (
-          <div className='flex w-1/2 justify-between'>
+        {inputObjs.map((inputObj, index) => (
+          <div className='flex w-1/2 justify-between' key={index}>
             <label htmlFor={inputObj.id}>{inputObj.label}</label>
             <Switch
               checked={individualSwitches[inputObj.id]}

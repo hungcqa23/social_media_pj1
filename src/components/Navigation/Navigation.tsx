@@ -2,6 +2,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { iconsSvg } from 'src/constants/icons';
 import ButtonNav from '../ButtonNav/ButtonNav';
 import { isActiveRoute } from 'src/utils/utils';
+import Popover from '../Popover';
+import { useMutation } from '@tanstack/react-query';
+import authApi from 'src/apis/auth.api';
+import { useAppContext } from 'src/contexts/app.contexts';
+import { clearLS } from 'src/utils/auth';
 
 interface Props {
   classNameNav?: string;
@@ -9,6 +14,23 @@ interface Props {
 export default function Navigation(props: Props) {
   const location = useLocation();
   const openMessages = isActiveRoute(location.pathname, 'messages');
+
+  const { setIsAuthenticated } = useAppContext();
+
+  const logoutMutation = useMutation({
+    mutationFn: authApi.logout,
+    onSuccess: () => {
+      setIsAuthenticated(false);
+    },
+    onError: () => {
+      window.location.reload();
+      clearLS();
+    }
+  });
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
 
   const {
     classNameNav = `w-17 border-r ${
@@ -75,14 +97,31 @@ export default function Navigation(props: Props) {
           ))}
         </div>
 
-        <ButtonNav
-          to='/more'
-          svg={iconsSvg.more}
-          text='More'
-          shorten={openMessages}
-          svgActive={iconsSvg.moreFilled}
-          isButton
-        />
+        <Popover
+          hasArrow={false}
+          placement='top-start'
+          renderPopover={
+            <div className='rounded-lg bg-white shadow-[0_0_10px_rgba(0,0,0,0.25)]'>
+              <div className='p-2'>
+                <ButtonNav text='Setting' svg={iconsSvg.setting} to='/accounts/profile' />
+                {/* <ButtonNav isButton text='Your activity' /> */}
+                <ButtonNav isButton text='Saved' svg={iconsSvg.saved} />
+              </div>
+              <div className='flex w-full justify-center border-t py-2'>
+                <ButtonNav isButton text='Log out' svg={iconsSvg.logout} onClick={handleLogout} />
+              </div>
+            </div>
+          }
+          className='w-max'
+        >
+          <ButtonNav
+            svg={iconsSvg.more}
+            text='More'
+            shorten={openMessages}
+            svgActive={iconsSvg.moreFilled}
+            isButton
+          />
+        </Popover>
       </div>
     </nav>
   );

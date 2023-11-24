@@ -40,8 +40,8 @@ export default function Profile() {
 
             <p className='mt-5 text-sm font-medium text-black'>An Hưng</p>
 
-            <p className='mt-4 max-w-[20rem] whitespace-pre-wrap'>
-              𝑺𝒉𝒂𝒍𝒍 𝑰 𝒄𝒐𝒎𝒑𝒂𝒓𝒆 𝒚𝒐𝒖 𝒕𝒐 𝒂 𝒔𝒖𝒎𝒎𝒆𝒓’𝒔 𝒅𝒂𝒚 𝑻𝒉𝒐𝒖 𝒂𝒓𝒕 𝒎𝒐𝒓𝒆 𝒍𝒐𝒗𝒆𝒍𝒚 𝒂𝒏𝒅 𝒎𝒐𝒓𝒆 𝒕𝒆𝒎𝒑𝒆𝒓𝒂𝒕𝒆.
+            <p className='mt-4 max-w-[22rem] whitespace-pre-wrap text-black'>
+              𝑺𝒉𝒂𝒍𝒍 𝑰 𝒄𝒐𝒎𝒑𝒂𝒓𝒆 𝒚𝒐𝒖 𝒕𝒐 𝒂 𝒔𝒖𝒎𝒎𝒆𝒓’𝒔 𝒅𝒂𝒚. 𝑻𝒉𝒐𝒖 𝒂𝒓𝒕 𝒎𝒐𝒓𝒆 𝒍𝒐𝒗𝒆𝒍𝒚 𝒂𝒏𝒅 𝒎𝒐𝒓𝒆 𝒕𝒆𝒎𝒑𝒆𝒓𝒂𝒕𝒆.
             </p>
           </section>
         </header>
@@ -49,19 +49,19 @@ export default function Profile() {
         <section className='mt-2'>
           <div className='flex gap-2 text-sm'>
             <Button typeButton='filter' value={'posts'}>
-              <img src={`${iconsSvg.posts}`} className='mr-2' />
+              <img src={`${iconsSvg.posts}`} className='mr-2' alt='Post icon' />
               <span className='font-medium text-black'>Posts</span>
             </Button>
             <Button typeButton='filter' value={'images'}>
-              <img src={`${iconsSvg.images}`} className='mr-2' />
+              <img src={`${iconsSvg.images}`} className='mr-2' alt='Images icon' />
               <span className='font-medium text-black'>Images</span>
             </Button>
             <Button typeButton='filter' value={'videos'}>
-              <img src={`${iconsSvg.videos}`} className='mr-2' />
+              <img src={`${iconsSvg.videos}`} className='mr-2' alt='Videos icon' />
               <span className='font-medium text-black'>Videos</span>
             </Button>
             <Button typeButton='filter' value={'saved'}>
-              <img src={iconsSvg.savedFilled} className='mr-2' />
+              <img src={iconsSvg.savedFilled} className='mr-2' alt='Saved icon' />
               <span className='font-medium text-black'>Saved</span>
             </Button>
           </div>

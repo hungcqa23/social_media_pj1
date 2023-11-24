@@ -15,6 +15,7 @@ const path = {
   search: 'search',
   accounts: 'accounts',
   emails: 'emails',
+  blocked_accounts: 'blocked_accounts',
   all: '*',
   messsageId: ':id'
 } as const;
