@@ -1,9 +1,18 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosError, HttpStatusCode, type AxiosInstance } from 'axios';
+import { getAccessTokenFromLS, getRefreshTokenFromLS } from './auth';
+import { toast } from 'react-toastify';
 
 class Http {
+  private accessToken: string;
+  private refreshToken: string;
+  private refreshTokenRequest: Promise<string> | null;
   public instance: AxiosInstance;
 
   constructor() {
+    this.accessToken = getAccessTokenFromLS();
+    this.refreshToken = getRefreshTokenFromLS();
+    this.refreshTokenRequest = null;
+
     this.instance = axios.create({
       baseURL: 'https://api-ecom.duthanhduoc.com',
       timeout: 10000,
@@ -11,6 +20,21 @@ class Http {
         'Content-Type': 'application/json'
       }
     });
+
+    this.instance.interceptors.request.use(
+      config => {
+        if (this.accessToken && config.headers) {
+          config.headers.Authorization = this.accessToken;
+        }
+        return config;
+      },
+      (error: AxiosError) => {
+        if (error.response?.status !== HttpStatusCode.UnprocessableEntity) {
+          toast.error('Some things wrong!');
+        }
+        return Promise.reject(error);
+      }
+    );
   }
 }
 

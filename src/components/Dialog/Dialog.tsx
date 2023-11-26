@@ -1,0 +1,74 @@
+import {
+  FloatingFocusManager,
+  FloatingOverlay,
+  FloatingPortal,
+  autoUpdate,
+  useClick,
+  useDismiss,
+  useFloating,
+  useId,
+  useInteractions,
+  useRole
+} from '@floating-ui/react';
+import { ElementType, Fragment, useState } from 'react';
+
+interface Props {
+  children: React.ReactNode;
+  renderDialog: React.ReactNode;
+  className?: string;
+  as?: ElementType;
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+export default function Dialog({
+  children,
+  renderDialog,
+  className,
+  as: Element = 'div',
+  isOpen,
+  setIsOpen
+}: Props) {
+  // const [isOpen, setIsOpen] = useState(initialOpen);
+  const { refs, context } = useFloating({
+    open: isOpen,
+    onOpenChange: setIsOpen,
+    whileElementsMounted: autoUpdate
+  });
+
+  const click = useClick(context);
+  const dismiss = useDismiss(context, {
+    outsidePressEvent: 'mousedown'
+  });
+  const role = useRole(context);
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+
+  //Set up label and description ids
+  const labelId = useId();
+  const descriptionId = useId();
+
+  return (
+    <>
+      <Element {...getReferenceProps()} ref={refs.setReference} className={className}>
+        {children}
+      </Element>
+
+      {isOpen && (
+        <FloatingPortal id={labelId}>
+          <FloatingOverlay lockScroll className='flex items-center justify-center bg-slate-100/80'>
+            <FloatingFocusManager context={context}>
+              <div
+                ref={refs.setFloating}
+                aria-labelledby={labelId}
+                aria-describedby={descriptionId}
+                {...getFloatingProps()}
+              >
+                {renderDialog}
+              </div>
+            </FloatingFocusManager>
+          </FloatingOverlay>
+        </FloatingPortal>
+      )}
+    </>
+  );
+}

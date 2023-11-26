@@ -19,7 +19,7 @@ export default function NotificationBar() {
         <Link to={'#'} className='block w-full'>
           <div className='mx-9 mt-4 flex flex-col gap-1'>
             <div className='flex'>
-              <IconProfile className='mr-3 h-16 w-16' classNameImage='h-16 w-16' />
+              <IconProfile className='mr-3 h-16 w-16' classNameImage='h-16 w-16' isImage />
               <div className='flex flex-grow flex-col justify-between text-sm font-normal'>
                 <p>
                   <span className='font-medium'>TaylorSwitch</span> and{' '}

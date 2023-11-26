@@ -11,7 +11,7 @@ import {
   useInteractions,
   offset
 } from '@floating-ui/react';
-import { motion } from 'framer-motion';
+// import { motion } from 'framer-motion';
 import { ElementType, useId, useRef, useState } from 'react';
 
 interface Props {
@@ -30,14 +30,14 @@ export default function Popover({
   renderPopover,
   placement = 'top'
 }: Props) {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const id = useId();
 
   const arrowRef = useRef<SVGSVGElement>(null);
 
   const { refs, floatingStyles, context } = useFloating({
-    open,
-    onOpenChange: setOpen,
+    open: isOpen,
+    onOpenChange: setIsOpen,
     placement,
     transform: false,
     whileElementsMounted: autoUpdate,
@@ -50,7 +50,8 @@ export default function Popover({
   return (
     <Element {...getReferenceProps()} ref={refs.setReference} className={className}>
       {children}
-      {open && (
+
+      {isOpen && (
         <FloatingPortal id={id}>
           <div {...getFloatingProps()} ref={refs.setFloating} style={floatingStyles}>
             {hasArrow && (

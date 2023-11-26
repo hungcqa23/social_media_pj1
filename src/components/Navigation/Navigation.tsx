@@ -20,12 +20,13 @@ export default function Navigation(props: Props) {
   const logoutMutation = useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
+      console.log('Success');
       setIsAuthenticated(false);
-    },
-    onError: () => {
-      window.location.reload();
-      clearLS();
     }
+    // onError: () => {
+    //   window.location.reload();
+    //   clearLS();
+    // }
   });
 
   const handleLogout = () => {

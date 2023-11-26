@@ -1,21 +1,29 @@
+import { useState } from 'react';
+import Dialog from '../Dialog';
 import IconProfile from '../IconProfile';
+import Modal from '../Modal';
 
-interface Props {
-  toggleModal: () => void;
-}
-export default function CreatePost({ toggleModal }: Props) {
+export default function CreatePost() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div className='mb-4 h-40 w-[34rem] max-w-full rounded-md border shadow'>
       <div className='p-4'>
-        <div className='flex border-b pb-3'>
+        <div className='flex gap-2 border-b pb-3'>
           <IconProfile />
-          <button className='grow rounded-full bg-gray-100 hover:bg-gray-200' onClick={toggleModal}>
+          <Dialog
+            as='button'
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            className='grow rounded-full bg-gray-100 hover:bg-gray-200'
+            renderDialog={<Modal closeModal={() => setIsOpen(false)} />}
+          >
             <div className='py-2 pl-3'>
-              <span className='block text-left text-base font-medium text-gray-400'>
-                What's on your thought, Hưng ?
+              <span className='block text-left text-base font-normal text-gray-500'>
+                What&apos;s on your thought, Hưng ?
               </span>
             </div>
-          </button>
+          </Dialog>
         </div>
       </div>
     </div>
