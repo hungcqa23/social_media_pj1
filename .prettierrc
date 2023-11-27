@@ -5,9 +5,9 @@
   "endOfLine": "auto",
   "useTabs": false,
   "singleQuote": true,
-  "printWidth": 100,
+  "printWidth": 80,
   "jsxSingleQuote": true,
-  "plugins": [    
+  "plugins": [
     "eslint-config-prettier",
     "eslint-plugin-import",
     "eslint-plugin-jsx-a11y",

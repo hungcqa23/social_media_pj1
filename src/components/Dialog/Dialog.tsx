@@ -10,7 +10,7 @@ import {
   useInteractions,
   useRole
 } from '@floating-ui/react';
-import { ElementType, Fragment, useState } from 'react';
+import { ElementType } from 'react';
 
 interface Props {
   children: React.ReactNode;
@@ -25,10 +25,9 @@ export default function Dialog({
   renderDialog,
   className,
   as: Element = 'div',
-  isOpen,
-  setIsOpen
+  setIsOpen,
+  isOpen
 }: Props) {
-  // const [isOpen, setIsOpen] = useState(initialOpen);
   const { refs, context } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
@@ -41,7 +40,11 @@ export default function Dialog({
   });
   const role = useRole(context);
 
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    click,
+    dismiss,
+    role
+  ]);
 
   //Set up label and description ids
   const labelId = useId();
@@ -49,13 +52,20 @@ export default function Dialog({
 
   return (
     <>
-      <Element {...getReferenceProps()} ref={refs.setReference} className={className}>
+      <Element
+        {...getReferenceProps()}
+        ref={refs.setReference}
+        className={className}
+      >
         {children}
       </Element>
 
       {isOpen && (
         <FloatingPortal id={labelId}>
-          <FloatingOverlay lockScroll className='flex items-center justify-center bg-slate-100/80'>
+          <FloatingOverlay
+            lockScroll
+            className='flex items-center justify-center bg-slate-100/80'
+          >
             <FloatingFocusManager context={context}>
               <div
                 ref={refs.setFloating}

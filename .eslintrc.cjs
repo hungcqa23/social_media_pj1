@@ -47,7 +47,7 @@ module.exports = {
         endOfLine: 'auto',
         useTabs: false,
         singleQuote: true,
-        printWidth: 100,
+        printWidth: 80,
         jsxSingleQuote: true
       }
     ]
