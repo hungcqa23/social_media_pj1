@@ -10,7 +10,6 @@ export default function Conversation() {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const maxTextAreaHeight = 48;
-  const fontSizeTextArea = 14;
   const originalHeight = 24;
 
   const onTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -25,7 +24,10 @@ export default function Conversation() {
         }
 
         // Calculate the new height
-        const newHeight = Math.min(maxTextAreaHeight, textareaRef.current.scrollHeight);
+        const newHeight = Math.min(
+          maxTextAreaHeight,
+          textareaRef.current.scrollHeight
+        );
         // Set the new height to the textarea
         textareaRef.current.style.height = `${newHeight}px`;
 
@@ -43,7 +45,9 @@ export default function Conversation() {
       <header className='space-between flex justify-between border-b px-4 py-4'>
         <div className='flex items-center'>
           <IconProfile />
-          <span className='ml-2 text-sm font-medium text-gray-950'>Andrew 2 tay</span>
+          <span className='ml-2 text-sm font-medium text-gray-950'>
+            Andrew 2 tay
+          </span>
         </div>
         <div className='flex gap-2'>
           <button className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300'>
@@ -82,7 +86,7 @@ export default function Conversation() {
               fill='none'
               xmlns='http://www.w3.org/2000/svg'
             >
-              <g clip-path='url(#clip0_97_724)'>
+              <g clipPath='url(#clip0_97_724)'>
                 <path
                   d='M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z'
                   fill='black'
@@ -97,6 +101,7 @@ export default function Conversation() {
           </button>
         </div>
       </header>
+
       <form onSubmit={send} className='flex h-16 w-full items-center border-t'>
         <button className='flex h-10 w-10 items-center justify-center'>
           <svg

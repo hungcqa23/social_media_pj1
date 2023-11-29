@@ -21,6 +21,7 @@ interface Props {
   as?: ElementType;
   placement: Placement;
   hasArrow?: boolean;
+  offsetNum?: number;
 }
 export default function Popover({
   children,
@@ -28,7 +29,8 @@ export default function Popover({
   className,
   as: Element = 'div',
   renderPopover,
-  placement = 'top'
+  placement = 'top',
+  offsetNum = 5
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const id = useId();
@@ -41,29 +43,43 @@ export default function Popover({
     placement,
     transform: false,
     whileElementsMounted: autoUpdate,
-    middleware: [shift(), flip(), arrow({ element: arrowRef }), offset(5)]
+    middleware: [
+      shift(),
+      flip(),
+      arrow({ element: arrowRef }),
+      offset(offsetNum)
+    ]
   });
 
   const click = useClick(context);
   const { getReferenceProps, getFloatingProps } = useInteractions([click]);
 
   return (
-    <Element {...getReferenceProps()} ref={refs.setReference} className={className}>
+    <Element
+      {...getReferenceProps()}
+      ref={refs.setReference}
+      className={className}
+    >
       {children}
 
       {isOpen && (
         <FloatingPortal id={id}>
-          <div {...getFloatingProps()} ref={refs.setFloating} style={floatingStyles}>
-            {hasArrow && (
-              <FloatingArrow
-                ref={arrowRef}
-                context={context}
-                width={10}
-                fill='white'
-                staticOffset={'10%'}
-              />
-            )}
-            {renderPopover}
+          <div
+            {...getFloatingProps()}
+            ref={refs.setFloating}
+            style={floatingStyles}
+          >
+            <div>
+              {hasArrow && (
+                <FloatingArrow
+                  ref={arrowRef}
+                  context={context}
+                  className=''
+                  tipRadius={0}
+                />
+              )}
+              {renderPopover}
+            </div>
           </div>
         </FloatingPortal>
       )}

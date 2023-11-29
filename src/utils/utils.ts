@@ -1,11 +1,4 @@
 import { AxiosError, HttpStatusCode, isAxiosError } from 'axios';
-import { useSearchParams } from 'react-router-dom';
-
-export const useQueryString = () => {
-  const [searchParams] = useSearchParams();
-  const searchParamsObj = Object.fromEntries(searchParams);
-  return searchParamsObj;
-};
 
 export function checkAxiosError<T>(error: unknown): error is AxiosError<T> {
   return isAxiosError(error);
@@ -14,13 +7,16 @@ export function checkAxiosError<T>(error: unknown): error is AxiosError<T> {
 export const isAxiosUnprocessableEntityError = <FormError>(
   error: unknown
 ): error is AxiosError<FormError> =>
-  checkAxiosError(error) && error.response?.status === HttpStatusCode.UnprocessableEntity;
+  checkAxiosError(error) &&
+  error.response?.status === HttpStatusCode.UnprocessableEntity;
 
 export const isActiveRoute = (pathname: string, keyword: string) => {
   return pathname.split('/')[1] === keyword;
 };
 
-export const calculateTextWidth = (elementRef: React.RefObject<HTMLTextAreaElement>) => {
+export const calculateTextWidth = (
+  elementRef: React.RefObject<HTMLTextAreaElement>
+) => {
   if (!elementRef?.current) {
     return;
   }

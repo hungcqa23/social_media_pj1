@@ -30,7 +30,11 @@ export default function IconProfile(props: Props) {
 
   return (
     <Link to={to} className={'block ' + className}>
-      <img src={src} alt='Profile User' className={'rounded-full object-cover ' + classNameImage} />
+      <img
+        src={src}
+        alt='Profile User'
+        className={'rounded-full object-cover ' + classNameImage}
+      />
     </Link>
   );
 }

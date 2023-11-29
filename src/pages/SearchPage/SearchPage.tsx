@@ -1,22 +1,10 @@
-import { set } from 'lodash';
-import { useState } from 'react';
-import { NavLink, useSearchParams } from 'react-router-dom';
 import Button from 'src/components/Button';
 import FilterPost from 'src/components/FilterPost';
-import IconProfile from 'src/components/IconProfile';
-import Modal from 'src/components/Modal';
 import Search from 'src/components/Search';
-import Suggested from 'src/components/Suggested';
+import Suggested from 'src/components/SuggestedBar';
 import { iconsSvg } from 'src/constants/icons';
-import { useQueryString } from 'src/utils/utils';
 
 export default function SearchPage() {
-  const [showModal, setShowModal] = useState<boolean>(false);
-
-  const toggleModal = () => {
-    setShowModal(prev => !prev);
-  };
-
   const isImage = false;
 
   return (
@@ -31,13 +19,15 @@ export default function SearchPage() {
             {/* Images */}
             <div>
               <div className='mb-4 flex items-center gap-6'>
-                <p className='text-sm font-medium uppercase text-gray-400'>Search results: </p>
+                <p className='text-sm font-medium uppercase text-gray-400'>
+                  Search results:{' '}
+                </p>
                 <Button
                   className={`'bg-gray-300' flex items-center justify-center rounded-full px-3 py-2 hover:bg-gray-300`}
                   typeButton={'filter'}
                   value={'posts'}
                 >
-                  <img src={`${iconsSvg.posts}`} className='mr-3' />
+                  <img src={`${iconsSvg.posts}`} className='mr-3' alt='' />
                   <span className='text-sm font-medium text-black'>Posts</span>
                 </Button>
 
@@ -46,8 +36,10 @@ export default function SearchPage() {
                   className={`flex items-center justify-center rounded-full px-3 py-2 hover:bg-gray-300`}
                   typeButton={'filter'}
                 >
-                  <img src={`${iconsSvg.posts}`} className='mr-3' />
-                  <span className='text-sm font-medium text-black'>Comments</span>
+                  <img src={`${iconsSvg.posts}`} className='mr-3' alt='' />
+                  <span className='text-sm font-medium text-black'>
+                    Comments
+                  </span>
                 </Button>
 
                 <Button
@@ -55,13 +47,15 @@ export default function SearchPage() {
                   typeButton={'filter'}
                   value={'people'}
                 >
-                  <img src={`${iconsSvg.posts}`} className='mr-3' />
+                  <img src={`${iconsSvg.posts}`} className='mr-3' alt='' />
                   <span className='text-sm font-medium text-black'>People</span>
                 </Button>
               </div>
 
               <div className='flex items-center'>
-                <p className='mr-3 text-sm font-normal text-gray-400'>Sort by: </p>
+                <p className='mr-3 text-sm font-normal text-gray-400'>
+                  Sort by:
+                </p>
                 <div className='relative max-w-sm'>
                   <div className='pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3.5'>
                     <svg
@@ -117,7 +111,6 @@ export default function SearchPage() {
           <Suggested />
         </div>
       </main>
-      {showModal && <Modal toggleModal={toggleModal} />}
     </>
   );
 }

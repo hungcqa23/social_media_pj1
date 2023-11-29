@@ -17,7 +17,7 @@ const path = {
   emails: 'emails',
   blocked_accounts: 'blocked_accounts',
   all: '*',
-  messsageId: ':id'
+  id: ':id'
 } as const;
 
 export default path;

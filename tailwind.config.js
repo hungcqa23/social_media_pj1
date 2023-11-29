@@ -5,6 +5,7 @@ export default {
     extend: {
       dropShadow: {
         font: '0 4px 4px rgba(0, 0, 0, 0.25)'
+        // normal: '0 0 4px rgba(0, 0, 0, 1)'
       },
       boxShadow: {
         default: '0 0 4px rgba(0, 0, 0, 1)'

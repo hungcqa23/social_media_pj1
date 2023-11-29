@@ -15,9 +15,10 @@ import { ElementType } from 'react';
 interface Props {
   children: React.ReactNode;
   renderDialog: React.ReactNode;
-  className?: string;
   as?: ElementType;
   isOpen: boolean;
+  className?: string;
+  classNameOverlay?: string;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export default function Dialog({
@@ -25,8 +26,9 @@ export default function Dialog({
   renderDialog,
   className,
   as: Element = 'div',
+  isOpen,
   setIsOpen,
-  isOpen
+  classNameOverlay = 'flex items-center justify-center bg-black/80'
 }: Props) {
   const { refs, context } = useFloating({
     open: isOpen,
@@ -62,10 +64,7 @@ export default function Dialog({
 
       {isOpen && (
         <FloatingPortal id={labelId}>
-          <FloatingOverlay
-            lockScroll
-            className='flex items-center justify-center bg-slate-100/80'
-          >
+          <FloatingOverlay lockScroll className={classNameOverlay}>
             <FloatingFocusManager context={context}>
               <div
                 ref={refs.setFloating}

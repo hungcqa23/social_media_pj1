@@ -1,4 +1,9 @@
-import { Navigate, Outlet, type RouteObject, useRoutes } from 'react-router-dom';
+import {
+  Navigate,
+  Outlet,
+  type RouteObject,
+  useRoutes
+} from 'react-router-dom';
 import path from './constants/path';
 
 import Login from './pages/Login';
@@ -85,15 +90,12 @@ export default function useRouteElement() {
                   index: true
                 },
                 {
-                  path: ':id',
+                  path: path.id,
                   element: <Conversation />
                 }
               ]
             },
-            {
-              path: path.profile,
-              element: <Profile />
-            },
+
             {
               path: path.notifications,
               element: <NotificationBar />
@@ -135,6 +137,10 @@ export default function useRouteElement() {
                   element: <BlockedAccount />
                 }
               ]
+            },
+            {
+              path: '/:username',
+              element: <Profile />
             }
           ]
         }

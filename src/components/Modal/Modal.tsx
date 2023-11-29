@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Profile from '../IconProfile';
 
 interface Props {
@@ -6,6 +6,7 @@ interface Props {
   includesMedia: boolean;
   setIncludesMedia: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 export default function Modal({
   closeModal,
   includesMedia,
@@ -19,7 +20,6 @@ export default function Modal({
   useEffect(() => {
     setIncludesMedia(false);
   }, [setIncludesMedia]);
-
   const handleTextAreaChange = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -49,12 +49,15 @@ export default function Modal({
     setIncludesMedia(false);
   };
 
+  // Floating
+
   return (
     <form
       className={`flex min-h-[30rem] w-[33rem] flex-col justify-between rounded-lg bg-white shadow`}
       onSubmit={handleSubmit}
     >
-      <div className='relative flex h-14 items-center justify-center border-b p-5'>
+      {/* Header */}
+      <header className='relative flex h-14 items-center justify-center border-b p-5'>
         <div className='text-xl font-bold text-black'>Create post</div>
         <button
           className='top-[calc((100% - 2.25rem) / 2)] absolute right-3 flex h-9 w-9 items-center justify-center rounded-full bg-gray-200'
@@ -69,16 +72,20 @@ export default function Modal({
             <path d='M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z' />
           </svg>
         </button>
-      </div>
+      </header>
 
+      {/* Content */}
       <div className='flex flex-grow flex-col justify-between overflow-y-auto'>
-        <div className='mx-4 flex py-3'>
+        {/* Profile */}
+        <div className='mx-4 flex items-center py-3'>
           <Profile to='/profile' className='mr-2 h-11 w-11' />
           <div>
             <div>
               <span className='font-semibold'>An Hưng</span>
             </div>
-            <button className='flex h-6 items-center gap-1 rounded bg-gray-200 px-2'>
+
+            {/* Set scope post */}
+            {/* <div className='flex h-6 items-center gap-1 rounded bg-gray-200 px-2'>
               <span>
                 <svg
                   width='16'
@@ -94,7 +101,7 @@ export default function Modal({
                 </svg>
               </span>
               <span className='text-[0.8125rem] font-medium text-black'>
-                Only me
+                Public
               </span>
               <span>
                 <svg
@@ -113,10 +120,11 @@ export default function Modal({
                   />
                 </svg>
               </span>
-            </button>
+            </div> */}
           </div>
         </div>
 
+        {/* Create Content */}
         <div className='flex flex-grow flex-col justify-between overflow-y-auto'>
           <div className='overflow-y-auto'>
             <div className='w-full px-4'>

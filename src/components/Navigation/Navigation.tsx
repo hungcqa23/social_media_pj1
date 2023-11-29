@@ -20,13 +20,12 @@ export default function Navigation(props: Props) {
   const logoutMutation = useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
-      console.log('Success');
       setIsAuthenticated(false);
+    },
+    onError: () => {
+      window.location.reload();
+      clearLS();
     }
-    // onError: () => {
-    //   window.location.reload();
-    //   clearLS();
-    // }
   });
 
   const handleLogout = () => {
@@ -40,7 +39,12 @@ export default function Navigation(props: Props) {
   } = props;
 
   const Links = [
-    { name: 'Home', to: '/', svg: iconsSvg.house, svgActive: iconsSvg.houseFilled },
+    {
+      name: 'Home',
+      to: '/',
+      svg: iconsSvg.house,
+      svgActive: iconsSvg.houseFilled
+    },
     {
       name: 'Search',
       to: '/search?type=posts',
@@ -61,7 +65,7 @@ export default function Navigation(props: Props) {
     },
     {
       name: 'Profile',
-      to: '/profile?type=posts',
+      to: '/anhungwindyy?type=posts',
       svg: iconsSvg.user,
       svgActive: iconsSvg.user,
       isProfile: true
@@ -78,7 +82,9 @@ export default function Navigation(props: Props) {
             className={`w-6 ${!openMessages ? 'lg:hidden' : ''}`}
           />
           <p
-            className={`hidden ${!openMessages ? 'font-cookie text-5xl text-black lg:block' : ''}`}
+            className={`hidden ${
+              !openMessages ? 'font-cookie text-5xl text-black lg:block' : ''
+            }`}
           >
             Instacloud
           </p>
@@ -104,12 +110,25 @@ export default function Navigation(props: Props) {
           renderPopover={
             <div className='rounded-lg bg-white shadow-[0_0_10px_rgba(0,0,0,0.25)]'>
               <div className='p-2'>
-                <ButtonNav text='Setting' svg={iconsSvg.setting} to='/accounts/profile' />
+                <ButtonNav
+                  text='Setting'
+                  svg={iconsSvg.setting}
+                  to='/accounts/profile'
+                />
                 {/* <ButtonNav isButton text='Your activity' /> */}
-                <ButtonNav isButton text='Saved' svg={iconsSvg.saved} />
+                <ButtonNav
+                  to='/anhungwindyy?type=saved'
+                  text='Saved'
+                  svg={iconsSvg.saved}
+                />
               </div>
               <div className='flex w-full justify-center border-t py-2'>
-                <ButtonNav isButton text='Log out' svg={iconsSvg.logout} onClick={handleLogout} />
+                <ButtonNav
+                  isButton
+                  text='Log out'
+                  svg={iconsSvg.logout}
+                  onClick={handleLogout}
+                />
               </div>
             </div>
           }

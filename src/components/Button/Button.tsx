@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useQueryString } from 'src/utils/utils';
+import { useQueryString } from 'src/hooks/useQueryString';
 
 type ButtonType = 'filter';
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -29,8 +29,8 @@ export default function Button(props: ButtonProps) {
     return (
       <button
         className={`${
-          isMatch ? 'bg-gray-300' : ''
-        } flex items-center justify-center rounded-full px-3 py-2 hover:bg-gray-300`}
+          isMatch ? 'border border-gray-400' : ''
+        } flex items-center justify-center rounded-full px-3 py-2 hover:bg-gray-100`}
         disabled={isLoading === true}
         onClick={() => handleClick(rest.value as string)}
         {...rest}

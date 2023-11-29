@@ -20,9 +20,9 @@ export default function CreatePost() {
         <div className='flex items-center gap-2 border-b pb-3'>
           <IconProfile />
           <Dialog
-            as='button'
             isOpen={isOpen}
             setIsOpen={setIsOpen}
+            as='button'
             className='grow rounded-full bg-gray-100 hover:bg-gray-200'
             renderDialog={
               <Modal
@@ -32,13 +32,11 @@ export default function CreatePost() {
               />
             }
           >
-            <>
-              <div className='py-2 pl-3'>
-                <span className='block text-left text-base font-normal text-gray-500'>
-                  What&apos;s on your thought, Hưng ?
-                </span>
-              </div>
-            </>
+            <div className='py-2 pl-3'>
+              <span className='block text-left text-base font-normal text-gray-500'>
+                What&apos;s on your thought, Hưng ?
+              </span>
+            </div>
           </Dialog>
         </div>
 

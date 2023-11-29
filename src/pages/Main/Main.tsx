@@ -1,6 +1,6 @@
 import CreatePost from 'src/components/CreatePost';
 import PostsList from 'src/components/PostsList';
-import Suggested from 'src/components/Suggested';
+import SuggestedBar from 'src/components/SuggestedBar';
 
 export default function Main() {
   return (
@@ -14,10 +14,9 @@ export default function Main() {
             </div>
           </div>
 
-          <Suggested />
+          <SuggestedBar />
         </div>
       </main>
-      {/* {showModal && <Modal toggleModal={toggleModal} />} */}
     </>
   );
 }

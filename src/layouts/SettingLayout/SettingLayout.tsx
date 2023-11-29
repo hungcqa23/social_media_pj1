@@ -4,7 +4,10 @@ const Links = [
   { name: 'Edit profile', path: '/accounts/profile' },
   { name: 'Email notification', path: '/accounts/emails' },
   { name: 'Push notifications', path: '/accounts/notifications' },
-  { name: 'Who can see your fucking content', path: '/accounts/who_can_see_your_content' }
+  {
+    name: 'Who can see your content',
+    path: '/accounts/who_can_see_your_content'
+  }
   // { name: 'Help', path: '/accounts/help' }
 ];
 
@@ -12,7 +15,9 @@ export default function SettingLayout() {
   return (
     <div className='ml-[4.5rem] flex lg:ml-56'>
       <nav className='flex h-screen w-72 min-w-fit flex-col border-r'>
-        <p className='mb-2 ml-9 mr-12 mt-10 text-xl font-bold text-black'>Settings</p>
+        <p className='mb-2 ml-9 mr-12 mt-10 text-xl font-bold text-black'>
+          Settings
+        </p>
         <div className='flex flex-col gap-1'>
           {Links.map(link => (
             <NavLink
