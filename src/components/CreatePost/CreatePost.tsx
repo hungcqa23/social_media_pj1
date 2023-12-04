@@ -2,10 +2,12 @@ import { useState } from 'react';
 import Dialog from '../Dialog';
 import IconProfile from '../IconProfile';
 import Modal from '../Modal';
+import { useAppContext } from 'src/contexts/app.contexts';
 // import { useDialogManager } from 'src/hooks/useDialogManager';
 
 export default function CreatePost() {
   // const { openDialog, closeDialog, isOpen } = useDialogManager();
+  const { profile, setProfile } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
   const [includesMedia, setIncludesMedia] = useState(false);
 
@@ -18,7 +20,10 @@ export default function CreatePost() {
     <div className='mb-4 h-36 w-[34rem] max-w-full rounded-md border shadow'>
       <div className='p-4'>
         <div className='flex items-center gap-2 border-b pb-3'>
-          <IconProfile />
+          <IconProfile
+            to={`${profile?.username}`}
+            src={profile?.profilePicture}
+          />
           <Dialog
             isOpen={isOpen}
             setIsOpen={setIsOpen}
@@ -34,7 +39,7 @@ export default function CreatePost() {
           >
             <div className='py-2 pl-3'>
               <span className='block text-left text-base font-normal text-gray-500'>
-                What&apos;s on your thought, Hưng ?
+                {`What's on your thought, ${profile?.fullname} ?`}
               </span>
             </div>
           </Dialog>

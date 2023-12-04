@@ -26,7 +26,7 @@ export default function Input(props: Props) {
 
   return (
     <div className={className}>
-      <input className={classNameInput} {...registerResult} {...rest} autoFocus={true} />
+      <input className={classNameInput} {...registerResult} {...rest} />
       <p className={classNameError}>{errorMessage}</p>
     </div>
   );

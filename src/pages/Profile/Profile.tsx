@@ -2,10 +2,13 @@ import IconProfile from 'src/components/IconProfile';
 import { Link, useParams } from 'react-router-dom';
 import { iconsSvg } from 'src/constants/icons';
 import Button from 'src/components/Button';
+import { useContext } from 'react';
+import { AppContext } from 'src/contexts/app.contexts';
 
 export default function Profile() {
+  const { profile, setProfile } = useContext(AppContext);
   const { username } = useParams();
-  const isProfile = username === 'anhungwindyy';
+  const isProfile = username === profile?.username.toLowerCase();
 
   return (
     <main className='ml-auto w-[calc(100%-4.5rem)] lg:w-[calc(100%-14rem)]'>
@@ -16,13 +19,14 @@ export default function Profile() {
               className='h-40 w-40'
               classNameImage='h-40 w-40'
               isImage
+              src={profile?.profilePicture}
             />
           </div>
 
           <section className='flex flex-grow-2 flex-col'>
             <div className='flex items-center'>
               <h2 className='mr-3 text-xl font-normal text-black'>
-                {username}
+                {profile?.username.toLowerCase()}
               </h2>
 
               {isProfile && (
@@ -61,13 +65,22 @@ export default function Profile() {
 
             <div className='mt-4 flex gap-4'>
               <p className='font-normal'>
-                <span className='font-semibold text-black'>2</span> posts
+                <span className='font-semibold text-black'>
+                  {profile?.postsCount || 0}
+                </span>{' '}
+                posts
               </p>
               <button className='font-normal'>
-                <span className='font-semibold text-black'>50</span> followers
+                <span className='font-semibold text-black'>
+                  {profile?.followersCount || 0}
+                </span>{' '}
+                followers
               </button>
               <button className='font-normal'>
-                <span className='font-semibold text-black'>74</span> following
+                <span className='font-semibold text-black'>
+                  {profile?.followingCount || 0}
+                </span>{' '}
+                following
               </button>
             </div>
 

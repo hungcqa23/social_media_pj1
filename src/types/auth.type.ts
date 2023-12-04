@@ -1,8 +1,7 @@
 import { User } from './user.type';
 import { ResponseAPI, SuccessResponse } from './utils.type';
 
-export type AuthResponse = SuccessResponse<{
-  access_token: string;
-  refresh_token: string;
+export interface AuthResponse extends SuccessResponse {
+  token: string;
   user: User;
-}>;
+}

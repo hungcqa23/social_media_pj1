@@ -1,27 +1,27 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { schema } from 'src/utils/rules';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 
 import Button from 'src/components/Button';
 import Input from 'src/components/Input';
-import { useMutation } from '@tanstack/react-query';
 import authApi from 'src/apis/auth.api';
-import { useAppContext } from 'src/contexts/app.contexts';
-import { isAxiosUnprocessableEntityError } from 'src/utils/utils';
+import { setAccessTokenToLS, setProfileToLS } from 'src/utils/auth';
 import { ErrorResponse } from 'src/types/utils.type';
-import { setAccessTokenToLS, setRefreshTokenToLS } from 'src/utils/auth';
+import { isAxiosUnprocessableEntityError } from 'src/utils/utils';
+import { schema } from 'src/utils/rules';
+import { useAppContext } from 'src/contexts/app.contexts';
 
 interface FormData {
-  email: string;
+  username: string;
   password: string;
 }
 
-const loginSchema = schema.pick(['email', 'password']);
+const loginSchema = schema.pick(['username', 'password']);
 
 export default function Login() {
   const navigate = useNavigate();
-
   const { setIsAuthenticated } = useAppContext();
 
   const {
@@ -40,13 +40,22 @@ export default function Login() {
   const onSubmit = handleSubmit(data => {
     loginMutation.mutate(data, {
       onSuccess: data => {
-        setAccessTokenToLS(data.data?.data?.access_token as string);
-        setRefreshTokenToLS(data.data?.data?.refresh_token as string);
-        setIsAuthenticated(true);
-        navigate('/');
+        console.log(data.request);
+        toast.success('Login successfully', {
+          position: toast.POSITION.TOP_RIGHT
+        });
+        setTimeout(() => {
+          setAccessTokenToLS(data.data.token as string);
+          setProfileToLS(data.data.user);
+          setIsAuthenticated(true);
+          navigate('/');
+        }, 1000);
       },
       // Handle error
       onError: (error: unknown) => {
+        toast.error('Login failed', {
+          position: toast.POSITION.TOP_RIGHT
+        });
         if (isAxiosUnprocessableEntityError<ErrorResponse<FormData>>(error)) {
           const formError = error.response?.data.data;
           if (formError) {
@@ -71,11 +80,11 @@ export default function Login() {
       <form onSubmit={onSubmit} className='flex flex-col gap-4' noValidate>
         <div className='flex flex-col'>
           <Input
-            placeholder='Email'
-            type='email'
-            name='email'
+            placeholder='Username'
+            type='username'
+            name='username'
             register={register}
-            errorMessage={errors.email?.message}
+            errorMessage={errors.username?.message}
             autoComplete='on'
           />
 

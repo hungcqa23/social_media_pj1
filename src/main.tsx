@@ -13,6 +13,7 @@ const queryClient = new QueryClient({
     }
   }
 });
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
@@ -21,8 +22,5 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       </AppProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
-    {/* <div className='flex'>
-      <Navigation />
-    </div> */}
   </BrowserRouter>
 );

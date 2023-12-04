@@ -1,13 +1,9 @@
 import { AxiosError, HttpStatusCode, isAxiosError } from 'axios';
 
-export function checkAxiosError<T>(error: unknown): error is AxiosError<T> {
-  return isAxiosError(error);
-}
-
 export const isAxiosUnprocessableEntityError = <FormError>(
   error: unknown
 ): error is AxiosError<FormError> =>
-  checkAxiosError(error) &&
+  isAxiosError(error) &&
   error.response?.status === HttpStatusCode.UnprocessableEntity;
 
 export const isActiveRoute = (pathname: string, keyword: string) => {

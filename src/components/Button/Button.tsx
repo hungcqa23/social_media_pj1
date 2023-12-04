@@ -28,14 +28,16 @@ export default function Button(props: ButtonProps) {
 
     return (
       <button
-        className={`${
-          isMatch ? 'border border-gray-400' : ''
-        } flex items-center justify-center rounded-full px-3 py-2 hover:bg-gray-100`}
+        className={`
+        relative flex h-10 items-center justify-center px-3 py-2 hover:bg-slate-100`}
         disabled={isLoading === true}
         onClick={() => handleClick(rest.value as string)}
         {...rest}
       >
         {children}
+        {isMatch && (
+          <div className='border-bottom-2 absolute bottom-0 left-0 right-0 border-b-2 border-gray-500'></div>
+        )}
       </button>
     );
   }

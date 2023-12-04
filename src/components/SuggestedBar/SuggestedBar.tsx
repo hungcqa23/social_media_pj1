@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import Profile from '../IconProfile';
 import List from '../List';
 import SuggestedFriend from '../SuggestedFriend';
+import { useAppContext } from 'src/contexts/app.contexts';
 
 interface SuggestedFriends {
   id: number;
@@ -41,18 +42,23 @@ const suggestedFriends: SuggestedFriends[] = [
 ];
 
 export default function SuggestedBar() {
+  const { profile } = useAppContext();
+
   return (
     <div className='hidden w-96 flex-col pl-16 xl:flex'>
       <div className='mt-9 flex flex-col gap-6'>
         {/* Profile */}
-        <div className='flex items-center gap-4 px-4'>
-          <Profile />
+        <div className='flex items-center gap-2 px-4'>
+          <Profile src={profile?.profilePicture} />
           <div className='flex flex-col'>
-            <Link to='/profile' className='text-sm font-semibold'>
-              anhungwindyy
+            <Link
+              to={`/${profile?.username.toLowerCase()}`}
+              className='text-sm font-semibold'
+            >
+              {profile?.username.toLowerCase()}
             </Link>
-            <p className='text-base font-normal leading-4 text-gray-500'>
-              An Hưng
+            <p className='text-sm font-normal leading-4 text-gray-500'>
+              {profile?.fullname}
             </p>
           </div>
         </div>

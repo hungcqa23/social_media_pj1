@@ -74,7 +74,7 @@ export default function Popover({
                 <FloatingArrow
                   ref={arrowRef}
                   context={context}
-                  className=''
+                  className='fill-white'
                   tipRadius={0}
                 />
               )}

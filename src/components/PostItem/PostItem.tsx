@@ -3,6 +3,7 @@ import Profile from '../IconProfile';
 import Comment from '../Comment';
 import List from '../List';
 import Dialog from '../Dialog';
+import { Post as PostType } from 'src/types/post.type';
 
 interface CommentType {
   id: number;
@@ -60,20 +61,26 @@ function reducer(state: States, action: { type: string }): States {
   }
 }
 
-export default function Post() {
+interface PostProps {
+  post: PostType;
+  innerRef?: React.Ref<HTMLParagraphElement>;
+}
+
+const comments: CommentType[] = [
+  {
+    id: 1,
+    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    username: 'An Hưng'
+  },
+  {
+    id: 2,
+    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    username: 'An Hưng'
+  }
+];
+
+export default function PostItem({ post, innerRef }: PostProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const comments: CommentType[] = [
-    {
-      id: 1,
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      username: 'An Hưng'
-    },
-    {
-      id: 2,
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      username: 'An Hưng'
-    }
-  ];
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const handleTextAreaChange = () => {
@@ -85,12 +92,6 @@ export default function Post() {
   };
 
   const buttons: ButtonType[] = [
-    // {
-    //   text: 'Edit',
-    //   onClick: () => {
-    //     dispatch({ type: ACTION_TYPES.OPEN_OPTIONS });
-    //   }
-    // },
     {
       text: 'Cancel',
       onClick: () => {
@@ -100,7 +101,8 @@ export default function Post() {
   ];
 
   return (
-    <div className='w-full rounded-md border shadow'>
+    <div className='w-full rounded-md border shadow' ref={innerRef}>
+      {/* Header */}
       <div className='flex h-16 items-center justify-between p-4'>
         <div className='flex'>
           <div className='mr-2'>
@@ -225,8 +227,9 @@ export default function Post() {
         </div>
       </div>
 
+      {/* Text */}
       <div className='px-4 text-base'>
-        <p className='pb-4 font-medium'>Lorem ipsum dolor sit amet</p>
+        <p className='pb-4 font-medium'>{post.post}</p>
       </div>
 
       {/* Image or video */}

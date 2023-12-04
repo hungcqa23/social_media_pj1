@@ -19,13 +19,9 @@ export const getRules = (getValues?: UseFormGetValues<any>): Rules => ({
       value: true,
       message: 'Username is required'
     },
-    minLength: {
-      value: 5,
-      message: 'The length of username should be 5 - 100 characters'
-    },
     maxLength: {
-      value: 100,
-      message: 'The length of username should be 5 - 100 characters'
+      value: 8,
+      message: 'The length of username should be less than 8 characters'
     }
   },
   email: {
@@ -75,7 +71,8 @@ export const getRules = (getValues?: UseFormGetValues<any>): Rules => ({
     },
     validate:
       typeof getValues === 'function'
-        ? (value: string) => value === getValues('password') || 'Password confirm do not match'
+        ? (value: string) =>
+            value === getValues('password') || 'Password confirm do not match'
         : undefined
   }
 });

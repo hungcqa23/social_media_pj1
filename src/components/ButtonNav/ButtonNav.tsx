@@ -36,7 +36,9 @@ export default function ButtonNav(props: Props) {
     isProfile,
     classNameText,
     className = ({ isActive }: { isActive: boolean }) =>
-      `${isActive ? 'border border-gray-300 font-medium' : ''} flex h-12 w-12 items-center 
+      `${
+        isActive ? 'border border-gray-300 font-medium' : ''
+      } flex h-12 w-12 items-center 
     justify-center gap rounded-lg 
     transition-all hover:bg-gray-200 ${lgNavLink} active:bg-gray-100`,
     classNameButton = `flex h-12 w-12 items-center 
@@ -50,7 +52,8 @@ export default function ButtonNav(props: Props) {
   const pathname = useLocation().pathname;
 
   const isActive =
-    isActiveRoute(pathname, text.toLowerCase()) || (text === 'Home' && pathname === '/');
+    isActiveRoute(pathname, text.toLowerCase()) ||
+    (text === 'Home' && pathname === '/');
 
   return (
     <>
@@ -69,7 +72,9 @@ export default function ButtonNav(props: Props) {
             >
               <img
                 src={`${isActive ? svgActive : svg}`}
-                className={`h-6 w-6 ${isProfile ? 'rounded-full' : ''} object-cover transition-all`}
+                className={`h-6 w-6 ${
+                  isProfile ? 'rounded-full' : ''
+                } object-cover transition-all`}
                 alt={`${text} logo`}
               />
             </div>

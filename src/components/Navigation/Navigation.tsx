@@ -28,6 +28,8 @@ export default function Navigation(props: Props) {
     }
   });
 
+  const { profile } = useAppContext();
+
   const handleLogout = () => {
     logoutMutation.mutate();
   };
@@ -65,7 +67,7 @@ export default function Navigation(props: Props) {
     },
     {
       name: 'Profile',
-      to: '/anhungwindyy?type=posts',
+      to: `${profile?.username.toLowerCase()}?type=posts`,
       svg: iconsSvg.user,
       svgActive: iconsSvg.user,
       isProfile: true
@@ -96,7 +98,7 @@ export default function Navigation(props: Props) {
               key={link.name}
               to={link.to}
               svg={link.svg}
-              text={link.name}
+              text={link?.isProfile ? (profile?.username as string) : link.name}
               svgActive={link.svgActive}
               shorten={openMessages}
               isProfile={link?.isProfile}
@@ -105,7 +107,7 @@ export default function Navigation(props: Props) {
         </div>
 
         <Popover
-          hasArrow={false}
+          hasArrow={true}
           placement='top-start'
           renderPopover={
             <div className='rounded-lg bg-white shadow-[0_0_10px_rgba(0,0,0,0.25)]'>

@@ -14,11 +14,12 @@ class Http {
     this.refreshTokenRequest = null;
 
     this.instance = axios.create({
-      baseURL: 'https://api-ecom.duthanhduoc.com',
+      baseURL: 'http://localhost:5000/api/v1',
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      withCredentials: true
     });
 
     this.instance.interceptors.request.use(
