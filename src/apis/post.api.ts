@@ -2,7 +2,7 @@ import { Post } from 'src/types/post.type';
 import { SuccessResponse } from 'src/types/utils.type';
 import http from 'src/utils/http';
 
-interface getAllPosts extends SuccessResponse {
+export interface getAllPosts extends SuccessResponse {
   posts: Post[];
   totalPosts: number;
 }

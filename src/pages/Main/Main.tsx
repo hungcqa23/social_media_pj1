@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { postApi } from 'src/apis/post.api';
+import { getAllPosts, postApi } from 'src/apis/post.api';
 import CreatePost from 'src/components/CreatePost';
 import List from 'src/components/List';
 import PostItem from 'src/components/PostItem';
@@ -17,14 +17,18 @@ export default function Main() {
       queryKey: ['posts'],
       queryFn: ({ pageParam }) => postApi.getAllPosts({ pageParam }),
       initialPageParam: 1,
-      getNextPageParam: (lastPage, allPages) => {
+      getNextPageParam: (
+        lastPage: getAllPosts,
+        allPages: getAllPosts[],
+        lastPageParam: number
+      ) => {
         // Total length of allPages
         const totalPages = allPages.reduce(
           (acc, page) => acc + page.posts.length,
           0
         );
         const nextPage =
-          totalPages < lastPage.totalPosts ? allPages.length + 1 : undefined;
+          totalPages < lastPage.totalPosts ? lastPageParam + 1 : undefined;
         return nextPage;
       }
     });
@@ -35,7 +39,6 @@ export default function Main() {
     }
   }, [inView, hasNextPage, fetchNextPage]);
 
-  console.log(data?.pages);
   return (
     <>
       <main className='ml-auto w-[calc(100%-4.5rem)] lg:w-[calc(100%-14rem)]'>
@@ -81,6 +84,22 @@ export default function Main() {
                     />
                   </svg>
                 </div>
+              )}
+
+              {!hasNextPage && (
+                <section className='mb-10 flex flex-col items-center'>
+                  <h1 className='my-4 text-2xl font-normal'>
+                    You&apos;re All Caught Up
+                  </h1>
+                  <button
+                    className='font-medium text-blue-500'
+                    onClick={() => {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  >
+                    View older posts
+                  </button>
+                </section>
               )}
             </div>
           </div>
