@@ -73,7 +73,7 @@ export default function Login() {
 
   return (
     <div>
-      <h1 className='lg:md-10 mb-8 text-center text-4xl font-semibold drop-shadow-font md:text-5xl lg:text-6xl'>
+      <h1 className='lg:md-10 mb-8 text-center font-cookie text-4xl font-semibold drop-shadow-font md:text-5xl lg:text-6xl'>
         Instacloud
       </h1>
 

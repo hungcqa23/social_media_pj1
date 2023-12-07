@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Profile from '../IconProfile';
+import { convertFileToBase64 } from 'src/utils/file';
 
 interface Props {
   closeModal: () => void;
@@ -39,9 +40,10 @@ export default function Modal({
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   };
-  const onChangeFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setFiles(event.target.files[0]);
+      console.log(await convertFileToBase64(event.target.files[0]));
     }
   };
   const onCloseFile = () => {

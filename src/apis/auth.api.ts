@@ -1,4 +1,5 @@
 import { AuthResponse } from 'src/types/auth.type';
+import { SuccessResponse } from 'src/types/utils.type';
 import http from 'src/utils/http';
 
 export const URL_LOGIN = 'signin';
@@ -15,6 +16,9 @@ const authApi = {
   },
   logout() {
     return http.post(URL_LOGOUT);
+  },
+  forgotPassword(body: { email: string }) {
+    return http.post<SuccessResponse>(URL_FORGOT_PASSWORD, body);
   }
 };
 

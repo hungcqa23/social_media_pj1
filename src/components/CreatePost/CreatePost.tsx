@@ -6,7 +6,6 @@ import { useAppContext } from 'src/contexts/app.contexts';
 // import { useDialogManager } from 'src/hooks/useDialogManager';
 
 export default function CreatePost() {
-  // const { openDialog, closeDialog, isOpen } = useDialogManager();
   const { profile, setProfile } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
   const [includesMedia, setIncludesMedia] = useState(false);
@@ -24,6 +23,7 @@ export default function CreatePost() {
             to={`${profile?.username}`}
             src={profile?.profilePicture}
           />
+
           <Dialog
             isOpen={isOpen}
             setIsOpen={setIsOpen}

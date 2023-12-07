@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 interface Props {
   query: string;
   setQuery: Dispatch<SetStateAction<string>>;
@@ -6,6 +6,19 @@ interface Props {
 export default function Search() {
   const [query, setQuery] = useState<string>('');
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setQuery('');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [setQuery]);
   return (
     <div className='flex w-full justify-between rounded-full border bg-gray-200 px-4 py-2 text-base font-normal outline-none transition duration-500'>
       <div className='flex w-full basis-11/12 items-center gap-3'>
@@ -24,12 +37,12 @@ export default function Search() {
       </div>
 
       {query !== '' && (
-        <span
+        <button
           className='hover:pointer flex h-6 basis-6 cursor-pointer items-center justify-center rounded-full bg-gray-300 '
           onClick={() => setQuery('')}
         >
           <img src='/src/assets/icons/close.svg' alt='Close' />
-        </span>
+        </button>
       )}
     </div>
   );

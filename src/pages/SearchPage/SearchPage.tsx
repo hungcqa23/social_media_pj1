@@ -22,32 +22,13 @@ export default function SearchPage() {
                 <p className='text-sm font-medium uppercase text-gray-400'>
                   Search results:{' '}
                 </p>
-                <Button
-                  className={`'bg-gray-300' flex items-center justify-center rounded-full px-3 py-2 hover:bg-gray-300`}
-                  typeButton={'filter'}
-                  value={'posts'}
-                >
+                <Button typeButton={'filter'} value={'posts'}>
                   <img src={`${iconsSvg.posts}`} className='mr-3' alt='' />
                   <span className='text-sm font-medium text-black'>Posts</span>
                 </Button>
 
-                <Button
-                  value={'comments'}
-                  className={`flex items-center justify-center rounded-full px-3 py-2 hover:bg-gray-300`}
-                  typeButton={'filter'}
-                >
-                  <img src={`${iconsSvg.posts}`} className='mr-3' alt='' />
-                  <span className='text-sm font-medium text-black'>
-                    Comments
-                  </span>
-                </Button>
-
-                <Button
-                  className={`flex items-center justify-center rounded-full px-3 py-2 hover:bg-gray-300`}
-                  typeButton={'filter'}
-                  value={'people'}
-                >
-                  <img src={`${iconsSvg.posts}`} className='mr-3' alt='' />
+                <Button typeButton={'filter'} value={'people'}>
+                  <img src={`${iconsSvg.cloud}`} className='mr-3' alt='' />
                   <span className='text-sm font-medium text-black'>People</span>
                 </Button>
               </div>

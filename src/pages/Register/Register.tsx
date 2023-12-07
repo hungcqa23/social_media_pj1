@@ -78,13 +78,19 @@ export default function Register() {
           errorMessage={errors.confirmPassword?.message}
         />
 
-        <Button className='rounded-lg bg-black px-4 py-3 text-sm font-normal text-white md:px-5 md:py-4 md:text-base md:font-semibold'>
+        <Button
+          className='rounded-lg bg-black px-4 py-3 text-sm font-normal text-white md:px-5 md:py-4 md:text-base md:font-semibold'
+          disabled={signUpMutation.isPending}
+        >
           Create account
         </Button>
 
         <p className='mt-10 text-center text-sm font-medium text-gray-500 md:text-base'>
           Already have an account?{' '}
-          <Link to={'/login'} className='font-medium text-black hover:underline'>
+          <Link
+            to={'/login'}
+            className='font-medium text-black hover:underline'
+          >
             Log in
           </Link>
         </p>

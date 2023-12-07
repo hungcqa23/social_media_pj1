@@ -7,13 +7,40 @@ import { useMutation } from '@tanstack/react-query';
 import authApi from 'src/apis/auth.api';
 import { useAppContext } from 'src/contexts/app.contexts';
 import { clearLS } from 'src/utils/auth';
+import NotificationBar from '../NotificationBar';
+
+import { useId, useState } from 'react';
+import {
+  FloatingPortal,
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  useFloating
+} from '@floating-ui/react';
 
 interface Props {
   classNameNav?: string;
 }
+
+interface LinkProps {
+  name: string;
+  to: string;
+  svg: string;
+  svgActive?: string;
+  isButton?: boolean;
+  className?: string;
+  type?: string;
+  isProfile?: boolean;
+  onClick?: () => void;
+}
 export default function Navigation(props: Props) {
+  const [isNotificationBarOpen, setIsNotificationBarOpen] = useState(false);
+
   const location = useLocation();
-  const openMessages = isActiveRoute(location.pathname, 'messages');
+  const id = useId();
+  const isShorten =
+    isActiveRoute(location.pathname, 'messages') || isNotificationBarOpen;
 
   const { setIsAuthenticated } = useAppContext();
 
@@ -36,11 +63,11 @@ export default function Navigation(props: Props) {
 
   const {
     classNameNav = `w-17 border-r ${
-      !openMessages ? 'lg:w-56' : ''
+      !isShorten ? 'lg:w-56' : ''
     } h-screen overflow-y-hidden fixed top-0 left-0 bottom-0 `
   } = props;
 
-  const Links = [
+  const Links: LinkProps[] = [
     {
       name: 'Home',
       to: '/',
@@ -63,7 +90,8 @@ export default function Navigation(props: Props) {
       name: 'Notifications',
       to: '/notifications',
       svg: iconsSvg.notification,
-      svgActive: iconsSvg.notificationFilled
+      svgActive: iconsSvg.notificationFilled,
+      isButton: true
     },
     {
       name: 'Profile',
@@ -74,6 +102,15 @@ export default function Navigation(props: Props) {
     }
   ];
 
+  const { refs, floatingStyles } = useFloating({
+    open: isNotificationBarOpen,
+    onOpenChange: setIsNotificationBarOpen,
+    placement: 'left',
+    transform: false,
+    whileElementsMounted: autoUpdate,
+    middleware: [shift(), flip(), offset(13)]
+  });
+
   return (
     <nav className={classNameNav}>
       <div className='flex h-full flex-col gap-6 px-3 py-5'>
@@ -81,11 +118,11 @@ export default function Navigation(props: Props) {
           <img
             src={iconsSvg.cloud}
             alt='cloud'
-            className={`w-6 ${!openMessages ? 'lg:hidden' : ''}`}
+            className={`w-6 ${!isShorten ? 'lg:hidden' : ''}`}
           />
           <p
             className={`hidden ${
-              !openMessages ? 'font-cookie text-5xl text-black lg:block' : ''
+              !isShorten ? 'font-cookie text-5xl text-black lg:block' : ''
             }`}
           >
             Instacloud
@@ -93,17 +130,47 @@ export default function Navigation(props: Props) {
         </Link>
 
         <div className='flex grow flex-col gap-1'>
-          {Links.map(link => (
-            <ButtonNav
-              key={link.name}
-              to={link.to}
-              svg={link.svg}
-              text={link?.isProfile ? (profile?.username as string) : link.name}
-              svgActive={link.svgActive}
-              shorten={openMessages}
-              isProfile={link?.isProfile}
-            />
-          ))}
+          {Links.map(link => {
+            if (link?.isButton && link?.name === 'Notifications') {
+              return (
+                <div key={link.name} ref={refs.setReference}>
+                  <ButtonNav
+                    text={link.name}
+                    svg={iconsSvg.notification}
+                    svgActive={iconsSvg.notificationFilled}
+                    shorten={isShorten}
+                    isButton
+                    isOpen={isNotificationBarOpen}
+                    onClick={() => {
+                      setIsNotificationBarOpen(prev => !prev);
+                    }}
+                  />
+
+                  {isNotificationBarOpen && (
+                    <FloatingPortal id={id}>
+                      <div style={floatingStyles} ref={refs.setFloating}>
+                        <NotificationBar className='overflow-y-auto bg-white shadow-[5px_0px_11px_-1px_rgba(0,0,0,0.2)]' />
+                      </div>
+                    </FloatingPortal>
+                  )}
+                </div>
+              );
+            }
+
+            return (
+              <ButtonNav
+                key={link.name}
+                to={link.to}
+                svg={link.svg}
+                text={
+                  link?.isProfile ? (profile?.username as string) : link.name
+                }
+                svgActive={link.svgActive}
+                shorten={isShorten}
+                isProfile={link?.isProfile}
+              />
+            );
+          })}
         </div>
 
         <Popover
@@ -119,7 +186,7 @@ export default function Navigation(props: Props) {
                 />
                 {/* <ButtonNav isButton text='Your activity' /> */}
                 <ButtonNav
-                  to='/anhungwindyy?type=saved'
+                  to={`/${profile?.username.toLowerCase()}?type=saved`}
                   text='Saved'
                   svg={iconsSvg.saved}
                 />
@@ -139,7 +206,7 @@ export default function Navigation(props: Props) {
           <ButtonNav
             svg={iconsSvg.more}
             text='More'
-            shorten={openMessages}
+            shorten={isShorten}
             svgActive={iconsSvg.moreFilled}
             isButton
           />

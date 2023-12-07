@@ -4,22 +4,8 @@ import {
   type RouteObject,
   useRoutes
 } from 'react-router-dom';
+import { lazy } from 'react';
 import path from './constants/path';
-
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import EmailSetting from './pages/EmailSetting';
-import NotFound from './pages/NotFound';
-import Messages from './pages/Messages';
-import Main from './pages/Main';
-import EditProfile from './pages/EditProfile';
-import Profile from './pages/Profile';
-import SearchPage from './pages/SearchPage';
-import YourContent from './pages/YourContent';
-
-import NotificationBar from './components/NotificationBar';
 
 import MainLayout from './layouts/MainLayout';
 import SettingLayout from './layouts/SettingLayout';
@@ -30,6 +16,21 @@ import Conversation from './components/Conversation';
 
 import { useAppContext } from './contexts/app.contexts';
 import BlockedAccount from './pages/BlockedAccount';
+import SearchPage from './pages/SearchPage';
+import NotificationBar from './components/NotificationBar';
+import Messages from './pages/Messages';
+import ResetPassword from './pages/ResetPassword';
+import ForgotPassword from './pages/ForgotPassword';
+import Register from './pages/Register';
+import Main from './pages/Main';
+import EmailSetting from './pages/EmailSetting';
+import EditProfile from './pages/EditProfile';
+import Profile from './pages/Profile';
+import YourContent from './pages/YourContent';
+import NotFound from './pages/NotFound';
+
+const Login = lazy(() => import('./pages/Login'));
+
 function ProtectedRoute() {
   const { isAuthenticated } = useAppContext();
   return isAuthenticated ? <Outlet /> : <Navigate to='/login' />;
@@ -148,7 +149,11 @@ export default function useRouteElement() {
     },
     // Handle Not Found page
     {
-      element: <NotFound />,
+      element: (
+        <MainLayout>
+          <NotFound />
+        </MainLayout>
+      ),
       path: path.all
     }
   ]);

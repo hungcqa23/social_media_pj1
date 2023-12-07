@@ -2,6 +2,8 @@ import { useRef, useState } from 'react';
 import IconProfile from '../IconProfile';
 import { calculateTextWidth } from 'src/utils/utils';
 
+const maxTextAreaHeight = 48;
+const originalHeight = 24;
 export default function Conversation() {
   const [value, setValue] = useState<string>('');
   const send = (e: React.FormEvent<HTMLFormElement>) => {
@@ -9,33 +11,29 @@ export default function Conversation() {
   };
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const maxTextAreaHeight = 48;
-  const originalHeight = 24;
 
   const onTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
     if (textareaRef.current) {
-      if (textareaRef.current) {
-        // Check if it's only 1 line
-        const textAreaWidth = textareaRef.current.clientWidth;
-        const textWidth = calculateTextWidth(textareaRef);
-        if ((textWidth || 0) < textAreaWidth) {
-          return (textareaRef.current.style.height = `${originalHeight}px`);
-        }
+      // Check if it's only 1 line
+      const textAreaWidth = textareaRef.current.clientWidth;
+      const textWidth = calculateTextWidth(textareaRef);
+      if ((textWidth || 0) < textAreaWidth) {
+        return (textareaRef.current.style.height = `${originalHeight}px`);
+      }
 
-        // Calculate the new height
-        const newHeight = Math.min(
-          maxTextAreaHeight,
-          textareaRef.current.scrollHeight
-        );
-        // Set the new height to the textarea
-        textareaRef.current.style.height = `${newHeight}px`;
+      // Calculate the new height
+      const newHeight = Math.min(
+        maxTextAreaHeight,
+        textareaRef.current.scrollHeight
+      );
+      // Set the new height to the textarea
+      textareaRef.current.style.height = `${newHeight}px`;
 
-        if (textareaRef.current.scrollHeight > maxTextAreaHeight) {
-          textareaRef.current.style.overflowY = 'scroll';
-        } else {
-          textareaRef.current.style.overflowY = 'hidden';
-        }
+      if (textareaRef.current.scrollHeight > maxTextAreaHeight) {
+        textareaRef.current.style.overflowY = 'scroll';
+      } else {
+        textareaRef.current.style.overflowY = 'hidden';
       }
     }
   };

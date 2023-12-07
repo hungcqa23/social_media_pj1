@@ -22,6 +22,9 @@ interface Props {
   placement: Placement;
   hasArrow?: boolean;
   offsetNum?: number;
+  initialOpen?: boolean;
+  action?: 'click' | 'hover' | null;
+  onOpenChange?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export default function Popover({
   children,
@@ -30,13 +33,13 @@ export default function Popover({
   as: Element = 'div',
   renderPopover,
   placement = 'top',
-  offsetNum = 5
+  offsetNum = 5,
+  initialOpen = false
 }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(initialOpen);
   const id = useId();
 
   const arrowRef = useRef<SVGSVGElement>(null);
-
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,

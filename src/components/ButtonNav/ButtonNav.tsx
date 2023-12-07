@@ -13,6 +13,7 @@ interface Props {
   isButton?: boolean;
   classNameButton?: string;
   classNameText?: string;
+  isOpen?: boolean;
   onClick?: () => void;
 }
 
@@ -45,6 +46,7 @@ export default function ButtonNav(props: Props) {
     justify-center gap rounded-lg 
     transition-all hover:bg-gray-200 ${lgNavLink} active:bg-gray-100`,
     isButton,
+    isOpen,
     onClick
   } = props;
   const [isHover, setIsHover] = useState(false);
@@ -55,56 +57,54 @@ export default function ButtonNav(props: Props) {
     isActiveRoute(pathname, text.toLowerCase()) ||
     (text === 'Home' && pathname === '/');
 
-  return (
-    <>
-      {isButton ? (
-        <>
-          <button
-            className={classNameButton}
-            onMouseEnter={() => setIsHover(true)}
-            onMouseLeave={() => setIsHover(false)}
-            onClick={onClick}
-          >
-            <div
-              className={`${isHover && 'scale-105'} ${
-                isActive && 'scale-105'
-              } ${lgImg} flex h-6 w-6 items-center justify-center transition-all duration-150`}
-            >
-              <img
-                src={`${isActive ? svgActive : svg}`}
-                className={`h-6 w-6 ${
-                  isProfile ? 'rounded-full' : ''
-                } object-cover transition-all`}
-                alt={`${text} logo`}
-              />
-            </div>
-            <p className={`hidden ${lgP}`}>{text}</p>
-          </button>
-        </>
-      ) : (
-        <NavLink
-          to={to}
-          className={className}
-          onMouseEnter={() => setIsHover(true)}
-          onMouseLeave={() => setIsHover(false)}
+  if (isButton) {
+    return (
+      <button
+        className={classNameButton}
+        onMouseEnter={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
+        onClick={onClick}
+      >
+        <div
+          className={`${isHover && 'scale-105'} ${
+            isOpen && 'scale-105'
+          } ${lgImg} flex h-6 w-6 items-center justify-center transition-all duration-150`}
         >
-          <div
-            className={`${isHover && 'scale-105'} ${
-              isActive && 'scale-105'
-            } ${lgImg} } flex h-6 w-6 items-center justify-center transition-all
+          <img
+            src={`${isOpen ? svgActive : svg}`}
+            className={`h-6 w-6 ${
+              isProfile ? 'rounded-full' : ''
+            } object-cover transition-all`}
+            alt={`${text} logo`}
+          />
+        </div>
+        <p className={`hidden ${lgP}`}>{text}</p>
+      </button>
+    );
+  }
+
+  return (
+    <NavLink
+      to={to}
+      className={className}
+      onMouseEnter={() => setIsHover(true)}
+      onMouseLeave={() => setIsHover(false)}
+    >
+      <div
+        className={`${isHover && 'scale-105'} ${
+          isActive && 'scale-105'
+        } ${lgImg} } flex h-6 w-6 items-center justify-center transition-all
             duration-150`}
-          >
-            <img
-              src={`${isActive ? svgActive : svg}`}
-              className={`h-6 w-6 rounded-full object-cover transition-all ${
-                isProfile && isActive && 'border-2 border-black'
-              }`}
-              alt={`${text} logo`}
-            />
-          </div>
-          <p className={`hidden ${lgP} ${classNameText}`}>{text}</p>
-        </NavLink>
-      )}
-    </>
+      >
+        <img
+          src={`${isActive ? svgActive : svg}`}
+          className={`h-6 w-6 rounded-full object-cover transition-all ${
+            isProfile && isActive && 'border-2 border-black'
+          }`}
+          alt={`${text} logo`}
+        />
+      </div>
+      <p className={`hidden ${lgP} ${classNameText}`}>{text}</p>
+    </NavLink>
   );
 }

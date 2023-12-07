@@ -1,22 +1,44 @@
 import Input from 'src/components/Input';
 import Button from 'src/components/Button';
-import { getRules } from 'src/utils/rules';
+import { getRules, schema } from 'src/utils/rules';
 import { useForm } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
+import { yupResolver } from '@hookform/resolvers/yup';
+import authApi from 'src/apis/auth.api';
+import { toast } from 'react-toastify';
 
 interface FormData {
   email: string;
 }
+const forgotPasswordSchema = schema.pick(['email']);
 export default function ForgotPassword() {
   const {
     getValues,
     register,
     handleSubmit,
+    reset,
     formState: { errors }
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    resolver: yupResolver(forgotPasswordSchema)
+  });
+
+  const forgotPasswordMutation = useMutation({
+    mutationFn: (body: FormData) => authApi.forgotPassword(body),
+    onSuccess: data => {
+      toast.success('Forgot password successfully. Please check your email', {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    },
+    onError: () => {
+      toast.error('Please check your email', {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    }
+  });
 
   const onSubmit = handleSubmit(data => {
-    console.log(getValues());
-    console.log(data);
+    forgotPasswordMutation.mutate(data);
+    reset();
   });
 
   const rules = getRules();
@@ -28,10 +50,15 @@ export default function ForgotPassword() {
       </h1>
 
       <p className='mb-4 text-sm md:text-base'>
-        Enter the email address you used and we&apos;ll send you code to reset your password.
+        Enter the email address you used and we&apos;ll send you code to reset
+        your password.
       </p>
 
-      <form className='flex flex-col gap-4  self-center' onSubmit={onSubmit} noValidate>
+      <form
+        className='flex flex-col gap-4  self-center'
+        onSubmit={onSubmit}
+        noValidate
+      >
         <Input
           placeholder='Enter your email ...'
           type='email'
