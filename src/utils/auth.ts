@@ -18,6 +18,7 @@ export const getRefreshTokenFromLS = () =>
 export const clearLS = () => {
   localStorage.removeItem('refresh_token');
   localStorage.removeItem('access_token');
+  localStorage.removeItem('profile');
 };
 
 export const setProfileToLS = (profile: User) => {

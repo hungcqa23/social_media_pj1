@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { isActiveRoute } from 'src/utils/utils';
+import classNames from 'classnames';
 
 interface Props {
   svg: string;
@@ -37,11 +38,14 @@ export default function ButtonNav(props: Props) {
     isProfile,
     classNameText,
     className = ({ isActive }: { isActive: boolean }) =>
-      `${
-        isActive ? 'border border-gray-300 font-medium' : ''
-      } flex h-12 w-12 items-center 
+      classNames(
+        `flex h-12 w-12 items-center 
     justify-center gap rounded-lg 
     transition-all hover:bg-gray-200 ${lgNavLink} active:bg-gray-100`,
+        {
+          'border border-gray-300 font-medium': isActive
+        }
+      ),
     classNameButton = `flex h-12 w-12 items-center 
     justify-center gap rounded-lg 
     transition-all hover:bg-gray-200 ${lgNavLink} active:bg-gray-100`,
@@ -54,7 +58,7 @@ export default function ButtonNav(props: Props) {
   const pathname = useLocation().pathname;
 
   const isActive =
-    isActiveRoute(pathname, text.toLowerCase()) ||
+    isActiveRoute(pathname, text?.toLowerCase()) ||
     (text === 'Home' && pathname === '/');
 
   if (isButton) {
@@ -66,15 +70,18 @@ export default function ButtonNav(props: Props) {
         onClick={onClick}
       >
         <div
-          className={`${isHover && 'scale-105'} ${
-            isOpen && 'scale-105'
-          } ${lgImg} flex h-6 w-6 items-center justify-center transition-all duration-150`}
+          className={classNames(
+            `${lgImg} flex h-6 w-6 items-center justify-center transition-all duration-150`,
+            {
+              'scale-105': isHover || isOpen
+            }
+          )}
         >
           <img
             src={`${isOpen ? svgActive : svg}`}
-            className={`h-6 w-6 ${
-              isProfile ? 'rounded-full' : ''
-            } object-cover transition-all`}
+            className={classNames(`h-6 w-6 object-cover transition-all`, {
+              'rounded-full': isProfile
+            })}
             alt={`${text} logo`}
           />
         </div>

@@ -3,10 +3,14 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import Button from 'src/components/Button';
 import { useContext } from 'react';
 import { AppContext } from 'src/contexts/app.contexts';
+import classNames from 'classnames';
+
+const classNamePath = ({ isMatch }: { isMatch: boolean }) =>
+  classNames(``, { 'fill-gray-500': !isMatch, 'fill-black': isMatch });
 
 const buttonsFilter = [
   {
-    value: 'Posts',
+    value: 'posts',
     isMatch: false,
     svg: ({ isMatch }: { isMatch: boolean }) => (
       <svg
@@ -18,13 +22,13 @@ const buttonsFilter = [
         <path
           d='M2 2H22V22H2V2ZM4 4V8H8V4H4ZM10 4V8H14V4H10ZM16 4V8H20V4H16ZM20 10H16V14H20V10ZM20 16H16V20H20V16ZM14 20V16H10V20H14ZM8 20V16H4V20H8ZM4 14H8V10H4V14ZM10 10V14H14V10H10Z'
           fill='black'
-          className={`${isMatch ? 'fill-black' : 'fill-gray-500'}`}
+          className={classNamePath({ isMatch })}
         />
       </svg>
     )
   },
   {
-    value: 'Images',
+    value: 'images',
     isMatch: false,
     svg: ({ isMatch }: { isMatch: boolean }) => (
       <svg
@@ -36,13 +40,13 @@ const buttonsFilter = [
         <path
           d='M2 2H22V22H2V2ZM4 20H17.586L9 11.414L4 16.414V20ZM20 19.586V4H4V13.586L9 8.586L20 19.586ZM15.547 7C15.2818 7 15.0274 7.10536 14.8399 7.29289C14.6524 7.48043 14.547 7.73478 14.547 8C14.547 8.26522 14.6524 8.51957 14.8399 8.70711C15.0274 8.89464 15.2818 9 15.547 9C15.8122 9 16.0666 8.89464 16.2541 8.70711C16.4416 8.51957 16.547 8.26522 16.547 8C16.547 7.73478 16.4416 7.48043 16.2541 7.29289C16.0666 7.10536 15.8122 7 15.547 7ZM12.547 8C12.547 7.20435 12.8631 6.44129 13.4257 5.87868C13.9883 5.31607 14.7514 5 15.547 5C16.3426 5 17.1057 5.31607 17.6683 5.87868C18.2309 6.44129 18.547 7.20435 18.547 8C18.547 8.79565 18.2309 9.55871 17.6683 10.1213C17.1057 10.6839 16.3426 11 15.547 11C14.7514 11 13.9883 10.6839 13.4257 10.1213C12.8631 9.55871 12.547 8.79565 12.547 8Z'
           fill='black'
-          className={`${isMatch ? 'fill-black' : 'fill-gray-500'}`}
+          className={classNamePath({ isMatch })}
         />
       </svg>
     )
   },
   {
-    value: 'Videos',
+    value: 'videos',
     isMatch: false,
     svg: ({ isMatch }: { isMatch: boolean }) => (
       <svg
@@ -53,13 +57,13 @@ const buttonsFilter = [
       >
         <path
           d='M2 2H22V22H2V2ZM4 4V20H20V4H4ZM8 6.37L17.75 12L8 17.63V6.37ZM10 9.835V14.165L13.75 12L10 9.835Z'
-          className={`${isMatch ? 'fill-black' : 'fill-gray-500'}`}
+          className={classNamePath({ isMatch })}
         />
       </svg>
     )
   },
   {
-    value: 'Saved',
+    value: 'saved',
     isMatch: false,
     svg: ({ isMatch }: { isMatch: boolean }) => (
       <svg
@@ -70,7 +74,7 @@ const buttonsFilter = [
       >
         <path
           d='M5 2H19C19.2652 2 19.5196 2.10536 19.7071 2.29289C19.8946 2.48043 20 2.73478 20 3V22.143C20.0001 22.2324 19.9763 22.3202 19.9309 22.3973C19.8855 22.4743 19.8204 22.5378 19.7421 22.5811C19.6639 22.6244 19.5755 22.6459 19.4861 22.6434C19.3968 22.641 19.3097 22.6146 19.234 22.567L12 18.03L4.766 22.566C4.69037 22.6135 4.60339 22.6399 4.5141 22.6424C4.42482 22.6449 4.33649 22.6235 4.2583 22.5803C4.1801 22.5371 4.11491 22.4738 4.06948 22.3969C4.02406 22.32 4.00007 22.2323 4 22.143V3C4 2.73478 4.10536 2.48043 4.29289 2.29289C4.48043 2.10536 4.73478 2 5 2ZM18 4H6V19.432L12 15.671L18 19.432V4Z'
-          className={`${isMatch ? 'fill-black' : 'fill-gray-500'}`}
+          className={classNamePath({ isMatch })}
         />
       </svg>
     )
@@ -192,43 +196,15 @@ export default function Profile() {
                 {svg({ isMatch })}
 
                 <span
-                  className={`text-base font-medium ${
-                    isMatch ? 'text-black' : 'text-gray-400'
-                  }`}
+                  className={classNames(`text-base font-medium capitalize`, {
+                    'text-black': isMatch,
+                    'text-gray-400': !isMatch
+                  })}
                 >
                   {value}
                 </span>
               </Button>
             ))}
-
-            {/* <Button typeButton='filter' value={'posts'}>
-              <img src={`${iconsSvg.posts}`} className='mr-2' alt='Post icon' />
-              <span className='font-medium text-gray-500'>POSTS</span>
-            </Button>
-            <Button typeButton='filter' value={'images'}>
-              <img
-                src={`${iconsSvg.images}`}
-                className='mr-2'
-                alt='Images icon'
-              />
-              <span className='font-medium text-gray-500'>IMAGES</span>
-            </Button>
-            <Button typeButton='filter' value={'videos'}>
-              <img
-                src={`${iconsSvg.videos}`}
-                className='mr-2'
-                alt='Videos icon'
-              />
-              <span className='font-medium text-gray-500'>VIDEOS</span>
-            </Button>
-            <Button typeButton='filter' value={'saved'}>
-              <img
-                src={iconsSvg.savedFilled}
-                className='mr-2'
-                alt='Saved icon'
-              />
-              <span className='font-medium text-gray-500'>SAVED</span>
-            </Button> */}
           </div>
         </section>
       </div>

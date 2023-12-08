@@ -1,6 +1,4 @@
-import { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { AppContext } from 'src/contexts/app.contexts';
 
 interface Props {
   className?: string;

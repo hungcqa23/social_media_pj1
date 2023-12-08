@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import Profile from '../IconProfile';
 import { convertFileToBase64 } from 'src/utils/file';
+import { useMutation } from '@tanstack/react-query';
+import { postApi } from 'src/apis/post.api';
+import { Post } from 'src/types/post.type';
+import { useForm } from 'react-hook-form';
+import classNames from 'classnames';
+import { toast } from 'react-toastify';
+import { useAppContext } from 'src/contexts/app.contexts';
 
 interface Props {
   closeModal: () => void;
@@ -13,50 +20,77 @@ export default function Modal({
   includesMedia,
   setIncludesMedia
 }: Props) {
-  const [value, setValue] = useState<string>('');
-  const [files, setFiles] = useState<File | null>(null);
+  const { profile } = useAppContext();
+  const [file, setFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  const { register, handleSubmit, getValues, watch } = useForm();
+  const watchContent = watch('content');
+
+  const { onChange, name, ref } = register('content');
+  const createPostMutation = useMutation({
+    mutationFn: (
+      body: Post & {
+        image?: string;
+      }
+    ) => postApi.createPost(body)
+  });
 
   useEffect(() => {
     setIncludesMedia(false);
   }, [setIncludesMedia]);
   const handleTextAreaChange = () => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = 'auto';
       // Reset the height to auto to adjust to content
-      textareaRef.current.style.height =
-        textareaRef.current.scrollHeight + 'px';
+      textAreaRef.current.style.height =
+        textAreaRef.current.scrollHeight + 'px';
       // Set the height to the scrollHeight
     }
   };
   const handleOpenFile = () => {
     inputRef?.current?.click();
   };
-  const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setValue(event.target.value);
-    handleTextAreaChange();
-  };
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-  };
+  const onSubmit = handleSubmit(async data => {
+    const stringBase64 = file ? await convertFileToBase64(file) : '';
+    createPostMutation.mutate(
+      {
+        post: data.content,
+        profilePicture: profile?.profilePicture,
+        privacy: 'public',
+        image: stringBase64
+      },
+      {
+        onSuccess: () => {
+          toast.success('Create post successfully!', {
+            position: toast.POSITION.TOP_RIGHT
+          });
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        },
+        onError: () => {
+          toast.error('Create post failed!', {
+            position: toast.POSITION.TOP_LEFT
+          });
+        }
+      }
+    );
+  });
   const onChangeFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setFiles(event.target.files[0]);
-      console.log(await convertFileToBase64(event.target.files[0]));
+      setFile(event.target.files[0]);
     }
   };
   const onCloseFile = () => {
-    setFiles(null);
+    setFile(null);
     setIncludesMedia(false);
   };
-
-  // Floating
 
   return (
     <form
       className={`flex min-h-[30rem] w-[33rem] flex-col justify-between rounded-lg bg-white shadow`}
-      onSubmit={handleSubmit}
+      onSubmit={onSubmit}
     >
       {/* Header */}
       <header className='relative flex h-14 items-center justify-center border-b p-5'>
@@ -80,7 +114,11 @@ export default function Modal({
       <div className='flex flex-grow flex-col justify-between overflow-y-auto'>
         {/* Profile */}
         <div className='mx-4 flex items-center py-3'>
-          <Profile to='/profile' className='mr-2 h-11 w-11' />
+          <Profile
+            to='/profile'
+            className='mr-2 h-11 w-11'
+            src={profile?.profilePicture}
+          />
           <div>
             <div>
               <span className='font-semibold'>An Hưng</span>
@@ -128,27 +166,40 @@ export default function Modal({
 
         {/* Create Content */}
         <div className='flex flex-grow flex-col justify-between overflow-y-auto'>
+          {/* Text */}
           <div className='overflow-y-auto'>
             <div className='w-full px-4'>
               <textarea
-                ref={textareaRef}
-                onChange={onChange}
                 className='max-h-40 w-full resize-none overflow-auto whitespace-pre-wrap text-base font-normal text-black placeholder:text-gray-600 focus:outline-none'
                 placeholder={"What's on your mind, An Hưng ?"}
-                value={value}
-              ></textarea>
+                onChange={event => {
+                  onChange(event);
+                  handleTextAreaChange();
+                }}
+                name={name}
+                ref={e => {
+                  ref(e);
+                  textAreaRef.current = e;
+                }}
+              />
             </div>
 
-            {(files || includesMedia) && (
+            {/* Media */}
+            {(file || includesMedia) && (
               <div className='w-full px-4'>
                 <div className='h-40'>
-                  <div className={`${!files && 'h-full'} rounded-lg border`}>
+                  <div
+                    className={classNames(`rounded-lg border`, {
+                      'h-full': !file
+                    })}
+                  >
                     <div className='h-full p-2'>
                       <div className='relative h-full'>
-                        {!files && includesMedia && (
+                        {!file && includesMedia && (
                           <button
                             className='hover:pointer flex h-full w-full flex-col items-center justify-center rounded-lg bg-gray-50 outline-none hover:bg-gray-100'
                             onClick={handleOpenFile}
+                            type='button'
                           >
                             <div className='flex h-11 w-11 items-center justify-center rounded-full bg-gray-200'>
                               <span>
@@ -172,10 +223,10 @@ export default function Modal({
                           </button>
                         )}
 
-                        {files && (
+                        {file && (
                           <div className='p-2'>
                             <img
-                              src={URL.createObjectURL(files)}
+                              src={URL.createObjectURL(file)}
                               alt='User Upload'
                               className='h-full w-full rounded-md'
                             />
@@ -210,6 +261,7 @@ export default function Modal({
                   includesMedia && 'bg-gray-100'
                 }`}
                 onClick={() => setIncludesMedia(true)}
+                type='button'
               >
                 <span>
                   <span>
@@ -227,23 +279,23 @@ export default function Modal({
                     </svg>
                   </span>
                 </span>
+                <input
+                  type='file'
+                  className='hidden'
+                  ref={inputRef}
+                  accept='image/*'
+                  onChange={onChangeFile}
+                />
               </button>
             </div>
 
+            {/* Submit button */}
             <button
-              disabled={value === ''}
+              disabled={watchContent === '' && file === null}
               className='block h-10 w-full rounded-md bg-blue-600 text-center text-sm font-medium hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-300'
             >
               <span className='text-base font-semibold text-white'>Post</span>
             </button>
-
-            <input
-              type='file'
-              className='hidden'
-              ref={inputRef}
-              accept='image/*'
-              onChange={onChangeFile}
-            />
           </div>
         </div>
       </div>

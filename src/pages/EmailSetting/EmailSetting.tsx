@@ -6,12 +6,13 @@ type IndividualSwitches = {
 };
 export default function EmailSetting() {
   const [isAllChecked, setIsAllChecked] = useState(true);
-  const [individualSwitches, setIndividualSwitches] = useState<IndividualSwitches>({
-    messages: false,
-    notifications: false,
-    likes: false,
-    'follower-requests': false
-  });
+  const [individualSwitches, setIndividualSwitches] =
+    useState<IndividualSwitches>({
+      messages: false,
+      notifications: false,
+      likes: false,
+      'follower-requests': false
+    });
 
   const inputObjs = [
     {
@@ -71,7 +72,9 @@ export default function EmailSetting() {
             <Switch
               checked={individualSwitches[inputObj.id]}
               id={inputObj.id}
-              handleCheckboxChange={() => handleIndividualCheckboxChange(inputObj.id)}
+              handleCheckboxChange={() =>
+                handleIndividualCheckboxChange(inputObj.id)
+              }
             />
           </div>
         ))}

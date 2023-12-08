@@ -6,6 +6,9 @@ import Dialog from '../Dialog';
 import { Post as PostType } from 'src/types/post.type';
 import { formatDate } from 'src/utils/helper';
 import { calculateTextWidth } from 'src/utils/utils';
+import { useAppContext } from 'src/contexts/app.contexts';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { postApi } from 'src/apis/post.api';
 
 interface CommentType {
   id: number;
@@ -25,6 +28,7 @@ interface States {
   openMenu: boolean;
   openComment: boolean;
 }
+
 const initialState: States = {
   openMenu: false,
   openOptions: false,
@@ -84,10 +88,15 @@ const comments: CommentType[] = [
 const originalHeight = 36;
 
 export default function PostItem({ post, innerRef }: PostProps) {
+  const { profile } = useAppContext();
   const [state, dispatch] = useReducer(reducer, initialState);
   const [liked, setLiked] = useState<boolean>(false);
 
-  const newDate = formatDate(post.createdAt);
+  const { data: reactions } = useQuery({
+    queryKey: ['reactions', post._id],
+    queryFn: () => postApi.getReactions(post._id || '')
+  });
+  const newDate = formatDate(post.createdAt as string);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const handleTextAreaChange = () => {
@@ -103,6 +112,26 @@ export default function PostItem({ post, innerRef }: PostProps) {
       textareaRef.current.style.height =
         textareaRef.current.scrollHeight + 'px'; // Set the height to the scrollHeight
     }
+  };
+
+  const likeMutation = useMutation({
+    mutationFn: (body: {
+      postId: string;
+      userTo: string;
+      postReactions: { likes: number };
+      profilePicture: string;
+    }) => postApi.likePost(body)
+  });
+
+  const onLike = () => {
+    likeMutation.mutate({
+      postId: post._id || '',
+      userTo: profile?._id || '',
+      postReactions: {
+        likes: 1
+      },
+      profilePicture: profile?.profilePicture || ''
+    });
   };
 
   const buttons: ButtonType[] = [
@@ -260,7 +289,7 @@ export default function PostItem({ post, innerRef }: PostProps) {
           {/* Likes */}
           <button
             className='flex basis-4/12 items-center justify-center rounded p-1 transition-colors hover:bg-gray-100'
-            onClick={() => setLiked(prev => !prev)}
+            onClick={onLike}
           >
             <span className='pr-2'>
               {liked && (
@@ -360,7 +389,11 @@ export default function PostItem({ post, innerRef }: PostProps) {
       {/* Created Comment */}
       <div className='px-4 py-2'>
         <div className='flex gap-2'>
-          <Profile className='h-8 w-8 flex-shrink-0' classNameImage='h-8 w-8' />
+          <Profile
+            className='h-8 w-8 flex-shrink-0'
+            classNameImage='h-8 w-8'
+            src={profile?.profilePicture}
+          />
           <textarea
             className='h-9 w-full flex-grow resize-none overflow-y-hidden rounded-3xl border bg-gray-100 p-2 text-sm text-gray-600 outline-none  '
             placeholder='Write a comment...'

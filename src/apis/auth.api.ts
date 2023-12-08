@@ -6,6 +6,7 @@ export const URL_LOGIN = 'signin';
 export const URL_REGISTER = 'sign-up';
 export const URL_LOGOUT = 'logout';
 export const URL_FORGOT_PASSWORD = 'forgot-password';
+export const URL_RESET_PASSWORD = 'reset-password';
 
 const authApi = {
   registerAccount(body: { email: string; password: string }) {
@@ -19,6 +20,16 @@ const authApi = {
   },
   forgotPassword(body: { email: string }) {
     return http.post<SuccessResponse>(URL_FORGOT_PASSWORD, body);
+  },
+  resetPassword(body: {
+    password: string;
+    confirmPassword: string;
+    token: string;
+  }) {
+    return http.post<SuccessResponse>(`${URL_RESET_PASSWORD}/${body.token}`, {
+      password: body.password,
+      confirmPassword: body.confirmPassword
+    });
   }
 };
 
