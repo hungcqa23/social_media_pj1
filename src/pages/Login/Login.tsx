@@ -40,7 +40,6 @@ export default function Login() {
   const onSubmit = handleSubmit(data => {
     loginMutation.mutate(data, {
       onSuccess: data => {
-        console.log(data.request);
         toast.success('Login successfully', {
           position: toast.POSITION.TOP_RIGHT
         });

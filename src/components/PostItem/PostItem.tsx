@@ -7,8 +7,15 @@ import { Post as PostType } from 'src/types/post.type';
 import { formatDate } from 'src/utils/helper';
 import { calculateTextWidth } from 'src/utils/utils';
 import { useAppContext } from 'src/contexts/app.contexts';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  dataTagSymbol,
+  useMutation,
+  useQuery,
+  useQueryClient
+} from '@tanstack/react-query';
 import { postApi } from 'src/apis/post.api';
+import { reactionApi } from 'src/apis/reaction.api';
+import classNames from 'classnames';
 
 interface CommentType {
   id: number;
@@ -89,15 +96,30 @@ const originalHeight = 36;
 
 export default function PostItem({ post, innerRef }: PostProps) {
   const { profile } = useAppContext();
+  const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [liked, setLiked] = useState<boolean>(false);
 
-  const { data: reactions } = useQuery({
+  const { data: reactionsData } = useQuery({
     queryKey: ['reactions', post._id],
-    queryFn: () => postApi.getReactions(post._id || '')
+    queryFn: () => reactionApi.getPostReactions(post._id || '')
   });
-  const newDate = formatDate(post.createdAt as string);
+  const reactions = reactionsData?.data.reactions;
 
+  const [liked, setLiked] = useState<boolean>(() => {
+    return (
+      reactions?.some(reaction => reaction.username === profile?.username) ||
+      false
+    );
+  });
+
+  const deletePostMutation = useMutation({
+    mutationFn: (postId: string) => postApi.deletePost(postId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    }
+  });
+
+  const newDate = formatDate(post.createdAt as string);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const handleTextAreaChange = () => {
     if (textareaRef.current) {
@@ -114,26 +136,6 @@ export default function PostItem({ post, innerRef }: PostProps) {
     }
   };
 
-  const likeMutation = useMutation({
-    mutationFn: (body: {
-      postId: string;
-      userTo: string;
-      postReactions: { likes: number };
-      profilePicture: string;
-    }) => postApi.likePost(body)
-  });
-
-  const onLike = () => {
-    likeMutation.mutate({
-      postId: post._id || '',
-      userTo: profile?._id || '',
-      postReactions: {
-        likes: 1
-      },
-      profilePicture: profile?.profilePicture || ''
-    });
-  };
-
   const buttons: ButtonType[] = [
     {
       text: 'Cancel',
@@ -142,6 +144,8 @@ export default function PostItem({ post, innerRef }: PostProps) {
       }
     }
   ];
+
+  const isOwner = post.username === profile?.username;
 
   return (
     <div className='w-full rounded-lg border shadow' ref={innerRef}>
@@ -195,22 +199,27 @@ export default function PostItem({ post, innerRef }: PostProps) {
               <div className='text-normal flex w-[28rem] flex-col rounded-lg bg-white text-base font-normal text-black'>
                 {state.openOptions && (
                   <>
-                    <button
-                      className='p-3 font-semibold text-red-500'
-                      onClick={() =>
-                        dispatch({ type: ACTION_TYPES.OPEN_DELETE })
-                      }
-                    >
-                      Deleted
-                    </button>
+                    {isOwner && (
+                      <button
+                        className='p-3 font-semibold text-red-500'
+                        onClick={() =>
+                          dispatch({ type: ACTION_TYPES.OPEN_DELETE })
+                        }
+                      >
+                        Deleted
+                      </button>
+                    )}
 
                     {buttons.map(({ important, onClick, text }, index) => (
                       <button
                         key={index}
-                        className={`border-t ${
-                          important && 'font-semibold text-red-500'
-                        } border-gray-300
-                        p-3`}
+                        className={classNames(
+                          `border-t border-gray-300
+                        p-3`,
+                          {
+                            'font-semibold text-red-500': important
+                          }
+                        )}
                         onClick={onClick}
                       >
                         {text}
@@ -219,7 +228,7 @@ export default function PostItem({ post, innerRef }: PostProps) {
                   </>
                 )}
 
-                {state.openDelete && (
+                {isOwner && state.openDelete && (
                   <>
                     <div className='border-b p-6 text-center'>
                       <h1 className='my-2 text-2xl'>Delete post?</h1>
@@ -228,14 +237,16 @@ export default function PostItem({ post, innerRef }: PostProps) {
                       </span>
                     </div>
 
-                    <button
-                      className='border-b p-3 font-semibold text-red-500'
-                      onClick={() =>
-                        dispatch({ type: ACTION_TYPES.OPEN_DELETE })
-                      }
-                    >
-                      Deleted
-                    </button>
+                    {
+                      <button
+                        className='border-b p-3 font-semibold text-red-500'
+                        onClick={() =>
+                          deletePostMutation.mutate(post._id || '')
+                        }
+                      >
+                        Deleted
+                      </button>
+                    }
 
                     <button
                       onClick={() => {
@@ -289,7 +300,7 @@ export default function PostItem({ post, innerRef }: PostProps) {
           {/* Likes */}
           <button
             className='flex basis-4/12 items-center justify-center rounded p-1 transition-colors hover:bg-gray-100'
-            onClick={onLike}
+            // onClick={onLike}
           >
             <span className='pr-2'>
               {liked && (
@@ -326,7 +337,9 @@ export default function PostItem({ post, innerRef }: PostProps) {
                 </svg>
               )}
             </span>
-            <span className='text-sm font-medium text-gray-500'>100</span>
+            <span className='text-sm font-medium text-gray-500'>
+              {reactions?.length || 0}
+            </span>
           </button>
 
           {/* Comments */}

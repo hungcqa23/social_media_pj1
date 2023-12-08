@@ -36,9 +36,10 @@ interface LinkProps {
 }
 export default function Navigation(props: Props) {
   const [isNotificationBarOpen, setIsNotificationBarOpen] = useState(false);
-
   const location = useLocation();
   const id = useId();
+  const { profile } = useAppContext();
+
   const isShorten =
     isActiveRoute(location.pathname, 'messages') || isNotificationBarOpen;
 
@@ -54,8 +55,6 @@ export default function Navigation(props: Props) {
       clearLS();
     }
   });
-
-  const { profile } = useAppContext();
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -96,8 +95,8 @@ export default function Navigation(props: Props) {
     {
       name: 'Profile',
       to: `${profile?.username.toLowerCase()}?type=posts`,
-      svg: iconsSvg.user,
-      svgActive: iconsSvg.user,
+      svg: profile?.profilePicture || '',
+      svgActive: profile?.profilePicture || '',
       isProfile: true
     }
   ];

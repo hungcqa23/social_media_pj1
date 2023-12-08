@@ -1,12 +1,10 @@
 import { Post } from 'src/types/post.type';
-import { Reaction } from 'src/types/reaction.type';
 import { SuccessResponse } from 'src/types/utils.type';
 import http from 'src/utils/http';
 
 const URL_GET_ALL_POSTS = 'post/all';
 const URL_CREATE_POST = 'post-with-image';
-const URL_LIKE_POST = 'post/reactions';
-const URL_GET_REACTION = 'post/reactions';
+const URL_DELETE_POST = 'post';
 
 export interface GetAllPosts extends SuccessResponse {
   posts: Post[];
@@ -15,10 +13,6 @@ export interface GetAllPosts extends SuccessResponse {
 
 export interface CreatePost extends SuccessResponse {
   post: Post;
-}
-
-export interface getReactions extends SuccessResponse {
-  reactions: Reaction[];
 }
 
 export const postApi = {
@@ -32,19 +26,7 @@ export const postApi = {
   createPost(body: Post) {
     return http.post<CreatePost>(URL_CREATE_POST, body);
   },
-
-  likePost(body: {
-    postId: string;
-    userTo: string;
-    postReactions: {
-      likes: number;
-    };
-    profilePicture: string;
-  }) {
-    return http.post<SuccessResponse>(URL_LIKE_POST, body);
-  },
-
-  getReactions(postId: string) {
-    return http.get<getReactions>(`${URL_GET_REACTION}/${postId}`);
+  deletePost(id: string) {
+    return http.delete<SuccessResponse>(`${URL_DELETE_POST}/${id}`);
   }
 };

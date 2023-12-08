@@ -13,7 +13,6 @@ interface FormData {
 const forgotPasswordSchema = schema.pick(['email']);
 export default function ForgotPassword() {
   const {
-    getValues,
     register,
     handleSubmit,
     reset,
@@ -24,7 +23,7 @@ export default function ForgotPassword() {
 
   const forgotPasswordMutation = useMutation({
     mutationFn: (body: FormData) => authApi.forgotPassword(body),
-    onSuccess: data => {
+    onSuccess: () => {
       toast.success('Forgot password successfully. Please check your email', {
         position: toast.POSITION.TOP_RIGHT
       });
