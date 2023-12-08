@@ -30,7 +30,7 @@ export default function ForgotPassword() {
       });
     },
     onError: () => {
-      toast.error('Please check your email', {
+      toast.error('Please try again', {
         position: toast.POSITION.TOP_RIGHT
       });
     }
