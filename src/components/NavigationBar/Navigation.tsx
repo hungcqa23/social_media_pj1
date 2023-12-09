@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { iconsSvg } from 'src/constants/icons';
 import ButtonNav from '../ButtonNav/ButtonNav';
 import { isActiveRoute } from 'src/utils/utils';
@@ -38,21 +38,15 @@ export default function Navigation(props: Props) {
   const [isNotificationBarOpen, setIsNotificationBarOpen] = useState(false);
   const location = useLocation();
   const id = useId();
-  const { profile } = useAppContext();
+  const { profile, setIsAuthenticated } = useAppContext();
 
   const isShorten =
     isActiveRoute(location.pathname, 'messages') || isNotificationBarOpen;
-
-  const { setIsAuthenticated } = useAppContext();
 
   const logoutMutation = useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
       setIsAuthenticated(false);
-    },
-    onError: () => {
-      window.location.reload();
-      clearLS();
     }
   });
 
@@ -183,13 +177,14 @@ export default function Navigation(props: Props) {
                   svg={iconsSvg.setting}
                   to='/accounts/profile'
                 />
-                {/* <ButtonNav isButton text='Your activity' /> */}
+
                 <ButtonNav
                   to={`/${profile?.username.toLowerCase()}?type=saved`}
                   text='Saved'
                   svg={iconsSvg.saved}
                 />
               </div>
+
               <div className='flex w-full justify-center border-t py-2'>
                 <ButtonNav
                   isButton

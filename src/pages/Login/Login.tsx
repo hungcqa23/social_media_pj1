@@ -43,11 +43,11 @@ export default function Login() {
         toast.success('Login successfully', {
           position: toast.POSITION.TOP_RIGHT
         });
+
+        setAccessTokenToLS(data.data.token as string);
+        setProfileToLS(data.data.user);
         setTimeout(() => {
-          setAccessTokenToLS(data.data.token as string);
-          setProfileToLS(data.data.user);
           setIsAuthenticated(true);
-          navigate('/');
         }, 1000);
       },
       // Handle error

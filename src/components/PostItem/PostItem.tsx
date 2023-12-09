@@ -105,12 +105,9 @@ export default function PostItem({ post, innerRef }: PostProps) {
   });
   const reactions = reactionsData?.data.reactions;
 
-  const [liked, setLiked] = useState<boolean>(() => {
-    return (
-      reactions?.some(reaction => reaction.username === profile?.username) ||
-      false
-    );
-  });
+  const liked =
+    reactions?.some(reaction => reaction.username === profile?.username) ||
+    false;
 
   const deletePostMutation = useMutation({
     mutationFn: (postId: string) => postApi.deletePost(postId),
@@ -146,6 +143,9 @@ export default function PostItem({ post, innerRef }: PostProps) {
   ];
 
   const isOwner = post.username === profile?.username;
+
+  // console.log('Post Id', post._id);
+  // console.log('User id', profile?._id);
 
   return (
     <div className='w-full rounded-lg border shadow' ref={innerRef}>

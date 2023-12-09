@@ -7,7 +7,7 @@ import {
 import { lazy } from 'react';
 import path from './constants/path';
 
-import MainLayout from './layouts/MainLayout';
+// import MainLayout from './layouts/MainLayout';
 import SettingLayout from './layouts/SettingLayout';
 import AuthLayout from './layouts/AuthLayout';
 
@@ -15,6 +15,7 @@ import Slogan from './components/Slogan';
 import Conversation from './components/Conversation';
 
 import { useAppContext } from './contexts/app.contexts';
+import Login from './pages/Login';
 import BlockedAccount from './pages/BlockedAccount';
 import SearchPage from './pages/SearchPage';
 import NotificationBar from './components/NotificationBar';
@@ -29,7 +30,7 @@ import Profile from './pages/Profile';
 import YourContent from './pages/YourContent';
 import NotFound from './pages/NotFound';
 
-const Login = lazy(() => import('./pages/Login'));
+const MainLayout = lazy(() => import('./layouts/MainLayout'));
 
 function ProtectedRoute() {
   const { isAuthenticated } = useAppContext();

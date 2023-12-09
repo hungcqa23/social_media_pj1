@@ -22,6 +22,7 @@ export default function CreatePost() {
           <IconProfile
             to={`${profile?.username}`}
             src={profile?.profilePicture}
+            className='h-11 w-11 shrink-0'
           />
 
           <Dialog
