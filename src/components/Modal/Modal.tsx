@@ -24,7 +24,8 @@ export default function Modal({
   const [file, setFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
-  const { register, handleSubmit, getValues, watch } = useForm();
+  // Form data
+  const { register, handleSubmit, watch } = useForm();
   const watchContent = watch('content');
 
   const { onChange, name, ref } = register('content');

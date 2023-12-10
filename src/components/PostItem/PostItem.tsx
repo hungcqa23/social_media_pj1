@@ -1,4 +1,4 @@
-import { useReducer, useRef, useState } from 'react';
+import { useReducer, useRef } from 'react';
 import Profile from '../IconProfile';
 import Comment from '../Comment';
 import List from '../List';
@@ -7,21 +7,13 @@ import { Post as PostType } from 'src/types/post.type';
 import { formatDate } from 'src/utils/helper';
 import { calculateTextWidth } from 'src/utils/utils';
 import { useAppContext } from 'src/contexts/app.contexts';
-import {
-  dataTagSymbol,
-  useMutation,
-  useQuery,
-  useQueryClient
-} from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { postApi } from 'src/apis/post.api';
 import { reactionApi } from 'src/apis/reaction.api';
 import classNames from 'classnames';
-
-interface CommentType {
-  id: number;
-  content: string;
-  username: string;
-}
+import commentApi from 'src/apis/comment.api';
+import { IComment } from 'src/types/comment.type';
+import { useForm } from 'react-hook-form';
 
 interface ButtonType {
   text: string;
@@ -49,6 +41,7 @@ enum ACTION_TYPES {
   OPEN_DELETE = 'openDelete',
   CLOSE = 'close'
 }
+
 function reducer(state: States, action: { type: string }): States {
   switch (action.type) {
     case ACTION_TYPES.OPEN_OPTIONS: {
@@ -79,36 +72,61 @@ interface PostProps {
   innerRef?: React.Ref<HTMLParagraphElement>;
 }
 
-const comments: CommentType[] = [
-  {
-    id: 1,
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    username: 'An Hưng'
-  },
-  {
-    id: 2,
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    username: 'An Hưng'
-  }
-];
-
 const originalHeight = 36;
 
 export default function PostItem({ post, innerRef }: PostProps) {
   const { profile } = useAppContext();
   const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initialState);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
+  // Form data for comment and submit comment
+  const { register, handleSubmit, watch, reset } = useForm<{
+    comment: string;
+  }>();
+
+  const watchContentComment = watch('comment');
+  const { onChange, name, ref } = register('comment');
+  const addCommentMutation = useMutation({
+    mutationFn: (body: { comment: string }) =>
+      commentApi.addComment({
+        ...body,
+        postId: post._id || '',
+        userTo: profile?._id || '',
+        profilePicture: profile?.profilePicture || ''
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', post._id] });
+    }
+  });
+
+  const onPostComment = handleSubmit(data => {
+    addCommentMutation.mutate({
+      comment: data.comment
+    });
+    reset();
+  });
+
+  // Get Data for reactions
   const { data: reactionsData } = useQuery({
     queryKey: ['reactions', post._id],
     queryFn: () => reactionApi.getPostReactions(post._id || '')
   });
   const reactions = reactionsData?.data.reactions;
 
+  // Get Data for comments
+  const { data: commentsData } = useQuery({
+    queryKey: ['comments', post._id],
+    queryFn: () => commentApi.getCommentsByPostId(post._id || '')
+  });
+  const comments = commentsData?.data.comments || [];
+
+  // Check Liked
   const liked =
     reactions?.some(reaction => reaction.username === profile?.username) ||
     false;
 
+  // Delete Post
   const deletePostMutation = useMutation({
     mutationFn: (postId: string) => postApi.deletePost(postId),
     onSuccess: () => {
@@ -117,7 +135,6 @@ export default function PostItem({ post, innerRef }: PostProps) {
   });
 
   const newDate = formatDate(post.createdAt as string);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const handleTextAreaChange = () => {
     if (textareaRef.current) {
       // Check if it's only 1 line
@@ -143,9 +160,6 @@ export default function PostItem({ post, innerRef }: PostProps) {
   ];
 
   const isOwner = post.username === profile?.username;
-
-  // console.log('Post Id', post._id);
-  // console.log('User id', profile?._id);
 
   return (
     <div className='w-full rounded-lg border shadow' ref={innerRef}>
@@ -392,29 +406,69 @@ export default function PostItem({ post, innerRef }: PostProps) {
         </div>
       </div>
 
-      {List<CommentType>({
+      {List<IComment>({
         listItems: comments,
-        mapFn: ({ id, content, username }: CommentType) => (
-          <Comment key={id} content={content} username={username} />
+        mapFn: (comment: IComment) => (
+          <Comment key={comment._id} comment={comment} />
         )
       })}
 
       {/* Created Comment */}
-      <div className='px-4 py-2'>
+      <form className='px-4 py-2' onSubmit={onPostComment}>
         <div className='flex gap-2'>
           <Profile
             className='h-8 w-8 flex-shrink-0'
             classNameImage='h-8 w-8'
             src={profile?.profilePicture}
           />
-          <textarea
-            className='h-9 w-full flex-grow resize-none overflow-y-hidden rounded-3xl border bg-gray-100 p-2 text-sm text-gray-600 outline-none  '
-            placeholder='Write a comment...'
-            ref={textareaRef}
-            onChange={handleTextAreaChange}
-          />
+          {/* Input */}
+          <div className='grow rounded-2xl bg-gray-100'>
+            <div className='flex flex-col'>
+              <textarea
+                className='h-9 w-full flex-grow resize-none overflow-y-hidden bg-transparent p-2 text-sm font-normal text-gray-600 outline-none'
+                placeholder='Write a comment...'
+                onChange={event => {
+                  onChange(event);
+                  handleTextAreaChange();
+                }}
+                ref={e => {
+                  ref(e);
+                  textareaRef.current = e;
+                }}
+                name={name}
+                onKeyDown={event => {
+                  if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    onPostComment();
+                  }
+                }}
+              />
+
+              {watchContentComment !== '' && (
+                <button
+                  className='mr-3 flex h-8 w-8 items-center justify-center self-end rounded-full hover:bg-gray-200'
+                  type='submit'
+                >
+                  <span className='ml-[0.2rem] mt-[0.05rem] flex items-center justify-center'>
+                    <svg
+                      width='23'
+                      height='24'
+                      viewBox='0 0 23 24'
+                      fill='none'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path
+                        d='M18.735 10.71L5.16001 3.40499C4.02001 2.78999 2.70001 3.85499 3.06001 5.09999L4.92001 11.61C4.99501 11.88 4.99501 12.15 4.92001 12.42L3.06001 18.93C2.70001 20.175 4.02001 21.24 5.16001 20.625L18.735 13.32C18.9666 13.1935 19.1599 13.0069 19.2945 12.7799C19.4291 12.5529 19.5002 12.2939 19.5002 12.03C19.5002 11.7661 19.4291 11.507 19.2945 11.2801C19.1599 11.0531 18.9666 10.8665 18.735 10.74V10.71Z'
+                        fill='#3B82F6'
+                      />
+                    </svg>
+                  </span>
+                </button>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

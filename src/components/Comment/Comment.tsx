@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import IconProfile from '../IconProfile';
+import { IComment } from 'src/types/comment.type';
 
 interface Props {
-  content: string;
-  username: string;
+  comment: IComment;
 }
-export default function Comment({ content, username = 'An Hung' }: Props) {
+
+export default function Comment({ comment }: Props) {
   const [hover, setHover] = useState(false);
 
   return (
@@ -18,15 +19,16 @@ export default function Comment({ content, username = 'An Hung' }: Props) {
         <IconProfile
           className='h-8 w-8 flex-shrink-0'
           classNameImage='h-8 w-8'
+          src={comment.profilePicture}
         />
-        <div className='flex max-w-fit flex-grow flex-col overflow-y-hidden  text-sm'>
+        <div className='flex max-w-fit flex-grow flex-col overflow-y-hidden text-sm'>
           <div className='flex items-center gap-2'>
-            <div className='rounded-2xl bg-gray-100 p-2'>
-              <span className='mb-1 w-fit text-xs font-semibold'>
-                {username}
+            <div className='rounded-2xl bg-gray-100 p-2 pt-1'>
+              <span className='-mt-1 mb-1 w-fit text-xs font-semibold'>
+                {comment.username}
               </span>
-              <p className='max-w-fit whitespace-pre-wrap text-sm font-light text-gray-700'>
-                {content}
+              <p className='text-regular max-w-fit whitespace-pre-wrap font-normal text-gray-700'>
+                {comment.comment}
               </p>
             </div>
 
@@ -46,8 +48,9 @@ export default function Comment({ content, username = 'An Hung' }: Props) {
               </button>
             )}
           </div>
+
           <ul className='text-xs text-gray-600'>
-            <span className='mx-2'>1 w</span>
+            <span className='mx-2'>1w</span>
             <button className='mx-2 font-semibold'>Like</button>
           </ul>
         </div>
