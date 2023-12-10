@@ -32,7 +32,7 @@
 // "createdAt": "2023-11-30T03:10:32.539Z"
 export interface User {
   _id: string;
-  profilePicture?: string;
+  profilePicture: string;
   postsCount: number;
   followersCount: number;
   followingCount: number;

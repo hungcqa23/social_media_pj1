@@ -1,50 +1,72 @@
-import { useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import IconProfile from '../IconProfile';
-import { calculateTextWidth } from 'src/utils/utils';
+import { useParams } from 'react-router-dom';
+import { retrieveMessages, sendMessage } from 'src/apis/conversation.api';
+import { AppContext } from 'src/contexts/app.contexts';
+import Message from '../Message';
+import { IMessageData, ISendMessageData } from 'src/types/conversation.type';
+import MessageInput from '../MessageInput';
+import { User } from 'src/types/user.type';
+import { getUserProfile } from 'src/apis/user.api';
+import useScrollToBottom from 'src/hooks/useScrollToBottom';
+import { ChatSocket } from 'src/socket/chatSocket';
 
-const maxTextAreaHeight = 48;
-const originalHeight = 24;
 export default function Conversation() {
-  const [value, setValue] = useState<string>('');
-  const send = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-  };
+  const [messages, setMessages] = useState<IMessageData[]>([]);
+  const [isFetching, setIsFetching] = useState<boolean>(true);
+  const [receiver, setReceiver] = useState<User>();
+  const scrollRef = useScrollToBottom(messages);
+  const receiverId = useParams();
+  console.log(receiverId.id);
+  const { profile } = useContext(AppContext);
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const onTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setValue(e.target.value);
-    if (textareaRef.current) {
-      // Check if it's only 1 line
-      const textAreaWidth = textareaRef.current.clientWidth;
-      const textWidth = calculateTextWidth(textareaRef);
-      if ((textWidth || 0) < textAreaWidth) {
-        return (textareaRef.current.style.height = `${originalHeight}px`);
-      }
-
-      // Calculate the new height
-      const newHeight = Math.min(
-        maxTextAreaHeight,
-        textareaRef.current.scrollHeight
+  useEffect(() => {
+    if (isFetching) {
+      getUserProfile(receiverId.id as string).then(data => {
+        setReceiver(data);
+        ChatSocket.joinRoom(data as User, profile as User);
+      });
+      retrieveMessages(receiverId.id as string).then(data =>
+        setMessages(data as IMessageData[])
       );
-      // Set the new height to the textarea
-      textareaRef.current.style.height = `${newHeight}px`;
-
-      if (textareaRef.current.scrollHeight > maxTextAreaHeight) {
-        textareaRef.current.style.overflowY = 'scroll';
-      } else {
-        textareaRef.current.style.overflowY = 'hidden';
-      }
     }
+    if (!isFetching) {
+      setIsFetching(false);
+    }
+  }, [getUserProfile, retrieveMessages, isFetching, receiverId.id]);
+
+  useEffect(() => {
+    if (isFetching) {
+      ChatSocket.receiveMessage(messages, profile!.username, setMessages);
+    }
+    if(!isFetching) {
+      setIsFetching(false);
+    }
+  }, []);
+
+  const sendChatMessage = async (
+    message: string,
+    selectedImage: string | ArrayBuffer | null
+  ) => {
+    if (!receiver) return;
+    const reqBody: ISendMessageData = {
+      receiverId: receiver._id,
+      receiverProfilePicture: receiver.profilePicture,
+      receiverUsername: receiver.username,
+      body: message,
+      selectedImage: selectedImage ? selectedImage : undefined,
+      conversationId: messages[0].conversationId
+    } as ISendMessageData;
+    await sendMessage(reqBody);
   };
 
   return (
     <div className='flex h-full w-full flex-col justify-between'>
       <header className='space-between flex justify-between border-b px-4 py-4'>
         <div className='flex items-center'>
-          <IconProfile />
+          <IconProfile src={profile?.profilePicture} />
           <span className='ml-2 text-sm font-medium text-gray-950'>
-            Andrew 2 tay
+            {profile?.username}
           </span>
         </div>
         <div className='flex gap-2'>
@@ -99,61 +121,19 @@ export default function Conversation() {
           </button>
         </div>
       </header>
-
-      <form onSubmit={send} className='flex h-16 w-full items-center border-t'>
-        <button className='flex h-10 w-10 items-center justify-center'>
-          <svg
-            width={24}
-            height={24}
-            viewBox='0 0 24 24'
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
-          >
-            <g clipPath='url(#clip0_543_589)'>
-              <path
-                d='M19 5V19H5V5H19ZM19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM14.14 11.86L11.14 15.73L9 13.14L6 17H18L14.14 11.86Z'
-                fill='#CCCCCC'
-              />
-            </g>
-            <defs>
-              <clipPath id='clip0_543_589'>
-                <rect width={24} height={24} fill='white' />
-              </clipPath>
-            </defs>
-          </svg>
-        </button>
-
-        <div className='mx-2 my-2 flex h-12 flex-grow items-center justify-between rounded-full border'>
-          <textarea
-            ref={textareaRef}
-            onChange={onTextChange}
-            className='ml-4 h-6 basis-11/12 resize-none whitespace-pre-wrap bg-slate-50 px-2 text-sm font-normal text-gray-950 outline-none'
-            placeholder='Write a message...'
-            value={value}
+      <div
+        className='mx-2 w-full flex-1 items-end justify-center overflow-y-scroll'
+        ref={scrollRef}
+      >
+        {messages.map((item: IMessageData, index: number) => (
+          <Message
+            item={item}
+            key={index}
+            isReceived={profile?._id === item.receiverId}
           />
-          <button className='mr-2'>
-            <svg
-              width={24}
-              height={24}
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <g clipPath='url(#clip0_114_1343)'>
-                <path
-                  d='M4.01 6.03L11.52 9.25L4 8.25L4.01 6.03ZM11.51 14.75L4 17.97V15.75L11.51 14.75ZM2.01 3L2 10L17 12L2 14L2.01 21L23 12L2.01 3Z'
-                  fill='#CCCCCC'
-                />
-              </g>
-              <defs>
-                <clipPath id='clip0_114_1343'>
-                  <rect width={24} height={24} fill='white' />
-                </clipPath>
-              </defs>
-            </svg>
-          </button>
-        </div>
-      </form>
+        ))}
+      </div>
+      <MessageInput setChatMessage={sendChatMessage} />
     </div>
   );
 }

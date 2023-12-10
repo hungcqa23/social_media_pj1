@@ -17,6 +17,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
+    "@dhaiwat10/react-link-preview": "^1.15.0",
     "@floating-ui/react": "^0.24.8",
     "@hookform/resolvers": "^3.3.2",
     "@tailwindcss/line-clamp": "^0.4.4",

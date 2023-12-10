@@ -2,6 +2,9 @@ import axios, { AxiosError, HttpStatusCode, type AxiosInstance } from 'axios';
 import { getAccessTokenFromLS, getRefreshTokenFromLS } from './auth';
 import { toast } from 'react-toastify';
 
+export const BASE_ENDPOINT = 'http://localhost:5000/api/v1';
+
+
 class Http {
   private accessToken: string;
   private refreshToken: string;
@@ -14,7 +17,7 @@ class Http {
     this.refreshTokenRequest = null;
 
     this.instance = axios.create({
-      baseURL: 'http://localhost:5000/api/v1',
+      baseURL: BASE_ENDPOINT,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json'

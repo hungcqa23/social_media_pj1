@@ -2,45 +2,35 @@ import Button from 'src/components/Button';
 import MessageUser from 'src/components/MessageUser';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import List from 'src/components/List';
+import { retrieveConversations } from 'src/apis/conversation.api';
+import { IMessageData } from 'src/types/conversation.type';
+import { useContext, useEffect, useState } from 'react';
+import { AppContext } from 'src/contexts/app.contexts';
 
-interface MessageUser {
-  newMessage?: boolean;
-  isActive?: boolean;
-  userAvatar?: string;
-}
-const messagesUsers: MessageUser[] = [
-  {
-    newMessage: true
-  },
-  {
-    isActive: true
-  },
-  {
-    userAvatar:
-      'https://images.unsplash.com/photo-1477118476589-bff2c5c4cfbb?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-  },
-  {
-    newMessage: true
-  },
-  {
-    isActive: true
-  },
-  {},
-  {},
-  {},
-  {}
-];
 export default function Messages() {
+  const [conversations, setConversations] = useState<IMessageData[]>([]);
+  const { profile } = useContext(AppContext);
+  console.log(profile?.username);
+  useEffect(() => {
+    retrieveConversations().then(data =>
+      setConversations(data as IMessageData[])
+    );
+  }, []);
+
   const navigate = useNavigate();
-  const handleClick = (id: number) => {
-    navigate(`/messages/${id}`);
+  const handleClick = (item: IMessageData) => {
+    if (profile?._id === item.receiverId) {
+      navigate(`/messages/${item.senderId}`);
+    } else {
+      navigate(`/messages/${item.receiverId}`);
+    }
   };
   return (
     <>
       <div className='ml-[4.5rem] flex h-screen bg-slate-200'>
-        <div className='h-full min-w-[16rem] basis-96 border-r bg-white'>
+        <div className='h-full min-w-[22rem] basis-96 border-r bg-white'>
           <div className='flex items-center justify-between px-6 pb-3 pt-9'>
-            <p className='text-lg font-bold text-black'>anhungwindy</p>
+            <p className='text-lg font-bold text-black'>{profile?.username}</p>
             <Button className='h-6 w-6'>
               <img src='/src/assets/icons/addMessages.svg' alt='' />
             </Button>
@@ -56,16 +46,16 @@ export default function Messages() {
             </Link>
           </div>
 
-          {List<MessageUser>({
-            listItems: messagesUsers,
+          {List<IMessageData>({
+            listItems: conversations,
             mapFn: (item, index) => (
               <MessageUser
                 key={index}
-                {...item}
-                onClick={() => handleClick(index)}
+                item={item}
+                onClick={() => handleClick(item)}
               />
             ),
-            className: 'h-[calc(100%-9.5rem)] overflow-y-auto'
+            className: 'h-[calc(100%-9.5rem)] overflow-y-auto w-full'
           })}
         </div>
 
