@@ -23,7 +23,7 @@ import Messages from './pages/Messages';
 import ResetPassword from './pages/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword';
 import Register from './pages/Register';
-import Main from './pages/Main';
+// import Main from './pages/Main';
 import EmailSetting from './pages/EmailSetting';
 import EditProfile from './pages/EditProfile';
 import Profile from './pages/Profile';
@@ -31,6 +31,7 @@ import YourContent from './pages/YourContent';
 import NotFound from './pages/NotFound';
 
 const MainLayout = lazy(() => import('./layouts/MainLayout'));
+const Main = lazy(() => import('./pages/Main'));
 
 function ProtectedRoute() {
   const { isAuthenticated } = useAppContext();

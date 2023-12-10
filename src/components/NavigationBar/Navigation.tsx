@@ -46,7 +46,11 @@ export default function Navigation(props: Props) {
   const logoutMutation = useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
+      console.log('Log out successfully !');
       setIsAuthenticated(false);
+    },
+    onError: () => {
+      console.log('Log out failed !');
     }
   });
 

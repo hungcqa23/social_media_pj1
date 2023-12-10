@@ -50,7 +50,7 @@ export default function Login() {
           setIsAuthenticated(true);
         }, 1000);
       },
-      // Handle error
+
       onError: (error: unknown) => {
         toast.error('Login failed', {
           position: toast.POSITION.TOP_RIGHT
