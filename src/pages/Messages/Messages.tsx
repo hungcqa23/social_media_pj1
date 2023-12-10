@@ -4,18 +4,25 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import List from 'src/components/List';
 import { retrieveConversations } from 'src/apis/conversation.api';
 import { IMessageData } from 'src/types/conversation.type';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { AppContext } from 'src/contexts/app.contexts';
+import { ChatSocket } from 'src/socket/chatSocket';
+import { User } from 'src/types/user.type';
 
 export default function Messages() {
   const [conversations, setConversations] = useState<IMessageData[]>([]);
   const { profile } = useContext(AppContext);
-  console.log(profile?.username);
+
+  const getConversations = useCallback(async () => {
+    const response: IMessageData[] =
+      (await retrieveConversations()) as IMessageData[];
+    setConversations(response);
+    ChatSocket.conversation(profile as User, conversations, setConversations);
+  }, [conversations, profile]);
+
   useEffect(() => {
-    retrieveConversations().then(data =>
-      setConversations(data as IMessageData[])
-    );
-  }, []);
+    getConversations();
+  }, [getConversations]);
 
   const navigate = useNavigate();
   const handleClick = (item: IMessageData) => {

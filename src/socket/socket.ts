@@ -9,7 +9,7 @@ class SocketIOService {
   }
 
   setUpConnection() {
-    this.socket = io(BASE_ENDPOINT, {
+    this.socket = io('http://localhost:5000', {
       transports: ['websocket'],
       secure: true
     });

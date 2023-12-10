@@ -26,6 +26,7 @@ const MessageInput = ({ setChatMessage }: Props) => {
     setBase64File('');
     setShowImagePreview(false);
     setFile('');
+    setMessage('');
   };
   const addToPreview = async (file: File) => {
     checkFile(file);
@@ -48,7 +49,6 @@ const MessageInput = ({ setChatMessage }: Props) => {
       );
       return default_image_sent_message;
     });
-    setMessage('');
     reset();
   };
 
@@ -144,6 +144,7 @@ const MessageInput = ({ setChatMessage }: Props) => {
         <div className='mx-2 my-2 flex h-12 flex-grow items-center justify-between rounded-full border'>
           <textarea
             ref={messageInputRef}
+            value={message}
             onChange={handleTextChange}
             className='ml-4 h-6 basis-11/12 resize-none whitespace-pre-wrap bg-slate-50 px-2 text-sm font-normal text-gray-950 outline-none'
             placeholder='Write a message...'

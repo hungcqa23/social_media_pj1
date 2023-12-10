@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import IconProfile from '../IconProfile';
 import { useParams } from 'react-router-dom';
 import { retrieveMessages, sendMessage } from 'src/apis/conversation.api';
@@ -10,39 +10,61 @@ import { User } from 'src/types/user.type';
 import { getUserProfile } from 'src/apis/user.api';
 import useScrollToBottom from 'src/hooks/useScrollToBottom';
 import { ChatSocket } from 'src/socket/chatSocket';
+import { socketIOService } from 'src/socket/socket';
 
 export default function Conversation() {
   const [messages, setMessages] = useState<IMessageData[]>([]);
-  const [isFetching, setIsFetching] = useState<boolean>(true);
+  const [fetched, setFetched] = useState<boolean>(false);
   const [receiver, setReceiver] = useState<User>();
   const scrollRef = useScrollToBottom(messages);
   const receiverId = useParams();
-  console.log(receiverId.id);
   const { profile } = useContext(AppContext);
 
-  useEffect(() => {
-    if (isFetching) {
-      getUserProfile(receiverId.id as string).then(data => {
-        setReceiver(data);
-        ChatSocket.joinRoom(data as User, profile as User);
-      });
-      retrieveMessages(receiverId.id as string).then(data =>
-        setMessages(data as IMessageData[])
-      );
-    }
-    if (!isFetching) {
-      setIsFetching(false);
-    }
-  }, [getUserProfile, retrieveMessages, isFetching, receiverId.id]);
+  const getMessages = useCallback(async (receiverId: string) => {
+    const response: IMessageData[] = (await retrieveMessages(
+      receiverId
+    )) as IMessageData[];
+    ChatSocket.chatMessages = [...response];
+    setMessages([...ChatSocket.chatMessages]);
+  }, []);
+
+  const getProfile = useCallback(
+    async (id: string) => {
+      const response: User = (await getUserProfile(id)) as unknown as User;
+      setReceiver(response);
+      ChatSocket.joinRoom(response, profile as User);
+    },
+    [profile]
+  );
 
   useEffect(() => {
-    if (isFetching) {
+    if (fetched) {
+      getProfile(receiverId.id as string);
+      getMessages(receiverId.id as string);
+    }
+    if (!fetched) {
+      setFetched(true);
+    }
+    return () => {
+      if (fetched) {
+        socketIOService.getSocket().off('join room');
+      }
+    };
+  }, [getProfile, getMessages, fetched, receiverId.id]);
+
+  useEffect(() => {
+    if (fetched) {
       ChatSocket.receiveMessage(messages, profile!.username, setMessages);
     }
-    if(!isFetching) {
-      setIsFetching(false);
+    if (!fetched) {
+      setFetched(true);
     }
-  }, []);
+    return () => {
+      if (fetched) {
+        socketIOService.getSocket().off('message receive');
+      }
+    };
+  }, [fetched]);
 
   const sendChatMessage = async (
     message: string,
@@ -58,6 +80,7 @@ export default function Conversation() {
       conversationId: messages[0].conversationId
     } as ISendMessageData;
     await sendMessage(reqBody);
+    console.log('when send', ChatSocket.chatMessages);
   };
 
   return (
