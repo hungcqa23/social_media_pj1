@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { getAllPosts, postApi } from 'src/apis/post.api';
+import { GetAllPosts, postApi } from 'src/apis/post.api';
 import CreatePost from 'src/components/CreatePost';
 import List from 'src/components/List';
 import PostItem from 'src/components/PostItem';
@@ -18,10 +18,11 @@ export default function Main() {
       queryFn: ({ pageParam }) => postApi.getAllPosts({ pageParam }),
       initialPageParam: 1,
       getNextPageParam: (
-        lastPage: getAllPosts,
-        allPages: getAllPosts[],
+        lastPage: GetAllPosts,
+        allPages: GetAllPosts[],
         lastPageParam: number
       ) => {
+        console.log(lastPage);
         // Total length of allPages
         const totalPages = allPages.reduce(
           (acc, page) => acc + page.posts.length,
@@ -67,10 +68,12 @@ export default function Main() {
                   </svg>
                 </div>
               )}
+
+              {/* Posts */}
               <div className='flex w-[34rem] max-w-full flex-col gap-3 pb-2'>
                 {data?.pages?.map((page, index) => (
                   <List
-                    listItems={page?.posts}
+                    listItems={page?.posts || []}
                     mapFn={(post, index) => {
                       if (page?.posts?.length === index + 1) {
                         return (

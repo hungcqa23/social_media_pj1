@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Profile from '../IconProfile';
 import { convertFileToBase64 } from 'src/utils/file';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { postApi } from 'src/apis/post.api';
 import { Post } from 'src/types/post.type';
 import { useForm } from 'react-hook-form';
@@ -21,6 +21,7 @@ export default function Modal({
   setIncludesMedia
 }: Props) {
   const { profile } = useAppContext();
+  const queryClient = useQueryClient();
   const [file, setFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -38,7 +39,9 @@ export default function Modal({
   });
 
   useEffect(() => {
-    setIncludesMedia(false);
+    return () => {
+      setIncludesMedia(false);
+    };
   }, [setIncludesMedia]);
   const handleTextAreaChange = () => {
     if (textAreaRef.current) {
@@ -53,31 +56,27 @@ export default function Modal({
     inputRef?.current?.click();
   };
   const onSubmit = handleSubmit(async data => {
-    const stringBase64 = file ? await convertFileToBase64(file) : '';
-    createPostMutation.mutate(
-      {
+    try {
+      const stringBase64 = file ? await convertFileToBase64(file) : '';
+      await createPostMutation.mutateAsync({
         post: data.content,
         profilePicture: profile?.profilePicture,
         privacy: 'public',
         image: stringBase64
-      },
-      {
-        onSuccess: () => {
-          toast.success('Create post successfully!', {
-            position: toast.POSITION.TOP_RIGHT
-          });
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
-        },
-        onError: () => {
-          toast.error('Create post failed!', {
-            position: toast.POSITION.TOP_LEFT
-          });
-        }
-      }
-    );
+      });
+
+      toast.success('Create post successfully!', {
+        position: toast.POSITION.TOP_RIGHT
+      });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      closeModal();
+    } catch (error) {
+      toast.error('Create post failed!', {
+        position: toast.POSITION.TOP_LEFT
+      });
+    }
   });
+
   const onChangeFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setFile(event.target.files[0]);
@@ -292,7 +291,10 @@ export default function Modal({
 
             {/* Submit button */}
             <button
-              disabled={watchContent === '' && file === null}
+              disabled={
+                (watchContent === '' && file === null) ||
+                createPostMutation.isPending
+              }
               className='block h-10 w-full rounded-md bg-blue-600 text-center text-sm font-medium hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-300'
             >
               <span className='text-base font-semibold text-white'>Post</span>

@@ -5,8 +5,12 @@ import Modal from '../Modal';
 import { useAppContext } from 'src/contexts/app.contexts';
 // import { useDialogManager } from 'src/hooks/useDialogManager';
 
+// interface Test {
+//   isOpen: boolean;
+//   includesMedia: boolean;
+// }
 export default function CreatePost() {
-  const { profile, setProfile } = useAppContext();
+  const { profile } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
   const [includesMedia, setIncludesMedia] = useState(false);
 
