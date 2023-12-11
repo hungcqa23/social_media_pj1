@@ -38,7 +38,7 @@ export default function Navigation(props: Props) {
   const [isNotificationBarOpen, setIsNotificationBarOpen] = useState(false);
   const location = useLocation();
   const id = useId();
-  const { profile, setIsAuthenticated } = useAppContext();
+  const { profile, setIsAuthenticated, setProfile } = useAppContext();
 
   const isShorten =
     isActiveRoute(location.pathname, 'messages') || isNotificationBarOpen;
@@ -46,7 +46,7 @@ export default function Navigation(props: Props) {
   const logoutMutation = useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
-      console.log('Log out successfully !');
+      setProfile(null);
       setIsAuthenticated(false);
     },
     onError: () => {

@@ -15,6 +15,7 @@ import commentApi from 'src/apis/comment.api';
 import { IComment } from 'src/types/comment.type';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
+import Button from '../Button';
 
 interface ButtonType {
   text: string;
@@ -108,13 +109,6 @@ export default function PostItem({ post, innerRef }: PostProps) {
     reset();
   });
 
-  // Get Data for reactions
-  const { data: reactionsData } = useQuery({
-    queryKey: ['reactions', post._id],
-    queryFn: () => reactionApi.getPostReactions(post._id || '')
-  });
-  const reactions = reactionsData?.data.reactions;
-
   // Get Data for comments
   const { data: commentsData } = useQuery({
     queryKey: ['comments', post._id],
@@ -122,10 +116,58 @@ export default function PostItem({ post, innerRef }: PostProps) {
   });
   const comments = commentsData?.data.comments || [];
 
-  // Check Liked
+  // Save Post
+  const { data: savedPostData } = useQuery({
+    queryKey: ['saved-posts'],
+    queryFn: () => postApi.getSavedPosts()
+  });
+  const savedPosts = savedPostData?.data.posts || [];
+  const isSaved = savedPosts.some(savedPost => savedPost.postId === post._id);
+  const savePostMutation = useMutation({
+    mutationFn: (postId: string) => postApi.savePost(postId)
+  });
+  const onSavePost = () => {
+    savePostMutation.mutate(post._id || '', {
+      onSuccess: () => {
+        setTimeout(
+          () => queryClient.invalidateQueries({ queryKey: ['saved-posts'] }),
+          500
+        );
+      }
+    });
+  };
+
+  // Like post
+  const { data: reactionsData } = useQuery({
+    queryKey: ['reactions', post._id],
+    queryFn: () => reactionApi.getPostReactions(post._id || '')
+  });
+  const reactions = reactionsData?.data.reactions;
   const liked =
     reactions?.some(reaction => reaction.username === profile?.username) ||
     false;
+  const likePostMutation = useMutation({
+    mutationFn: (postId: string) =>
+      reactionApi.likePost({
+        postId,
+        userTo: profile?._id || '',
+        profilePicture: profile?.profilePicture || ''
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reactions', post._id] });
+    }
+  });
+  const unlikeMutation = useMutation({
+    mutationFn: (postId: string) =>
+      reactionApi.unlikePost({
+        postId
+      }),
+    onSuccess: () => {
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['reactions', post._id] });
+      }, 500);
+    }
+  });
 
   // Delete Post
   const deletePostMutation = useMutation({
@@ -193,35 +235,42 @@ export default function PostItem({ post, innerRef }: PostProps) {
 
         <div className='flex'>
           {/* Saved button */}
-          <button>
-            {!profile?._id ? (
-              <svg
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M5 2H19C19.2652 2 19.5196 2.10536 19.7071 2.29289C19.8946 2.48043 20 2.73478 20 3V22.143C20.0001 22.2324 19.9763 22.3202 19.9309 22.3973C19.8855 22.4743 19.8204 22.5378 19.7421 22.5811C19.6639 22.6244 19.5755 22.6459 19.4861 22.6434C19.3968 22.641 19.3097 22.6146 19.234 22.567L12 18.03L4.766 22.566C4.69037 22.6135 4.60339 22.6399 4.5141 22.6424C4.42482 22.6449 4.33649 22.6235 4.2583 22.5803C4.1801 22.5371 4.11491 22.4738 4.06948 22.3969C4.02406 22.32 4.00007 22.2323 4 22.143V3C4 2.73478 4.10536 2.48043 4.29289 2.29289C4.48043 2.10536 4.73478 2 5 2ZM18 4H6V19.432L12 15.671L18 19.432V4Z'
-                  fill='#9ca3af'
-                />
-              </svg>
-            ) : (
-              <svg
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M5 2H19C19.2652 2 19.5196 2.10536 19.7071 2.29289C19.8946 2.48043 20 2.73478 20 3V22.143C20.0001 22.2324 19.9763 22.3202 19.9309 22.3973C19.8855 22.4743 19.8204 22.5378 19.7421 22.5811C19.6639 22.6244 19.5755 22.6459 19.4861 22.6434C19.3968 22.641 19.3097 22.6146 19.234 22.567L12 18.03L4.766 22.566C4.69037 22.6135 4.60339 22.6399 4.5141 22.6424C4.42482 22.6449 4.33649 22.6235 4.2583 22.5803C4.1801 22.5371 4.11491 22.4738 4.06948 22.3969C4.02406 22.32 4.00007 22.2323 4 22.143V3C4 2.73478 4.10536 2.48043 4.29289 2.29289C4.48043 2.10536 4.73478 2 5 2Z'
-                  fill='#9ca3af'
-                />
-              </svg>
-            )}
-          </button>
+          <Button
+            colorSpinner='blue'
+            onClick={onSavePost}
+            disabled={savePostMutation.isPending}
+            isLoading={savePostMutation.isPending}
+          >
+            {!savePostMutation.isPending &&
+              (!isSaved ? (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                  className='hover:opacity-50'
+                >
+                  <path
+                    d='M5 2H19C19.2652 2 19.5196 2.10536 19.7071 2.29289C19.8946 2.48043 20 2.73478 20 3V22.143C20.0001 22.2324 19.9763 22.3202 19.9309 22.3973C19.8855 22.4743 19.8204 22.5378 19.7421 22.5811C19.6639 22.6244 19.5755 22.6459 19.4861 22.6434C19.3968 22.641 19.3097 22.6146 19.234 22.567L12 18.03L4.766 22.566C4.69037 22.6135 4.60339 22.6399 4.5141 22.6424C4.42482 22.6449 4.33649 22.6235 4.2583 22.5803C4.1801 22.5371 4.11491 22.4738 4.06948 22.3969C4.02406 22.32 4.00007 22.2323 4 22.143V3C4 2.73478 4.10536 2.48043 4.29289 2.29289C4.48043 2.10536 4.73478 2 5 2ZM18 4H6V19.432L12 15.671L18 19.432V4Z'
+                    className='fill-gray-500'
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M5 2H19C19.2652 2 19.5196 2.10536 19.7071 2.29289C19.8946 2.48043 20 2.73478 20 3V22.143C20.0001 22.2324 19.9763 22.3202 19.9309 22.3973C19.8855 22.4743 19.8204 22.5378 19.7421 22.5811C19.6639 22.6244 19.5755 22.6459 19.4861 22.6434C19.3968 22.641 19.3097 22.6146 19.234 22.567L12 18.03L4.766 22.566C4.69037 22.6135 4.60339 22.6399 4.5141 22.6424C4.42482 22.6449 4.33649 22.6235 4.2583 22.5803C4.1801 22.5371 4.11491 22.4738 4.06948 22.3969C4.02406 22.32 4.00007 22.2323 4 22.143V3C4 2.73478 4.10536 2.48043 4.29289 2.29289C4.48043 2.10536 4.73478 2 5 2Z'
+                    className='fill-blue-500 active:fill-blue-500/50'
+                  />
+                </svg>
+              ))}
+          </Button>
 
           {/* Edit post */}
           {isOwner && (
@@ -333,7 +382,10 @@ export default function PostItem({ post, innerRef }: PostProps) {
           {/* Likes */}
           <button
             className='flex basis-4/12 items-center justify-center rounded p-1 transition-colors hover:bg-gray-100'
-            // onClick={onLike}
+            onClick={() => {
+              if (!liked) likePostMutation.mutate(post._id || '');
+              else unlikeMutation.mutate(post._id || '');
+            }}
           >
             <span className='pr-2'>
               {liked && (
@@ -441,10 +493,10 @@ export default function PostItem({ post, innerRef }: PostProps) {
             src={profile?.profilePicture}
           />
           {/* Input */}
-          <div className='grow rounded-2xl bg-gray-100'>
+          <div className='grow rounded-3xl bg-gray-100'>
             <div className='flex flex-col'>
               <textarea
-                className='h-9 w-full flex-grow resize-none overflow-y-hidden bg-transparent p-2 text-sm font-normal text-gray-700 outline-none'
+                className='h-9 w-full flex-grow resize-none overflow-y-hidden bg-transparent p-2 text-sm font-normal text-gray-700 outline-none transition-all'
                 placeholder='Write a comment...'
                 onChange={event => {
                   onChange(event);

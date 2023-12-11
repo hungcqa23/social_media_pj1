@@ -32,7 +32,6 @@ export default function Login() {
   } = useForm<FormData>({
     resolver: yupResolver(loginSchema)
   });
-  const navigate = useNavigate();
 
   const loginMutation = useMutation({
     mutationFn: (body: FormData) => authApi.login(body)
@@ -42,14 +41,12 @@ export default function Login() {
     loginMutation.mutate(data, {
       onSuccess: data => {
         setAccessTokenToLS(data.data.token as string);
-        setProfileToLS(data.data.user);
         toast.success('Login successfully', {
           position: toast.POSITION.TOP_RIGHT
         });
         setProfile(data.data.user);
         setTimeout(() => {
           setIsAuthenticated(true);
-          navigate('/');
         }, 1000);
       },
 

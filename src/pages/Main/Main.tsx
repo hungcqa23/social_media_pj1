@@ -1,13 +1,13 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { GetAllPosts, postApi } from 'src/apis/post.api';
-import CreatePost from 'src/components/CreatePost';
+import CreatePost from 'src/pages/Main/CreatePost';
 import List from 'src/components/List';
 import PostItem from 'src/components/PostItem';
-// import SuggestedBar from 'src/components/SuggestedBar';
+import SuggestedBar from 'src/pages/Main//SuggestedBar';
 import { useInView } from 'react-intersection-observer';
-import { lazy, useEffect } from 'react';
+import { useEffect } from 'react';
 
-const SuggestedBar = lazy(() => import('src/components/SuggestedBar'));
+// const SuggestedBar = lazy(() => import('src/pages/Main/SuggestedBar'));
 export default function Main() {
   const { ref, inView } = useInView({
     threshold: 0.75

@@ -15,7 +15,7 @@ import Slogan from './components/Slogan';
 import Conversation from './components/Conversation';
 
 import { useAppContext } from './contexts/app.contexts';
-// import Login from './pages/Login';
+import Login from './pages/Login';
 import BlockedAccount from './pages/BlockedAccount';
 import SearchPage from './pages/SearchPage';
 import NotificationBar from './components/NotificationBar';
@@ -23,16 +23,16 @@ import Messages from './pages/Messages';
 import ResetPassword from './pages/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword';
 // import Register from './pages/Register';
-// import Main from './pages/Main';
+import Main from './pages/Main';
 import EmailSetting from './pages/EmailSetting';
 import EditProfile from './pages/EditProfile';
 import Profile from './pages/Profile';
 import YourContent from './pages/YourContent';
 // import NotFound from './pages/NotFound';
 
-const Login = lazy(() => import('./pages/Login'));
+// const Login = lazy(() => import('./pages/Login'));
 const MainLayout = lazy(() => import('./layouts/MainLayout'));
-const Main = lazy(() => import('./pages/Main'));
+// const Main = lazy(() => import('./pages/Main'));
 const Register = lazy(() => import('./pages/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
@@ -101,7 +101,6 @@ export default function useRouteElement() {
                 }
               ]
             },
-
             {
               path: path.notifications,
               element: <NotificationBar />
@@ -146,7 +145,17 @@ export default function useRouteElement() {
             },
             {
               path: '/:username',
-              element: <Profile />
+              element: <Profile />,
+              children: [
+                {
+                  index: true,
+                  element: <p>Hello World!</p>
+                },
+                {
+                  path: ':type',
+                  element: <p>Hello World!</p>
+                }
+              ]
             }
           ]
         }

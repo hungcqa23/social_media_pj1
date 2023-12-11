@@ -1,5 +1,11 @@
 import IconProfile from 'src/components/IconProfile';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import {
+  Link,
+  Outlet,
+  useNavigate,
+  useParams,
+  useSearchParams
+} from 'react-router-dom';
 import Button from 'src/components/Button';
 import { useContext } from 'react';
 import { AppContext } from 'src/contexts/app.contexts';
@@ -10,7 +16,7 @@ const classNamePath = ({ isMatch }: { isMatch: boolean }) =>
 
 const buttonsFilter = [
   {
-    value: 'posts',
+    value: '',
     isMatch: false,
     svg: ({ isMatch }: { isMatch: boolean }) => (
       <svg
@@ -82,19 +88,17 @@ const buttonsFilter = [
 ];
 
 export default function Profile() {
-  const [searchParams, setSearchParams] = useSearchParams();
-
+  const navigate = useNavigate();
   const { profile } = useContext(AppContext);
-  const { username } = useParams();
+  const { username, type } = useParams<{
+    username: string;
+    type?: string;
+  }>();
+
   const isProfile = username === profile?.username.toLowerCase();
 
-  const handleClick = (type: string) => {
-    searchParams.set('type', type);
-    setSearchParams(searchParams);
-  };
-
   buttonsFilter.forEach(button => {
-    if (button.value === searchParams.get('type')) {
+    if (button.value === type || (button.value === '' && type === undefined)) {
       button.isMatch = true;
     } else button.isMatch = false;
   });
@@ -183,14 +187,15 @@ export default function Profile() {
 
         <section className='border-t border-gray-300'>
           <div className='flex justify-center gap-6 text-sm'>
-            {/* Filter buttons */}
             {buttonsFilter.map(({ value, isMatch, svg }, index) => (
               <Button
                 key={index}
                 typeButton='filter'
                 value={value}
                 className='items-center gap-2 pt-4 active:opacity-60'
-                onClick={() => handleClick(value)}
+                onClick={() => {
+                  navigate(value);
+                }}
                 isMatch={isMatch}
               >
                 {svg({ isMatch })}
@@ -201,12 +206,13 @@ export default function Profile() {
                     'text-gray-400': !isMatch
                   })}
                 >
-                  {value}
+                  {value || 'Post'}
                 </span>
               </Button>
             ))}
           </div>
         </section>
+        <Outlet />
       </div>
     </main>
   );

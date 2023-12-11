@@ -2,10 +2,12 @@ import classNames from 'classnames';
 import { ButtonHTMLAttributes } from 'react';
 
 type ButtonType = 'filter' | 'submit';
+type ColorSpinner = 'blue' | 'dark';
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
   typeButton?: ButtonType;
   isMatch?: boolean;
+  colorSpinner?: ColorSpinner;
 }
 export default function Button(props: ButtonProps) {
   const {
@@ -15,6 +17,7 @@ export default function Button(props: ButtonProps) {
     children,
     isMatch,
     className,
+    colorSpinner,
     ...rest
   } = props;
 
@@ -27,12 +30,12 @@ export default function Button(props: ButtonProps) {
     return (
       <button
         className={`${classBase} ${className}`}
-        disabled={isLoading === true}
+        disabled={isLoading}
         {...rest}
       >
         {children}
         {isMatch && (
-          <div className='border-bottom-2 absolute left-0 right-0 top-0 border-b border-gray-500'></div>
+          <div className='border-bottom-2 absolute left-0 right-0 top-0 border-b border-gray-500' />
         )}
       </button>
     );
@@ -58,7 +61,13 @@ export default function Button(props: ButtonProps) {
       {isLoading && (
         <svg
           aria-hidden='true'
-          className='h-4 w-4 animate-spin fill-gray-600 text-gray-200 dark:text-gray-600'
+          className={classNames(
+            'h-4 w-4 animate-spin text-gray-200 dark:text-gray-600',
+            {
+              'fill-blue-600': colorSpinner === 'blue',
+              'fill-gray-700': colorSpinner
+            }
+          )}
           viewBox='0 0 100 101'
           fill='none'
           xmlns='http://www.w3.org/2000/svg'

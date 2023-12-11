@@ -1,7 +1,7 @@
 import Button from 'src/components/Button';
 import FilterPost from 'src/components/FilterPost';
 import Search from 'src/components/Search';
-import Suggested from 'src/components/SuggestedBar';
+import Suggested from 'src/pages/Main/SuggestedBar';
 import { iconsSvg } from 'src/constants/icons';
 
 export default function SearchPage() {

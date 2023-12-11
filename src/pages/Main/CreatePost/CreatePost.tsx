@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import Dialog from '../Dialog';
-import IconProfile from '../IconProfile';
-import Modal from '../Modal';
+import Dialog from '../../../components/Dialog';
+import IconProfile from '../../../components/IconProfile';
+import Modal from '../../../components/Modal';
 import { useAppContext } from 'src/contexts/app.contexts';
 // import { useDialogManager } from 'src/hooks/useDialogManager';
 

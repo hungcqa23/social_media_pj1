@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import Profile from '../IconProfile';
-import List from '../List';
+import Profile from '../../../components/IconProfile';
+import List from '../../../components/List';
 import SuggestedFriend from '../SuggestedFriend';
 import { useAppContext } from 'src/contexts/app.contexts';
 

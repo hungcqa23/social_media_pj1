@@ -174,7 +174,7 @@ export default function Modal({
             <div className='w-full px-4'>
               <textarea
                 className='max-h-40 w-full resize-none overflow-auto whitespace-pre-wrap text-base font-normal text-black placeholder:text-gray-600 focus:outline-none'
-                placeholder={"What's on your mind, An Hưng ?"}
+                placeholder={`What's on your mind, ${profile?.fullname} ?`}
                 onChange={event => {
                   onChange(event);
                   handleTextAreaChange();

@@ -5,6 +5,8 @@ import http from 'src/utils/http';
 const URL_GET_ALL_POSTS = 'post/all';
 const URL_CREATE_POST = 'post-with-image';
 const URL_DELETE_POST = 'post';
+const URL_GET_ALL_SAVED_POSTS = 'saved-posts';
+const URL_SAVE_POST = 'post/save-post';
 
 export interface GetAllPosts extends SuccessResponse {
   posts: Post[];
@@ -13,6 +15,16 @@ export interface GetAllPosts extends SuccessResponse {
 
 export interface CreatePost extends SuccessResponse {
   post: Post;
+}
+
+export interface GetAllSavedPosts extends SuccessResponse {
+  posts: {
+    _id: string;
+    userId: string;
+    postId: string;
+    username: string;
+    createdAt: string;
+  }[];
 }
 
 export const postApi = {
@@ -28,5 +40,11 @@ export const postApi = {
   },
   deletePost(id: string) {
     return http.delete<SuccessResponse>(`${URL_DELETE_POST}/${id}`);
+  },
+  getSavedPosts() {
+    return http.get<GetAllSavedPosts>(URL_GET_ALL_SAVED_POSTS);
+  },
+  savePost(postId: string) {
+    return http.post<SuccessResponse>(URL_SAVE_POST, { postId });
   }
 };
