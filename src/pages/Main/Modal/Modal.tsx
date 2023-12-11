@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import Profile from '../IconProfile';
+import Profile from '../../../components/IconProfile';
 import { convertFileToBase64 } from 'src/utils/file';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { postApi } from 'src/apis/post.api';
@@ -30,14 +30,20 @@ export default function Modal({
   const watchContent = watch('content');
 
   const { onChange, name, ref } = register('content');
-  const createPostMutation = useMutation({
+  const createPostWithMediaMutation = useMutation({
     mutationFn: (
       body: Post & {
         image?: string;
       }
-    ) => postApi.createPost(body)
+    ) => postApi.createPostWithMedia(body)
   });
-
+  const createPostMutation = useMutation({
+    mutationFn: ({ content }: { content: string }) =>
+      postApi.createPost({
+        content,
+        profilePicture: profile?.profilePicture || ''
+      })
+  });
   useEffect(() => {
     return () => {
       setIncludesMedia(false);
@@ -55,30 +61,53 @@ export default function Modal({
   const handleOpenFile = () => {
     inputRef?.current?.click();
   };
+
   const onSubmit = handleSubmit(async data => {
     const stringBase64 = file ? await convertFileToBase64(file) : '';
-    createPostMutation.mutate(
-      {
-        post: data.content,
-        profilePicture: profile?.profilePicture,
-        privacy: 'public',
-        image: stringBase64
-      },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['posts'] });
-          toast.success('Create post successfully!', {
-            position: toast.POSITION.TOP_RIGHT
-          });
-          closeModal();
+    if (file) {
+      createPostWithMediaMutation.mutate(
+        {
+          post: data.content,
+          profilePicture: profile?.profilePicture,
+          privacy: 'public',
+          image: stringBase64
         },
-        onError: () => {
-          toast.error('Create post failed!', {
-            position: toast.POSITION.TOP_RIGHT
-          });
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['posts'] });
+            toast.success('Create post successfully!', {
+              position: toast.POSITION.TOP_RIGHT
+            });
+            closeModal();
+          },
+          onError: () => {
+            toast.error('Create post failed!', {
+              position: toast.POSITION.TOP_RIGHT
+            });
+          }
         }
-      }
-    );
+      );
+    } else {
+      createPostMutation.mutate(
+        {
+          content: data.content
+        },
+        {
+          onSuccess: () => {
+            toast.success('Create post successfully!', {
+              position: toast.POSITION.TOP_RIGHT
+            });
+            closeModal();
+            queryClient.invalidateQueries({ queryKey: ['posts'] });
+          },
+          onError: () => {
+            toast.error('Create post failed!', {
+              position: toast.POSITION.TOP_RIGHT
+            });
+          }
+        }
+      );
+    }
   });
   const onChangeFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -296,6 +325,7 @@ export default function Modal({
             <button
               disabled={
                 (watchContent === '' && file === null) ||
+                createPostWithMediaMutation.isPending ||
                 createPostMutation.isPending
               }
               className='block h-10 w-full rounded-md bg-blue-600 text-center text-sm font-medium hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-300'

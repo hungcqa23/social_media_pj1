@@ -92,7 +92,7 @@ export default function Navigation(props: Props) {
     },
     {
       name: 'Profile',
-      to: `${profile?.username.toLowerCase()}?type=posts`,
+      to: `${profile?.username.toLowerCase()}`,
       svg: profile?.profilePicture || '',
       svgActive: profile?.profilePicture || '',
       isProfile: true
@@ -183,7 +183,7 @@ export default function Navigation(props: Props) {
                 />
 
                 <ButtonNav
-                  to={`/${profile?.username.toLowerCase()}?type=saved`}
+                  to={`/${profile?.username.toLowerCase()}/saved`}
                   text='Saved'
                   svg={iconsSvg.saved}
                 />

@@ -18,5 +18,4 @@ export interface Post {
     like: number;
   };
   createdAt?: string;
-  liked?: boolean;
 }

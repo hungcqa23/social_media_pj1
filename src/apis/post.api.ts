@@ -3,8 +3,8 @@ import { SuccessResponse } from 'src/types/utils.type';
 import http from 'src/utils/http';
 
 const URL_GET_ALL_POSTS = 'post/all';
-const URL_CREATE_POST = 'post-with-image';
-const URL_DELETE_POST = 'post';
+const URL_CREATE_POST_WITH_MEDIA = 'post-with-image';
+const URL_POST = 'post';
 const URL_GET_ALL_SAVED_POSTS = 'saved-posts';
 const URL_SAVE_POST = 'post/save-post';
 
@@ -35,11 +35,17 @@ export const postApi = {
     return response.data;
   },
 
-  createPost(body: Post) {
-    return http.post<CreatePost>(URL_CREATE_POST, body);
+  createPostWithMedia(body: Post) {
+    return http.post<CreatePost>(URL_CREATE_POST_WITH_MEDIA, body);
+  },
+  createPost(body: { content: string; profilePicture: string }) {
+    return http.post<CreatePost>(URL_POST, {
+      post: body.content,
+      profilePicture: body.profilePicture
+    });
   },
   deletePost(id: string) {
-    return http.delete<SuccessResponse>(`${URL_DELETE_POST}/${id}`);
+    return http.delete<SuccessResponse>(`${URL_POST}/${id}`);
   },
   getSavedPosts() {
     return http.get<GetAllSavedPosts>(URL_GET_ALL_SAVED_POSTS);
