@@ -15,23 +15,26 @@ import Slogan from './components/Slogan';
 import Conversation from './components/Conversation';
 
 import { useAppContext } from './contexts/app.contexts';
-import Login from './pages/Login';
+// import Login from './pages/Login';
 import BlockedAccount from './pages/BlockedAccount';
 import SearchPage from './pages/SearchPage';
 import NotificationBar from './components/NotificationBar';
 import Messages from './pages/Messages';
 import ResetPassword from './pages/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword';
-import Register from './pages/Register';
+// import Register from './pages/Register';
 // import Main from './pages/Main';
 import EmailSetting from './pages/EmailSetting';
 import EditProfile from './pages/EditProfile';
 import Profile from './pages/Profile';
 import YourContent from './pages/YourContent';
-import NotFound from './pages/NotFound';
+// import NotFound from './pages/NotFound';
 
+const Login = lazy(() => import('./pages/Login'));
 const MainLayout = lazy(() => import('./layouts/MainLayout'));
 const Main = lazy(() => import('./pages/Main'));
+const Register = lazy(() => import('./pages/Register'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 function ProtectedRoute() {
   const { isAuthenticated } = useAppContext();

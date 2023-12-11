@@ -12,6 +12,7 @@ import { ErrorResponse } from 'src/types/utils.type';
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils';
 import { schema } from 'src/utils/rules';
 import { useAppContext } from 'src/contexts/app.contexts';
+import path from 'src/constants/path';
 
 interface FormData {
   username: string;
@@ -21,8 +22,7 @@ interface FormData {
 const loginSchema = schema.pick(['username', 'password']);
 
 export default function Login() {
-  const navigate = useNavigate();
-  const { setIsAuthenticated } = useAppContext();
+  const { setIsAuthenticated, setProfile } = useAppContext();
 
   const {
     register,
@@ -32,6 +32,7 @@ export default function Login() {
   } = useForm<FormData>({
     resolver: yupResolver(loginSchema)
   });
+  const navigate = useNavigate();
 
   const loginMutation = useMutation({
     mutationFn: (body: FormData) => authApi.login(body)
@@ -40,14 +41,15 @@ export default function Login() {
   const onSubmit = handleSubmit(data => {
     loginMutation.mutate(data, {
       onSuccess: data => {
+        setAccessTokenToLS(data.data.token as string);
+        setProfileToLS(data.data.user);
         toast.success('Login successfully', {
           position: toast.POSITION.TOP_RIGHT
         });
-
-        setAccessTokenToLS(data.data.token as string);
-        setProfileToLS(data.data.user);
+        setProfile(data.data.user);
         setTimeout(() => {
           setIsAuthenticated(true);
+          navigate('/');
         }, 1000);
       },
 
@@ -103,7 +105,11 @@ export default function Login() {
           </Link>
         </div>
 
-        <Button className='rounded-lg bg-black px-4 py-3 text-sm font-normal text-white md:px-5 md:py-4 md:text-base md:font-semibold'>
+        <Button
+          className='flex items-center justify-center gap-1 rounded-lg bg-black px-4 py-3 text-sm font-normal text-white md:px-5 md:py-4 md:text-base md:font-semibold'
+          isLoading={loginMutation.isPending}
+          disabled={loginMutation.isPending}
+        >
           Log in
         </Button>
       </form>
@@ -111,7 +117,7 @@ export default function Login() {
       <p className='mt-10 text-center text-sm font-medium text-gray-500 md:text-base'>
         Don&apos;t have an account?
         <Link
-          to={'/sign-up'}
+          to={path.register}
           className='text-sm font-normal italic text-black hover:underline md:text-base md:font-semibold'
         >
           Sign up

@@ -56,27 +56,30 @@ export default function Modal({
     inputRef?.current?.click();
   };
   const onSubmit = handleSubmit(async data => {
-    try {
-      const stringBase64 = file ? await convertFileToBase64(file) : '';
-      await createPostMutation.mutateAsync({
+    const stringBase64 = file ? await convertFileToBase64(file) : '';
+    createPostMutation.mutate(
+      {
         post: data.content,
         profilePicture: profile?.profilePicture,
         privacy: 'public',
         image: stringBase64
-      });
-
-      toast.success('Create post successfully!', {
-        position: toast.POSITION.TOP_RIGHT
-      });
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      closeModal();
-    } catch (error) {
-      toast.error('Create post failed!', {
-        position: toast.POSITION.TOP_LEFT
-      });
-    }
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['posts'] });
+          toast.success('Create post successfully!', {
+            position: toast.POSITION.TOP_RIGHT
+          });
+          closeModal();
+        },
+        onError: () => {
+          toast.error('Create post failed!', {
+            position: toast.POSITION.TOP_RIGHT
+          });
+        }
+      }
+    );
   });
-
   const onChangeFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setFile(event.target.files[0]);

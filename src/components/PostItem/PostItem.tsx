@@ -14,6 +14,7 @@ import classNames from 'classnames';
 import commentApi from 'src/apis/comment.api';
 import { IComment } from 'src/types/comment.type';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 
 interface ButtonType {
   text: string;
@@ -128,18 +129,20 @@ export default function PostItem({ post, innerRef }: PostProps) {
 
   // Delete Post
   const deletePostMutation = useMutation({
-    mutationFn: (postId: string) => postApi.deletePost(postId)
-  });
-  const handleDeletePost = async () => {
-    try {
-      await deletePostMutation.mutateAsync(`${post._id}/${post.pId}`);
-      dispatch({ type: ACTION_TYPES.CLOSE });
+    mutationFn: (postId: string) => postApi.deletePost(postId),
+    onSuccess: () => {
+      toast.success('Delete post successfully!', {
+        position: 'top-right'
+      });
+
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['posts'] });
       }, 2000);
-    } catch (error) {
-      console.log(error);
     }
+  });
+  const handleDeletePost = () => {
+    deletePostMutation.mutate(`${post._id}/${post.pId}`);
+    dispatch({ type: ACTION_TYPES.CLOSE });
   };
 
   const handleTextAreaChange = () => {
@@ -191,23 +194,33 @@ export default function PostItem({ post, innerRef }: PostProps) {
         <div className='flex'>
           {/* Saved button */}
           <button>
-            <svg
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-              className='fill-gray-400'
-            >
-              <g clipPath='url(#clip0_62_123)'>
-                <path d='M17 3H7C5.9 3 5 3.9 5 5V21L12 18L19 21V5C19 3.9 18.1 3 17 3ZM17 18L12 15.82L7 18V5H17V18Z' />
-              </g>
-              <defs>
-                <clipPath id='clip0_62_123'>
-                  <rect width='24' height='24' fill='white' />
-                </clipPath>
-              </defs>
-            </svg>
+            {!profile?._id ? (
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M5 2H19C19.2652 2 19.5196 2.10536 19.7071 2.29289C19.8946 2.48043 20 2.73478 20 3V22.143C20.0001 22.2324 19.9763 22.3202 19.9309 22.3973C19.8855 22.4743 19.8204 22.5378 19.7421 22.5811C19.6639 22.6244 19.5755 22.6459 19.4861 22.6434C19.3968 22.641 19.3097 22.6146 19.234 22.567L12 18.03L4.766 22.566C4.69037 22.6135 4.60339 22.6399 4.5141 22.6424C4.42482 22.6449 4.33649 22.6235 4.2583 22.5803C4.1801 22.5371 4.11491 22.4738 4.06948 22.3969C4.02406 22.32 4.00007 22.2323 4 22.143V3C4 2.73478 4.10536 2.48043 4.29289 2.29289C4.48043 2.10536 4.73478 2 5 2ZM18 4H6V19.432L12 15.671L18 19.432V4Z'
+                  fill='#9ca3af'
+                />
+              </svg>
+            ) : (
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M5 2H19C19.2652 2 19.5196 2.10536 19.7071 2.29289C19.8946 2.48043 20 2.73478 20 3V22.143C20.0001 22.2324 19.9763 22.3202 19.9309 22.3973C19.8855 22.4743 19.8204 22.5378 19.7421 22.5811C19.6639 22.6244 19.5755 22.6459 19.4861 22.6434C19.3968 22.641 19.3097 22.6146 19.234 22.567L12 18.03L4.766 22.566C4.69037 22.6135 4.60339 22.6399 4.5141 22.6424C4.42482 22.6449 4.33649 22.6235 4.2583 22.5803C4.1801 22.5371 4.11491 22.4738 4.06948 22.3969C4.02406 22.32 4.00007 22.2323 4 22.143V3C4 2.73478 4.10536 2.48043 4.29289 2.29289C4.48043 2.10536 4.73478 2 5 2Z'
+                  fill='#9ca3af'
+                />
+              </svg>
+            )}
           </button>
 
           {/* Edit post */}
@@ -314,6 +327,7 @@ export default function PostItem({ post, innerRef }: PostProps) {
         </div>
       )}
 
+      {/* Interaction */}
       <div className={`border-t border-gray-200 px-4`}>
         <div className={`flex gap-1 py-3 ${true && 'border-b'}`}>
           {/* Likes */}
@@ -430,7 +444,7 @@ export default function PostItem({ post, innerRef }: PostProps) {
           <div className='grow rounded-2xl bg-gray-100'>
             <div className='flex flex-col'>
               <textarea
-                className='h-9 w-full flex-grow resize-none overflow-y-hidden bg-transparent p-2 text-sm font-normal text-gray-600 outline-none'
+                className='h-9 w-full flex-grow resize-none overflow-y-hidden bg-transparent p-2 text-sm font-normal text-gray-700 outline-none'
                 placeholder='Write a comment...'
                 onChange={event => {
                   onChange(event);
@@ -451,7 +465,7 @@ export default function PostItem({ post, innerRef }: PostProps) {
 
               {watchContentComment !== '' && (
                 <button
-                  className='mr-3 flex h-8 w-8 items-center justify-center self-end rounded-full hover:bg-gray-200'
+                  className='mb-1 mr-3 flex h-8 w-8 items-center justify-center self-end rounded-full hover:bg-gray-200'
                   type='submit'
                 >
                   <span className='ml-[0.2rem] mt-[0.05rem] flex items-center justify-center'>

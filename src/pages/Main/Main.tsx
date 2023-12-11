@@ -3,10 +3,11 @@ import { GetAllPosts, postApi } from 'src/apis/post.api';
 import CreatePost from 'src/components/CreatePost';
 import List from 'src/components/List';
 import PostItem from 'src/components/PostItem';
-import SuggestedBar from 'src/components/SuggestedBar';
+// import SuggestedBar from 'src/components/SuggestedBar';
 import { useInView } from 'react-intersection-observer';
-import { useEffect } from 'react';
+import { lazy, useEffect } from 'react';
 
+const SuggestedBar = lazy(() => import('src/components/SuggestedBar'));
 export default function Main() {
   const { ref, inView } = useInView({
     threshold: 0.75
@@ -22,7 +23,6 @@ export default function Main() {
         allPages: GetAllPosts[],
         lastPageParam: number
       ) => {
-        console.log(lastPage);
         // Total length of allPages
         const totalPages = allPages.reduce(
           (acc, page) => acc + page.posts.length,

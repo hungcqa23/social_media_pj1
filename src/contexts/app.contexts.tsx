@@ -30,14 +30,15 @@ export const AppProvider = ({
   const [isAuthenticated, setIsAuthenticated] = useState(
     defaultValue.isAuthenticated
   );
+  const [profile, setProfile] = useState<User | null>(defaultValue.profile);
 
   return (
     <AppContext.Provider
       value={{
         isAuthenticated,
         setIsAuthenticated,
-        profile: defaultValue.profile,
-        setProfile: defaultValue.setProfile
+        profile,
+        setProfile
       }}
     >
       {children}

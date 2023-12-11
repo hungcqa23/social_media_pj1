@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import authApi from 'src/apis/auth.api';
 import Button from 'src/components/Button';
 import Input from 'src/components/Input';
+import path from 'src/constants/path';
 import { getRules } from 'src/utils/rules';
 
 interface FormData {
@@ -79,7 +80,9 @@ export default function Register() {
         />
 
         <Button
-          className='rounded-lg bg-black px-4 py-3 text-sm font-normal text-white md:px-5 md:py-4 md:text-base md:font-semibold'
+          className='flex items-center justify-center gap-1 rounded-lg bg-black px-4 py-3 text-sm font-normal text-white md:px-5 md:py-4 md:text-base md:font-semibold'
+          type='submit'
+          isLoading={signUpMutation.isPending}
           disabled={signUpMutation.isPending}
         >
           Create account
@@ -88,7 +91,7 @@ export default function Register() {
         <p className='mt-10 text-center text-sm font-medium text-gray-500 md:text-base'>
           Already have an account?{' '}
           <Link
-            to={'/login'}
+            to={path.login}
             className='font-medium text-black hover:underline'
           >
             Log in

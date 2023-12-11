@@ -84,7 +84,7 @@ const buttonsFilter = [
 export default function Profile() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const { profile, setProfile } = useContext(AppContext);
+  const { profile } = useContext(AppContext);
   const { username } = useParams();
   const isProfile = username === profile?.username.toLowerCase();
 

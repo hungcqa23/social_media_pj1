@@ -49,7 +49,11 @@ export default function SuggestedBar() {
       <div className='mt-9 flex flex-col gap-6'>
         {/* Profile */}
         <div className='flex items-center gap-2 px-4'>
-          <Profile src={profile?.profilePicture} />
+          <Profile
+            src={profile?.profilePicture}
+            to={`/${profile?.username.toLowerCase()}`}
+          />
+
           <div className='flex flex-col'>
             <Link
               to={`/${profile?.username.toLowerCase()}`}
