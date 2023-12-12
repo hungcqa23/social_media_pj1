@@ -28,6 +28,8 @@ import EmailSetting from './pages/EmailSetting';
 import EditProfile from './pages/EditProfile';
 import Profile from './pages/Profile';
 import YourContent from './pages/YourContent';
+import PostItem from './components/PostItem';
+import PostPage from './pages/PostPage';
 // import NotFound from './pages/NotFound';
 
 // const Login = lazy(() => import('./pages/Login'));
@@ -156,6 +158,10 @@ export default function useRouteElement() {
                   element: <p>Hello World!</p>
                 }
               ]
+            },
+            {
+              path: '/posts/:postId',
+              element: <PostPage />
             }
           ]
         }

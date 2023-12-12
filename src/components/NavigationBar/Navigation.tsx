@@ -171,7 +171,6 @@ export default function Navigation(props: Props) {
         </div>
 
         <Popover
-          hasArrow={true}
           placement='top-start'
           renderPopover={
             <div className='rounded-lg bg-white shadow-[0_0_10px_rgba(0,0,0,0.25)]'>

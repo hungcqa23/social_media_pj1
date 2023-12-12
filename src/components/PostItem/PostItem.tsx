@@ -16,6 +16,7 @@ import { IComment } from 'src/types/comment.type';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import Button from '../Button';
+import CopyButton from './CopyButton';
 
 interface ButtonType {
   text: string;
@@ -70,13 +71,18 @@ function reducer(state: States, action: { type: string }): States {
 }
 
 interface PostProps {
+  className?: string;
   post: PostType;
   innerRef?: React.Ref<HTMLParagraphElement>;
 }
 
 const originalHeight = 36;
 
-export default function PostItem({ post, innerRef }: PostProps) {
+export default function PostItem({
+  post,
+  innerRef,
+  className = 'w-full rounded-lg border shadow'
+}: PostProps) {
   const { profile } = useAppContext();
   const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -86,9 +92,28 @@ export default function PostItem({ post, innerRef }: PostProps) {
   const { register, handleSubmit, watch, reset } = useForm<{
     comment: string;
   }>();
-
   const watchContentComment = watch('comment');
   const { onChange, name, ref } = register('comment');
+  const handleTextAreaChange = () => {
+    if (textareaRef.current) {
+      // Check if it's only 1 line
+      const textAreaWidth = textareaRef.current.clientWidth;
+      const textContentWidth = calculateTextWidth(textareaRef);
+      if ((textContentWidth || 0) < textAreaWidth) {
+        return (textareaRef.current.style.height = `${originalHeight}px`);
+      }
+
+      textareaRef.current.style.height = 'auto'; // Reset the height to auto to adjust to content
+      textareaRef.current.style.height =
+        textareaRef.current.scrollHeight + 'px'; // Set the height to the scrollHeight
+    }
+  };
+  // Get Data for comments
+  const { data: commentsData, isLoading: isLoadingComment } = useQuery({
+    queryKey: ['comments', post._id],
+    queryFn: () => commentApi.getCommentsByPostId(post._id || '')
+  });
+  const comments = commentsData?.data.comments || [];
   const addCommentMutation = useMutation({
     mutationFn: (body: { comment: string }) =>
       commentApi.addComment({
@@ -101,20 +126,21 @@ export default function PostItem({ post, innerRef }: PostProps) {
       queryClient.invalidateQueries({ queryKey: ['comments', post._id] });
     }
   });
-
   const onPostComment = handleSubmit(data => {
-    addCommentMutation.mutate({
-      comment: data.comment
-    });
+    addCommentMutation.mutate(
+      {
+        comment: data.comment
+      },
+      {
+        onSuccess: () => {
+          setTimeout(() => {
+            queryClient.invalidateQueries({ queryKey: ['comments', post._id] });
+          }, 1000);
+        }
+      }
+    );
     reset();
   });
-
-  // Get Data for comments
-  const { data: commentsData } = useQuery({
-    queryKey: ['comments', post._id],
-    queryFn: () => commentApi.getCommentsByPostId(post._id || '')
-  });
-  const comments = commentsData?.data.comments || [];
 
   // Save Post
   const { data: savedPostData } = useQuery({
@@ -176,7 +202,6 @@ export default function PostItem({ post, innerRef }: PostProps) {
       toast.success('Delete post successfully!', {
         position: 'top-right'
       });
-
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['posts'] });
       }, 2000);
@@ -185,21 +210,6 @@ export default function PostItem({ post, innerRef }: PostProps) {
   const handleDeletePost = () => {
     deletePostMutation.mutate(`${post._id}/${post.pId}`);
     dispatch({ type: ACTION_TYPES.CLOSE });
-  };
-
-  const handleTextAreaChange = () => {
-    if (textareaRef.current) {
-      // Check if it's only 1 line
-      const textAreaWidth = textareaRef.current.clientWidth;
-      const textContentWidth = calculateTextWidth(textareaRef);
-      if ((textContentWidth || 0) < textAreaWidth) {
-        return (textareaRef.current.style.height = `${originalHeight}px`);
-      }
-
-      textareaRef.current.style.height = 'auto'; // Reset the height to auto to adjust to content
-      textareaRef.current.style.height =
-        textareaRef.current.scrollHeight + 'px'; // Set the height to the scrollHeight
-    }
   };
 
   const buttons: ButtonType[] = [
@@ -212,10 +222,9 @@ export default function PostItem({ post, innerRef }: PostProps) {
   ];
 
   const isOwner = post.username === profile?.username;
-  console.log(isOwner);
 
   return (
-    <div className='w-full rounded-lg border shadow' ref={innerRef}>
+    <div className={classNames(className)} ref={innerRef}>
       {/* Header */}
       <div className='flex h-16 items-center justify-between p-4'>
         <div className='flex'>
@@ -382,60 +391,70 @@ export default function PostItem({ post, innerRef }: PostProps) {
         <div className={`flex gap-1 py-3 ${true && 'border-b'}`}>
           {/* Likes */}
           <button
-            className='flex basis-4/12 items-center justify-center rounded p-1 transition-colors hover:bg-gray-100'
+            className='ease-normal flex basis-4/12 items-center justify-center rounded p-1 transition-[background] duration-500 hover:bg-gray-200'
             onClick={() => {
               if (!liked) likePostMutation.mutate(post._id || '');
               else unlikeMutation.mutate(post._id || '');
             }}
           >
-            <span className='pr-2'>
-              {liked && (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M12 21.35L10.55 20.03C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5C22 12.27 18.6 15.36 13.45 20.03L12 21.35Z'
-                    fill='#FF3040'
-                  />
-                </svg>
-              )}
+            <div className='relative mr-1 h-6 w-6'>
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                className={classNames(
+                  'absolute left-0 top-0 transition-opacity duration-300',
+                  {
+                    'opacity-0': !liked
+                  }
+                )}
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M12 21.35L10.55 20.03C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5C22 12.27 18.6 15.36 13.45 20.03L12 21.35Z'
+                  className={classNames('fill-red-500', {
+                    // 'opacity-0': !liked
+                  })}
+                />
+              </svg>
 
-              {!liked && (
-                <svg
-                  width='24'
-                  height='24'
-                  viewBox='0 0 24 24'
-                  className='fill-gray-400'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <g clipPath='url(#clip0_62_120)'>
-                    <path d='M16.5 3C14.76 3 13.09 3.81 12 5.09C10.91 3.81 9.24 3 7.5 3C4.42 3 2 5.42 2 8.5C2 12.28 5.4 15.36 10.55 20.04L12 21.35L13.45 20.03C18.6 15.36 22 12.28 22 8.5C22 5.42 19.58 3 16.5 3ZM12.1 18.55L12 18.65L11.9 18.55C7.14 14.24 4 11.39 4 8.5C4 6.5 5.5 5 7.5 5C9.04 5 10.54 5.99 11.07 7.36H12.94C13.46 5.99 14.96 5 16.5 5C18.5 5 20 6.5 20 8.5C20 11.39 16.86 14.24 12.1 18.55Z' />
-                  </g>
-                  <defs>
-                    <clipPath id='clip0_62_120'>
-                      <rect width='24' height='24' fill='white' />
-                    </clipPath>
-                  </defs>
-                </svg>
-              )}
-            </span>
-            <span className='text-sm font-medium text-gray-500'>
+              <svg
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                className={classNames(
+                  'absolute left-0 top-0 fill-gray-400 transition-opacity duration-300',
+                  {
+                    'opacity-0': liked,
+                    'opacity-100': !liked
+                  }
+                )}
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <g clipPath='url(#clip0_62_120)'>
+                  <path d='M16.5 3C14.76 3 13.09 3.81 12 5.09C10.91 3.81 9.24 3 7.5 3C4.42 3 2 5.42 2 8.5C2 12.28 5.4 15.36 10.55 20.04L12 21.35L13.45 20.03C18.6 15.36 22 12.28 22 8.5C22 5.42 19.58 3 16.5 3ZM12.1 18.55L12 18.65L11.9 18.55C7.14 14.24 4 11.39 4 8.5C4 6.5 5.5 5 7.5 5C9.04 5 10.54 5.99 11.07 7.36H12.94C13.46 5.99 14.96 5 16.5 5C18.5 5 20 6.5 20 8.5C20 11.39 16.86 14.24 12.1 18.55Z' />
+                </g>
+                <defs>
+                  <clipPath id='clip0_62_120'>
+                    <rect width='24' height='24' fill='white' />
+                  </clipPath>
+                </defs>
+              </svg>
+            </div>
+            <span className='min-w-[1rem] text-sm font-medium text-gray-500'>
               {reactions?.length || 0}
             </span>
           </button>
 
           {/* Comments */}
           <button
-            className='flex basis-4/12 items-center justify-center rounded hover:bg-gray-200'
+            className='ease-normal flex basis-4/12 items-center justify-center rounded transition-[background] duration-500 hover:bg-gray-200'
             onClick={() => {
               textareaRef.current?.focus();
             }}
           >
-            <span className='pr-2'>
+            <span className='pr-1'>
               <svg
                 width={24}
                 height={24}
@@ -452,38 +471,50 @@ export default function PostItem({ post, innerRef }: PostProps) {
                 />
               </svg>
             </span>
-            <span className='text-sm font-medium text-gray-500'>
-              {post.commentsCount}
+            <span className='min-w-[1rem] text-sm font-medium text-gray-500'>
+              {comments.length || 0}
             </span>
           </button>
 
           {/* Share */}
-          <button className='flex basis-4/12 items-center justify-center rounded hover:bg-gray-200'>
-            <span className='pr-2'>
-              <svg
-                width={24}
-                height={24}
-                viewBox='0 0 24 24'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M21.707 11.293L13.707 3.293C13.5671 3.15319 13.389 3.05798 13.195 3.01942C13.0011 2.98085 12.8 3.00065 12.6173 3.07632C12.4346 3.15199 12.2785 3.28013 12.1686 3.44454C12.0587 3.60895 12 3.80225 12 4V7.545C9.26829 7.79779 6.72923 9.06086 4.87969 11.087C3.03015 13.1132 2.00327 15.7566 2 18.5V20C2.00016 20.2076 2.06491 20.41 2.18527 20.5791C2.30564 20.7482 2.47565 20.8757 2.67173 20.9438C2.8678 21.012 3.08022 21.0174 3.27953 20.9594C3.47883 20.9014 3.65514 20.7827 3.784 20.62C4.7637 19.455 5.96576 18.4968 7.31994 17.8016C8.67413 17.1064 10.1533 16.6881 11.671 16.571C11.721 16.565 11.846 16.555 12 16.545V20C12 20.1978 12.0587 20.391 12.1686 20.5555C12.2785 20.7199 12.4346 20.848 12.6173 20.9237C12.8 20.9993 13.0011 21.0192 13.195 20.9806C13.389 20.942 13.5671 20.8468 13.707 20.707L21.707 12.707C21.8945 12.5195 21.9998 12.2652 21.9998 12C21.9998 11.7348 21.8945 11.4805 21.707 11.293ZM14 17.586V15.5C14 15.2348 13.8946 14.9804 13.7071 14.7929C13.5196 14.6054 13.2652 14.5 13 14.5C12.745 14.5 11.704 14.55 11.438 14.585C8.74286 14.8333 6.17742 15.8573 4.052 17.533C4.29324 15.3274 5.33954 13.2883 6.99055 11.8062C8.64157 10.324 10.7813 9.50285 13 9.5C13.2652 9.5 13.5196 9.39464 13.7071 9.20711C13.8946 9.01957 14 8.76522 14 8.5V6.414L19.586 12L14 17.586Z'
-                  fill='#9CA3AF'
-                />
-              </svg>
-            </span>
-            <span className='text-sm font-medium text-gray-500'>0</span>
-          </button>
+          <CopyButton
+            content={`http://localhost:3000/posts/${post._id}`}
+            className='flex basis-4/12 items-center justify-center rounded hover:bg-gray-200'
+          />
         </div>
       </div>
 
-      {List<IComment>({
-        listItems: comments,
-        mapFn: (comment: IComment) => (
-          <Comment key={comment._id} comment={comment} />
-        )
-      })}
+      {/* Comments */}
+      {!isLoadingComment &&
+        List<IComment>({
+          listItems: comments,
+          as: 'ul',
+          mapFn: (comment: IComment) => (
+            <Comment key={comment._id} comment={comment} />
+          )
+        })}
+
+      {isLoadingComment && (
+        <ul className='mt-2 flex flex-col gap-2'>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div className='w-full rounded-md p-4' key={index}>
+              <div className='flex animate-pulse space-x-4'>
+                <div className='h-10 w-10 rounded-full bg-slate-200' />
+                <div className='flex-1 space-y-6 py-1'>
+                  <div className='h-2 rounded bg-slate-200' />
+                  <div className='space-y-3'>
+                    <div className='grid grid-cols-3 gap-4'>
+                      <div className='col-span-2 h-2 rounded bg-slate-200' />
+                      <div className='col-span-1 h-2 rounded bg-slate-200' />
+                    </div>
+                    <div className='h-2 rounded bg-slate-200' />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </ul>
+      )}
 
       {/* Created Comment */}
       <form className='px-4 py-2' onSubmit={onPostComment}>

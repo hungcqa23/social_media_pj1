@@ -13,7 +13,6 @@ export interface Post {
   feelings?: string;
   gifUrl?: string;
   privacy: 'public' | 'private';
-  commentsCount?: number;
   reactions?: {
     like: number;
   };

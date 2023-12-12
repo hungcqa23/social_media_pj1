@@ -5,11 +5,12 @@
 body {
   font-family: 'Inter', sans-serif;
   font-weight: 300;
+  scroll-behavior: smooth;
 }
 
 /* width */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 6px;
 }
 
 /* Track */
