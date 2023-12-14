@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useAppContext } from 'src/contexts/app.contexts';
 
 interface Props {
   className?: string;
@@ -8,11 +9,12 @@ interface Props {
   isImage?: boolean;
 }
 export default function IconProfile(props: Props) {
+  const { profile } = useAppContext();
   const {
     className = 'h-11 w-11',
     classNameImage = 'h-full w-full',
     src = '/src/assets/images/user.jpg',
-    to = '/',
+    to = `${profile?._id}`,
     isImage
   } = props;
 

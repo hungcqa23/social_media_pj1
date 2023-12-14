@@ -22,7 +22,7 @@ const authApi = {
     return http.post<AuthResponse>(URL_LOGIN, body);
   },
   logout() {
-    return http.get<SuccessResponse>(URL_LOGOUT);
+    return http.post<SuccessResponse>(URL_LOGOUT);
   },
   forgotPassword(body: { email: string }) {
     return http.post<SuccessResponse>(URL_FORGOT_PASSWORD, body);

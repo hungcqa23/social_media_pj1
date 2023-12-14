@@ -7,7 +7,7 @@ import {
 import { lazy } from 'react';
 import path from './constants/path';
 
-// import MainLayout from './layouts/MainLayout';
+import MainLayout from './layouts/MainLayout';
 import SettingLayout from './layouts/SettingLayout';
 import AuthLayout from './layouts/AuthLayout';
 
@@ -28,15 +28,15 @@ import EmailSetting from './pages/EmailSetting';
 import EditProfile from './pages/EditProfile';
 import Profile from './pages/Profile';
 import YourContent from './pages/YourContent';
-import PostItem from './components/PostItem';
 import PostPage from './pages/PostPage';
 // import NotFound from './pages/NotFound';
 
 // const Login = lazy(() => import('./pages/Login'));
-const MainLayout = lazy(() => import('./layouts/MainLayout'));
+// const MainLayout = lazy(() => import('./layouts/MainLayout'));
 // const Main = lazy(() => import('./pages/Main'));
 const Register = lazy(() => import('./pages/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+// const PostPage = lazy(() => import('./pages/PostPage'));
 
 function ProtectedRoute() {
   const { isAuthenticated } = useAppContext();
@@ -146,18 +146,8 @@ export default function useRouteElement() {
               ]
             },
             {
-              path: '/:username',
-              element: <Profile />,
-              children: [
-                {
-                  index: true,
-                  element: <p>Hello World!</p>
-                },
-                {
-                  path: ':type',
-                  element: <p>Hello World!</p>
-                }
-              ]
+              path: '/:userId/:type?',
+              element: <Profile />
             },
             {
               path: '/posts/:postId',

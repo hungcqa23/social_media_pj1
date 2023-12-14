@@ -16,5 +16,6 @@ export interface Post {
   reactions?: {
     like: number;
   };
+  commentsCount?: number;
   createdAt?: string;
 }

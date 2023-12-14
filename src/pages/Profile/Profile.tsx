@@ -1,101 +1,212 @@
 import IconProfile from 'src/components/IconProfile';
-import {
-  Link,
-  Outlet,
-  useNavigate,
-  useParams,
-  useSearchParams
-} from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from 'src/components/Button';
 import { useContext } from 'react';
 import { AppContext } from 'src/contexts/app.contexts';
 import classNames from 'classnames';
+import { useQuery } from '@tanstack/react-query';
+import { profileApi } from 'src/apis/profile.api';
+import ImageItem from './ImageItem';
+import { Post } from 'src/types/post.type';
+import PostItem from 'src/components/PostItem';
+import List from 'src/components/List';
+import Spinner from 'src/components/Spinner';
+import NotFound from '../NotFound';
+import { User } from 'src/types/user.type';
 
 const classNamePath = ({ isMatch }: { isMatch: boolean }) =>
   classNames(``, { 'fill-gray-500': !isMatch, 'fill-black': isMatch });
 
-const buttonsFilter = [
+const postsTest: Post[] = [
   {
-    value: '',
-    isMatch: false,
-    svg: ({ isMatch }: { isMatch: boolean }) => (
-      <svg
-        viewBox='0 0 24 24'
-        fill='none'
-        className='h-4 w-4'
-        xmlns='http://www.w3.org/2000/svg'
-      >
-        <path
-          d='M2 2H22V22H2V2ZM4 4V8H8V4H4ZM10 4V8H14V4H10ZM16 4V8H20V4H16ZM20 10H16V14H20V10ZM20 16H16V20H20V16ZM14 20V16H10V20H14ZM8 20V16H4V20H8ZM4 14H8V10H4V14ZM10 10V14H14V10H10Z'
-          fill='black'
-          className={classNamePath({ isMatch })}
-        />
-      </svg>
-    )
+    userId: '6576763e5891f9feab9a6734',
+    gifUrl: 'undefined',
+    feelings: 'undefined',
+    commentsCount: 1500,
+    videoId: '',
+    imgId: 'qapkckms4zxagzryyopq',
+    videoVersion: '',
+    post: '',
+    pId: '56604224382717',
+    email: 'anbeel191@gmail.com',
+    imgVersion: '1702514653',
+    profilePicture:
+      'https://res.cloudinary.com/daszajz9a/image/upload/v1702262340/6576763e5891f9feab9a6734',
+    username: 'anbeel',
+    privacy: 'public',
+    createdAt: '2023-12-14T00:44:09.000Z',
+    _id: '657a4fd8294366e34a4b4f77',
+    reactions: {
+      like: 2500
+    }
   },
   {
-    value: 'images',
-    isMatch: false,
-    svg: ({ isMatch }: { isMatch: boolean }) => (
-      <svg
-        className='h-4 w-4'
-        viewBox='0 0 24 24'
-        fill='none'
-        xmlns='http://www.w3.org/2000/svg'
-      >
-        <path
-          d='M2 2H22V22H2V2ZM4 20H17.586L9 11.414L4 16.414V20ZM20 19.586V4H4V13.586L9 8.586L20 19.586ZM15.547 7C15.2818 7 15.0274 7.10536 14.8399 7.29289C14.6524 7.48043 14.547 7.73478 14.547 8C14.547 8.26522 14.6524 8.51957 14.8399 8.70711C15.0274 8.89464 15.2818 9 15.547 9C15.8122 9 16.0666 8.89464 16.2541 8.70711C16.4416 8.51957 16.547 8.26522 16.547 8C16.547 7.73478 16.4416 7.48043 16.2541 7.29289C16.0666 7.10536 15.8122 7 15.547 7ZM12.547 8C12.547 7.20435 12.8631 6.44129 13.4257 5.87868C13.9883 5.31607 14.7514 5 15.547 5C16.3426 5 17.1057 5.31607 17.6683 5.87868C18.2309 6.44129 18.547 7.20435 18.547 8C18.547 8.79565 18.2309 9.55871 17.6683 10.1213C17.1057 10.6839 16.3426 11 15.547 11C14.7514 11 13.9883 10.6839 13.4257 10.1213C12.8631 9.55871 12.547 8.79565 12.547 8Z'
-          fill='black'
-          className={classNamePath({ isMatch })}
-        />
-      </svg>
-    )
+    userId: '6576763e5891f9feab9a6734',
+    gifUrl: 'undefined',
+    feelings: 'undefined',
+    commentsCount: 1500,
+    videoId: '',
+    imgId: 'qapkckms4zxagzryyopq',
+    videoVersion: '',
+    post: '',
+    pId: '56604224382717',
+    email: 'anbeel191@gmail.com',
+    imgVersion: '1702514653',
+    profilePicture:
+      'https://res.cloudinary.com/daszajz9a/image/upload/v1702262340/6576763e5891f9feab9a6734',
+    username: 'anbeel',
+    privacy: 'public',
+    createdAt: '2023-12-14T00:44:09.000Z',
+    _id: '657a4fd8294366e34a4b4f77',
+    reactions: {
+      like: 2500
+    }
   },
   {
-    value: 'videos',
-    isMatch: false,
-    svg: ({ isMatch }: { isMatch: boolean }) => (
-      <svg
-        className='h-4 w-4'
-        viewBox='0 0 24 24'
-        fill='none'
-        xmlns='http://www.w3.org/2000/svg'
-      >
-        <path
-          d='M2 2H22V22H2V2ZM4 4V20H20V4H4ZM8 6.37L17.75 12L8 17.63V6.37ZM10 9.835V14.165L13.75 12L10 9.835Z'
-          className={classNamePath({ isMatch })}
-        />
-      </svg>
-    )
+    userId: '6576763e5891f9feab9a6734',
+    gifUrl: 'undefined',
+    feelings: 'undefined',
+    commentsCount: 1500,
+    videoId: '',
+    imgId: 'qapkckms4zxagzryyopq',
+    videoVersion: '',
+    post: '',
+    pId: '56604224382717',
+    email: 'anbeel191@gmail.com',
+    imgVersion: '1702514653',
+    profilePicture:
+      'https://res.cloudinary.com/daszajz9a/image/upload/v1702262340/6576763e5891f9feab9a6734',
+    username: 'anbeel',
+    privacy: 'public',
+    createdAt: '2023-12-14T00:44:09.000Z',
+    _id: '657a4fd8294366e34a4b4f77',
+    reactions: {
+      like: 2500
+    }
   },
   {
-    value: 'saved',
-    isMatch: false,
-    svg: ({ isMatch }: { isMatch: boolean }) => (
-      <svg
-        className='h-4 w-4'
-        viewBox='0 0 24 24'
-        fill='none'
-        xmlns='http://www.w3.org/2000/svg'
-      >
-        <path
-          d='M5 2H19C19.2652 2 19.5196 2.10536 19.7071 2.29289C19.8946 2.48043 20 2.73478 20 3V22.143C20.0001 22.2324 19.9763 22.3202 19.9309 22.3973C19.8855 22.4743 19.8204 22.5378 19.7421 22.5811C19.6639 22.6244 19.5755 22.6459 19.4861 22.6434C19.3968 22.641 19.3097 22.6146 19.234 22.567L12 18.03L4.766 22.566C4.69037 22.6135 4.60339 22.6399 4.5141 22.6424C4.42482 22.6449 4.33649 22.6235 4.2583 22.5803C4.1801 22.5371 4.11491 22.4738 4.06948 22.3969C4.02406 22.32 4.00007 22.2323 4 22.143V3C4 2.73478 4.10536 2.48043 4.29289 2.29289C4.48043 2.10536 4.73478 2 5 2ZM18 4H6V19.432L12 15.671L18 19.432V4Z'
-          className={classNamePath({ isMatch })}
-        />
-      </svg>
-    )
+    userId: '6576763e5891f9feab9a6734',
+    gifUrl: 'undefined',
+    feelings: 'undefined',
+    commentsCount: 1500,
+    videoId: '',
+    imgId: 'qapkckms4zxagzryyopq',
+    videoVersion: '',
+    post: '',
+    pId: '56604224382717',
+    email: 'anbeel191@gmail.com',
+    imgVersion: '1702514653',
+    profilePicture:
+      'https://res.cloudinary.com/daszajz9a/image/upload/v1702262340/6576763e5891f9feab9a6734',
+    username: 'anbeel',
+    privacy: 'public',
+    createdAt: '2023-12-14T00:44:09.000Z',
+    _id: '657a4fd8294366e34a4b4f77',
+    reactions: {
+      like: 2500
+    }
   }
 ];
 
 export default function Profile() {
+  const buttonsFilter = [
+    {
+      value: '',
+      isMatch: false,
+      svg: ({ isMatch }: { isMatch: boolean }) => (
+        <svg
+          viewBox='0 0 24 24'
+          fill='none'
+          className='h-6 w-6'
+          xmlns='http://www.w3.org/2000/svg'
+        >
+          <path
+            d='M2 2H22V22H2V2ZM4 4V8H8V4H4ZM10 4V8H14V4H10ZM16 4V8H20V4H16ZM20 10H16V14H20V10ZM20 16H16V20H20V16ZM14 20V16H10V20H14ZM8 20V16H4V20H8ZM4 14H8V10H4V14ZM10 10V14H14V10H10Z'
+            fill='black'
+            className={classNamePath({ isMatch })}
+          />
+        </svg>
+      )
+    },
+    {
+      value: 'images',
+      isMatch: false,
+      svg: ({ isMatch }: { isMatch: boolean }) => (
+        <svg
+          className='h-6 w-6'
+          viewBox='0 0 24 24'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+        >
+          <path
+            d='M2 2H22V22H2V2ZM4 20H17.586L9 11.414L4 16.414V20ZM20 19.586V4H4V13.586L9 8.586L20 19.586ZM15.547 7C15.2818 7 15.0274 7.10536 14.8399 7.29289C14.6524 7.48043 14.547 7.73478 14.547 8C14.547 8.26522 14.6524 8.51957 14.8399 8.70711C15.0274 8.89464 15.2818 9 15.547 9C15.8122 9 16.0666 8.89464 16.2541 8.70711C16.4416 8.51957 16.547 8.26522 16.547 8C16.547 7.73478 16.4416 7.48043 16.2541 7.29289C16.0666 7.10536 15.8122 7 15.547 7ZM12.547 8C12.547 7.20435 12.8631 6.44129 13.4257 5.87868C13.9883 5.31607 14.7514 5 15.547 5C16.3426 5 17.1057 5.31607 17.6683 5.87868C18.2309 6.44129 18.547 7.20435 18.547 8C18.547 8.79565 18.2309 9.55871 17.6683 10.1213C17.1057 10.6839 16.3426 11 15.547 11C14.7514 11 13.9883 10.6839 13.4257 10.1213C12.8631 9.55871 12.547 8.79565 12.547 8Z'
+            fill='black'
+            className={classNamePath({ isMatch })}
+          />
+        </svg>
+      )
+    },
+    {
+      value: 'videos',
+      isMatch: false,
+      svg: ({ isMatch }: { isMatch: boolean }) => (
+        <svg
+          className='h-6 w-6'
+          viewBox='0 0 24 24'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+        >
+          <path
+            d='M2 2H22V22H2V2ZM4 4V20H20V4H4ZM8 6.37L17.75 12L8 17.63V6.37ZM10 9.835V14.165L13.75 12L10 9.835Z'
+            className={classNamePath({ isMatch })}
+          />
+        </svg>
+      )
+    },
+    {
+      value: 'saved',
+      isMatch: false,
+      svg: ({ isMatch }: { isMatch: boolean }) => (
+        <svg
+          className='h-6 w-6'
+          viewBox='0 0 24 24'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+        >
+          <path
+            d='M5 2H19C19.2652 2 19.5196 2.10536 19.7071 2.29289C19.8946 2.48043 20 2.73478 20 3V22.143C20.0001 22.2324 19.9763 22.3202 19.9309 22.3973C19.8855 22.4743 19.8204 22.5378 19.7421 22.5811C19.6639 22.6244 19.5755 22.6459 19.4861 22.6434C19.3968 22.641 19.3097 22.6146 19.234 22.567L12 18.03L4.766 22.566C4.69037 22.6135 4.60339 22.6399 4.5141 22.6424C4.42482 22.6449 4.33649 22.6235 4.2583 22.5803C4.1801 22.5371 4.11491 22.4738 4.06948 22.3969C4.02406 22.32 4.00007 22.2323 4 22.143V3C4 2.73478 4.10536 2.48043 4.29289 2.29289C4.48043 2.10536 4.73478 2 5 2ZM18 4H6V19.432L12 15.671L18 19.432V4Z'
+            className={classNamePath({ isMatch })}
+          />
+        </svg>
+      )
+    }
+  ];
   const navigate = useNavigate();
   const { profile } = useContext(AppContext);
-  const { username, type } = useParams<{
-    username: string;
+  const { userId, type } = useParams<{
+    userId: string;
     type?: string;
   }>();
 
-  const isProfile = username === profile?.username.toLowerCase();
+  const {
+    data: profileData,
+    isLoading: isLoadingProfile,
+    isError
+  } = useQuery({
+    queryKey: ['profile-materials', userId],
+    queryFn: () => profileApi.getProfileMaterial(userId || '')
+  });
+  // const userProfile = profileData?.data.user as User;
+  const posts = profileData?.data.posts || [];
+  const savedPosts = profileData?.data.savedPosts || [];
+  const isProfile = userId === profile?._id.toLowerCase();
+  if (!isProfile) {
+    // Modify the original array directly
+    const savedButtonIndex = buttonsFilter.findIndex(
+      button => button.value === 'saved'
+    );
+    if (savedButtonIndex !== -1) buttonsFilter.pop();
+  }
 
   buttonsFilter.forEach(button => {
     if (button.value === type || (button.value === '' && type === undefined)) {
@@ -119,7 +230,7 @@ export default function Profile() {
           <section className='flex flex-grow-2 flex-col'>
             <div className='flex items-center'>
               <h2 className='mr-3 text-xl font-normal text-black'>
-                {profile?.username.toLowerCase()}
+                {'anhung'}
               </h2>
 
               {isProfile && (
@@ -177,7 +288,7 @@ export default function Profile() {
               </button>
             </div>
 
-            <p className='mt-5 text-sm font-medium text-black'>An Hưng</p>
+            <p className='mt-5 text-sm font-medium text-black'>{'An Hung'}</p>
             <p className='mt-4 max-w-[22rem] whitespace-pre-wrap text-sm text-black'>
               𝑺𝒉𝒂𝒍𝒍 𝑰 𝒄𝒐𝒎𝒑𝒂𝒓𝒆 𝒚𝒐𝒖 𝒕𝒐 𝒂 𝒔𝒖𝒎𝒎𝒆𝒓’𝒔 𝒅𝒂𝒚. 𝑻𝒉𝒐𝒖 𝒂𝒓𝒕 𝒎𝒐𝒓𝒆 𝒍𝒐𝒗𝒆𝒍𝒚 𝒂𝒏𝒅
               𝒎𝒐𝒓𝒆 𝒕𝒆𝒎𝒑𝒆𝒓𝒂𝒕𝒆.
@@ -185,7 +296,7 @@ export default function Profile() {
           </section>
         </header>
 
-        <section className='border-t border-gray-300'>
+        <section className='mb-8 border-t border-gray-300'>
           <div className='flex justify-center gap-6 text-sm'>
             {buttonsFilter.map(({ value, isMatch, svg }, index) => (
               <Button
@@ -194,17 +305,20 @@ export default function Profile() {
                 value={value}
                 className='items-center gap-2 pt-4 active:opacity-60'
                 onClick={() => {
-                  navigate(value);
+                  navigate(`/${userId}/${value}`);
                 }}
                 isMatch={isMatch}
               >
                 {svg({ isMatch })}
 
                 <span
-                  className={classNames(`text-base font-medium capitalize`, {
-                    'text-black': isMatch,
-                    'text-gray-400': !isMatch
-                  })}
+                  className={classNames(
+                    `hidden text-base font-medium capitalize md:inline`,
+                    {
+                      'text-black': isMatch,
+                      'text-gray-400': !isMatch
+                    }
+                  )}
                 >
                   {value || 'Post'}
                 </span>
@@ -212,7 +326,78 @@ export default function Profile() {
             ))}
           </div>
         </section>
-        <Outlet />
+
+        <article
+          className={classNames('mb-2 flex flex-col gap-1', {
+            'items-center': isLoadingProfile
+          })}
+        >
+          {isError && <NotFound />}
+
+          {isLoadingProfile && <Spinner />}
+
+          {!type &&
+            List<Post>({
+              listItems: posts || [],
+              mapFn: post => <PostItem key={post._id} post={post} />,
+              as: 'ul',
+              className: 'mb-2 flex flex-col gap-2 items-center'
+            })}
+
+          {type === 'saved' && (
+            <List
+              listItems={savedPosts}
+              mapFn={savedPost => (
+                <PostItem
+                  key={savedPost._id}
+                  post={{
+                    ...savedPost,
+                    profilePicture: savedPost.authorProfilePicture,
+                    _id: savedPost.postId,
+                    createdAt: savedPost.postCreatedDate,
+                    username: savedPost.authorName
+                  }}
+                />
+              )}
+              as='ul'
+              className='mb-2 flex flex-col items-center gap-2'
+            />
+          )}
+
+          {type === 'images' && (
+            <>
+              {/* Convert this to map function */}
+              {Array.from({ length: Math.ceil(postsTest.length / 3) }).map(
+                (_, index, arr) => {
+                  if (index !== arr.length - 1) {
+                    return (
+                      <div className='flex gap-1' key={index}>
+                        <ImageItem post={postsTest[index]} />
+                        <ImageItem post={postsTest[index + 1]} />
+                        <ImageItem post={postsTest[index + 2]} />
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div className='flex gap-1' key={index}>
+                        {Array.from({
+                          length: postsTest.length - index * 3
+                        }).map((_, idx) => {
+                          return (
+                            <ImageItem
+                              post={postsTest[idx + index * 3]}
+                              key={idx}
+                            />
+                          );
+                        })}
+                      </div>
+                    );
+                  }
+                }
+              )}
+            </>
+          )}
+        </article>
       </div>
     </main>
   );

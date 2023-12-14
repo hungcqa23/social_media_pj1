@@ -15,7 +15,7 @@ export default function Input(props: Props) {
     errorMessage,
     className,
     classNameError = 'ml-1 mt-1 min-h-[1.25rem] text-sm font-medium text-red-600',
-    classNameInput = 'block w-full rounded-lg border lg:px-5 lg:py-4 px-4 py-3 text-sm md:text-base md:font-medium text-gray-700 outline-none focus:text-gray-700 focus:shadow font-normal',
+    classNameInput = 'block w-full rounded border lg:px-4 lg:py-3 px-4 py-3 text-sm md:text-sm text-gray-700 outline-none focus:text-gray-700 focus:shadow font-normal',
     register,
     name,
     ruleName,

@@ -7,3 +7,13 @@ export const formatDate = (inputDateString: string): string => {
 
   return formattedDate;
 };
+
+export const formatSocialNumber = (number: number): string => {
+  // Format to number social media
+  return new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumFractionDigits: 2
+  })
+    .format(number)
+    .replace('.', ',');
+};

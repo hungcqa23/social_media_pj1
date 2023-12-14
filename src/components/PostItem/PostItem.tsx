@@ -3,8 +3,8 @@ import Profile from '../IconProfile';
 import Comment from '../Comment';
 import List from '../List';
 import Dialog from '../Dialog';
-import { Post as PostType } from 'src/types/post.type';
-import { formatDate } from 'src/utils/helper';
+import { Post } from 'src/types/post.type';
+import { formatDate, formatSocialNumber } from 'src/utils/helper';
 import { calculateTextWidth } from 'src/utils/utils';
 import { useAppContext } from 'src/contexts/app.contexts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -72,7 +72,7 @@ function reducer(state: States, action: { type: string }): States {
 
 interface PostProps {
   className?: string;
-  post: PostType;
+  post: Post;
   innerRef?: React.Ref<HTMLParagraphElement>;
 }
 
@@ -81,7 +81,7 @@ const originalHeight = 36;
 export default function PostItem({
   post,
   innerRef,
-  className = 'w-full rounded-lg border shadow'
+  className = 'max-w-[40rem] w-full rounded-lg border shadow'
 }: PostProps) {
   const { profile } = useAppContext();
   const queryClient = useQueryClient();
@@ -142,23 +142,26 @@ export default function PostItem({
     reset();
   });
 
-  // Save Post
+  // Saved Posts
   const { data: savedPostData } = useQuery({
-    queryKey: ['saved-posts'],
-    queryFn: () => postApi.getSavedPosts()
+    queryKey: ['saved-posts', post._id],
+    queryFn: () => postApi.checkSavedByPostId(post._id || '')
   });
-  const savedPosts = savedPostData?.data.posts || [];
-  const isSaved = savedPosts.some(savedPost => savedPost.postId === post._id);
+  const isSaved = savedPostData?.data.isExisted;
   const savePostMutation = useMutation({
     mutationFn: (postId: string) => postApi.savePost(postId)
   });
   const onSavePost = () => {
     savePostMutation.mutate(post._id || '', {
       onSuccess: () => {
-        setTimeout(
-          () => queryClient.invalidateQueries({ queryKey: ['saved-posts'] }),
-          500
-        );
+        setTimeout(() => {
+          queryClient.invalidateQueries({
+            queryKey: ['saved-posts', post._id]
+          });
+          queryClient.invalidateQueries({
+            queryKey: ['profile-materials', post.userId]
+          });
+        }, 500);
       }
     });
   };
@@ -191,7 +194,7 @@ export default function PostItem({
     onSuccess: () => {
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['reactions', post._id] });
-      }, 500);
+      }, 300);
     }
   });
 
@@ -229,7 +232,7 @@ export default function PostItem({
       <div className='flex h-16 items-center justify-between p-4'>
         <div className='flex'>
           <div className='mr-2'>
-            <Profile src={post.profilePicture} />
+            <Profile src={post.profilePicture} to={post.userId} />
           </div>
           <div>
             <div>
@@ -371,8 +374,8 @@ export default function PostItem({
       </div>
 
       {/* Text */}
-      <div className='px-4 text-base'>
-        <p className='pb-4 font-medium'>{post.post}</p>
+      <div className='px-4'>
+        <p className='pb-4 text-sm font-normal text-gray-950'>{post.post}</p>
       </div>
 
       {/* Image or video */}
@@ -391,7 +394,7 @@ export default function PostItem({
         <div className={`flex gap-1 py-3 ${true && 'border-b'}`}>
           {/* Likes */}
           <button
-            className='ease-normal flex basis-4/12 items-center justify-center rounded p-1 transition-[background] duration-500 hover:bg-gray-200'
+            className='flex basis-4/12 items-center justify-center rounded p-1 transition-[background] duration-500 ease-normal hover:bg-gray-200'
             onClick={() => {
               if (!liked) likePostMutation.mutate(post._id || '');
               else unlikeMutation.mutate(post._id || '');
@@ -443,13 +446,13 @@ export default function PostItem({
               </svg>
             </div>
             <span className='min-w-[1rem] text-sm font-medium text-gray-500'>
-              {reactions?.length || 0}
+              {formatSocialNumber(reactions?.length || 0)}
             </span>
           </button>
 
           {/* Comments */}
           <button
-            className='ease-normal flex basis-4/12 items-center justify-center rounded transition-[background] duration-500 hover:bg-gray-200'
+            className='flex basis-4/12 items-center justify-center rounded transition-[background] duration-500 ease-normal hover:bg-gray-200'
             onClick={() => {
               textareaRef.current?.focus();
             }}
@@ -472,7 +475,7 @@ export default function PostItem({
               </svg>
             </span>
             <span className='min-w-[1rem] text-sm font-medium text-gray-500'>
-              {comments.length || 0}
+              {formatSocialNumber(comments.length || 0)}
             </span>
           </button>
 

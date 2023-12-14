@@ -92,7 +92,7 @@ export default function Navigation(props: Props) {
     },
     {
       name: 'Profile',
-      to: `${profile?.username.toLowerCase()}`,
+      to: `${profile?._id}`,
       svg: profile?.profilePicture || '',
       svgActive: profile?.profilePicture || '',
       isProfile: true

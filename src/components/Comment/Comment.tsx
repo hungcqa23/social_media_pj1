@@ -8,7 +8,15 @@ interface Props {
 
 export default function Comment({ comment }: Props) {
   const [hover, setHover] = useState(false);
-
+  const [showSeeMore, setShowSeeMore] = useState(() => {
+    if (comment.comment.length > 100) {
+      return true;
+    }
+    return false;
+  });
+  const commentText = showSeeMore
+    ? `${comment.comment.slice(0, 100)}...`
+    : comment.comment;
   return (
     <div className='px-4 py-2'>
       <div
@@ -28,14 +36,19 @@ export default function Comment({ comment }: Props) {
               <span className='-mt-1 mb-1 w-fit text-xs font-semibold'>
                 {comment.username}
               </span>
-              <p
-                className='text-regular line-clamp-3 w-full overflow-x-hidden whitespace-pre-wrap break-words font-normal text-gray-700 hover:line-clamp-none hover:max-h-[4rem] hover:overflow-y-auto'
-                onScrollCapture={() => {
-                  console.log('Hello World!');
-                }}
-              >
-                {comment.comment}
-              </p>
+              <div>
+                <div className='text-regular w-full overflow-y-hidden whitespace-pre-wrap break-words font-normal text-gray-700'>
+                  {commentText}
+                  {comment.comment.length > 100 && (
+                    <button
+                      onClick={() => setShowSeeMore(!showSeeMore)}
+                      className='pl-1 font-medium text-gray-950 hover:underline'
+                    >
+                      {`See ${showSeeMore ? 'more' : 'less'}`}
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
 
             <button className='min-h-[2rem] min-w-[2rem] rounded-full hover:bg-gray-100'>

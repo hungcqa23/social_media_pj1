@@ -24,7 +24,6 @@ export default function CreatePost() {
       <div className='p-4'>
         <div className='flex items-center gap-2 border-b pb-3'>
           <IconProfile
-            to={`${profile?.username}`}
             src={profile?.profilePicture}
             className='h-11 w-11 shrink-0'
           />

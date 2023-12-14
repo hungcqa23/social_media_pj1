@@ -2,6 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { isActiveRoute } from 'src/utils/utils';
 import classNames from 'classnames';
+import { useAppContext } from 'src/contexts/app.contexts';
 
 interface Props {
   svg: string;
@@ -23,6 +24,7 @@ export default function ButtonNav(props: Props) {
   let lgImg = 'lg:ml-2 lg:w-6';
   let lgP = 'lg:block lg:font-medium lg:ml-2';
 
+  const { profile } = useAppContext();
   const { shorten } = props;
   if (shorten) {
     lgNavLink = '';
@@ -56,10 +58,11 @@ export default function ButtonNav(props: Props) {
   const [isHover, setIsHover] = useState(false);
 
   const pathname = useLocation().pathname;
-
   const isActive =
     isActiveRoute(pathname, text?.toLowerCase()) ||
-    (text === 'Home' && pathname === '/');
+    (text === 'Home' && pathname === '/') ||
+    (pathname === `/${profile?._id}` &&
+      text.toLowerCase() === profile?.username);
 
   if (isButton) {
     return (

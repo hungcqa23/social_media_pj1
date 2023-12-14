@@ -6,7 +6,7 @@ const URL_GET_ALL_POSTS = 'post/all';
 const URL_CREATE_POST_WITH_MEDIA = 'post-with-image';
 const URL_POST = 'post';
 const URL_GET_ALL_SAVED_POSTS = 'saved-posts';
-const URL_SAVE_POST = 'post/save-post';
+const URL_SAVED_POST = 'post/save-post';
 
 export interface GetAllPosts extends SuccessResponse {
   posts: Post[];
@@ -18,13 +18,15 @@ export interface CreatePost extends SuccessResponse {
 }
 
 export interface GetAllSavedPosts extends SuccessResponse {
-  posts: {
-    _id: string;
-    userId: string;
-    postId: string;
-    username: string;
-    createdAt: string;
-  }[];
+  posts: Post[];
+}
+
+export interface GetPostById {
+  post: Post;
+}
+
+export interface CheckSavedPost {
+  isExisted: boolean;
 }
 
 export const postApi = {
@@ -50,7 +52,13 @@ export const postApi = {
   getSavedPosts() {
     return http.get<GetAllSavedPosts>(URL_GET_ALL_SAVED_POSTS);
   },
+  checkSavedByPostId(postId: string) {
+    return http.get<CheckSavedPost>(`${URL_GET_ALL_SAVED_POSTS}/${postId}`);
+  },
   savePost(postId: string) {
-    return http.post<SuccessResponse>(URL_SAVE_POST, { postId });
+    return http.post<SuccessResponse>(URL_SAVED_POST, { postId });
+  },
+  getPostById(id: string) {
+    return http.get<GetPostById>(`${URL_POST}/${id}`);
   }
 };
