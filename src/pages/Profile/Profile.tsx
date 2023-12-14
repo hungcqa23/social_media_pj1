@@ -196,7 +196,7 @@ export default function Profile() {
     queryKey: ['profile-materials', userId],
     queryFn: () => profileApi.getProfileMaterial(userId || '')
   });
-  // const userProfile = profileData?.data.user as User;
+  const userProfile = profileData?.data.user as User;
   const posts = profileData?.data.posts || [];
   const savedPosts = profileData?.data.savedPosts || [];
   const isProfile = userId === profile?._id.toLowerCase();
@@ -230,7 +230,7 @@ export default function Profile() {
           <section className='flex flex-grow-2 flex-col'>
             <div className='flex items-center'>
               <h2 className='mr-3 text-xl font-normal text-black'>
-                {'anhung'}
+                {userProfile?.username}
               </h2>
 
               {isProfile && (
@@ -288,7 +288,9 @@ export default function Profile() {
               </button>
             </div>
 
-            <p className='mt-5 text-sm font-medium text-black'>{'An Hung'}</p>
+            <p className='mt-5 text-sm font-medium text-black'>
+              {userProfile?.fullname}
+            </p>
             <p className='mt-4 max-w-[22rem] whitespace-pre-wrap text-sm text-black'>
               𝑺𝒉𝒂𝒍𝒍 𝑰 𝒄𝒐𝒎𝒑𝒂𝒓𝒆 𝒚𝒐𝒖 𝒕𝒐 𝒂 𝒔𝒖𝒎𝒎𝒆𝒓’𝒔 𝒅𝒂𝒚. 𝑻𝒉𝒐𝒖 𝒂𝒓𝒕 𝒎𝒐𝒓𝒆 𝒍𝒐𝒗𝒆𝒍𝒚 𝒂𝒏𝒅
               𝒎𝒐𝒓𝒆 𝒕𝒆𝒎𝒑𝒆𝒓𝒂𝒕𝒆.
@@ -332,10 +334,13 @@ export default function Profile() {
             'items-center': isLoadingProfile
           })}
         >
-          {isError && <NotFound />}
-
+          {/* Error */}
+          {isError && (
+            <NotFound className='flex h-48 items-center justify-center' />
+          )}
+          {/* Loading */}
           {isLoadingProfile && <Spinner />}
-
+          {/* Default Post */}
           {!type &&
             List<Post>({
               listItems: posts || [],
@@ -343,7 +348,7 @@ export default function Profile() {
               as: 'ul',
               className: 'mb-2 flex flex-col gap-2 items-center'
             })}
-
+          {/* Saved Post */}
           {type === 'saved' && (
             <List
               listItems={savedPosts}
@@ -363,7 +368,7 @@ export default function Profile() {
               className='mb-2 flex flex-col items-center gap-2'
             />
           )}
-
+          {/* Images Post */}
           {type === 'images' && (
             <>
               {/* Convert this to map function */}

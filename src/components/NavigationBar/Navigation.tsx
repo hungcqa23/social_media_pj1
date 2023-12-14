@@ -18,6 +18,7 @@ import {
   shift,
   useFloating
 } from '@floating-ui/react';
+import { clear } from 'console';
 
 interface Props {
   classNameNav?: string;
@@ -50,7 +51,8 @@ export default function Navigation(props: Props) {
       setIsAuthenticated(false);
     },
     onError: () => {
-      console.log('Log out failed !');
+      setIsAuthenticated(false);
+      clearLS();
     }
   });
 
@@ -141,7 +143,12 @@ export default function Navigation(props: Props) {
                     onClick={() => {
                       setIsNotificationBarOpen(prev => !prev);
                     }}
-                  />
+                  >
+                    {/* <span className='absolute -right-1 -top-1 flex h-3 w-3'>
+                      <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75' />
+                      <span className='relative inline-flex h-3 w-3 rounded-full bg-red-400' />
+                    </span> */}
+                  </ButtonNav>
 
                   {isNotificationBarOpen && (
                     <FloatingPortal id={id}>

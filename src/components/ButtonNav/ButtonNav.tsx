@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { useAppContext } from 'src/contexts/app.contexts';
 
 interface Props {
+  children?: React.ReactNode;
   svg: string;
   svgActive?: string;
   text: string;
@@ -25,7 +26,8 @@ export default function ButtonNav(props: Props) {
   let lgP = 'lg:block lg:font-medium lg:ml-2';
 
   const { profile } = useAppContext();
-  const { shorten } = props;
+  const { shorten, children } = props;
+
   if (shorten) {
     lgNavLink = '';
     lgImg = '';
@@ -48,7 +50,7 @@ export default function ButtonNav(props: Props) {
           'border border-gray-300 font-medium': isActive
         }
       ),
-    classNameButton = `flex h-12 w-12 items-center 
+    classNameButton = `flex relative h-12 w-12 items-center 
     justify-center gap rounded-lg 
     transition-all hover:bg-gray-200 ${lgNavLink} active:bg-gray-100`,
     isButton,
@@ -89,6 +91,7 @@ export default function ButtonNav(props: Props) {
           />
         </div>
         <p className={`hidden ${lgP}`}>{text}</p>
+        {children}
       </button>
     );
   }
@@ -100,6 +103,7 @@ export default function ButtonNav(props: Props) {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
+      {children}
       <div
         className={`${isHover && 'scale-105'} ${
           isActive && 'scale-105'

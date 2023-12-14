@@ -119,7 +119,7 @@ export default function PostItem({
       commentApi.addComment({
         ...body,
         postId: post._id || '',
-        userTo: profile?._id || '',
+        userTo: post?.userId || '',
         profilePicture: profile?.profilePicture || ''
       }),
     onSuccess: () => {
