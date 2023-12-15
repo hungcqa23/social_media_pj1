@@ -7,15 +7,24 @@ interface GetProfile extends SuccessResponse {
   user: User;
 }
 
+interface Follower {
+  _id: string;
+  username: string;
+  profilePicture: string;
+}
+
 interface GetProfileMaterial extends SuccessResponse {
   user: User;
   posts: Post[];
+  image: Post[];
   savedPosts: ({
     authorProfilePicture: string;
     postId: string;
     postCreatedDate: string;
     authorName: string;
   } & Post)[];
+  followers: Follower[];
+  followings: Follower[];
 }
 
 export const profileApi = {
@@ -28,5 +37,17 @@ export const profileApi = {
     return http.get<GetProfileMaterial>(
       `user/profile-materials/${user._id}/${user.username}/${user.uId}`
     );
+  },
+  follow: (userId: string) => {
+    return http.put<SuccessResponse>(`user/follow/${userId}`);
+  },
+  unfollow: ({
+    userId,
+    followingId
+  }: {
+    userId: string;
+    followingId: string;
+  }) => {
+    return http.put<SuccessResponse>(`user/unfollow/${followingId}/${userId}`);
   }
 };

@@ -69,8 +69,8 @@ export default function Modal({
         {
           post: data.content,
           profilePicture: profile?.profilePicture,
-          privacy: 'public',
-          image: stringBase64
+          image: stringBase64,
+          privacy: 'public'
         },
         {
           onSuccess: () => {

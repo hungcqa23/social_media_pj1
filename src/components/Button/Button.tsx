@@ -17,7 +17,7 @@ export default function Button(props: ButtonProps) {
     children,
     isMatch,
     className,
-    colorSpinner,
+    colorSpinner = 'dark',
     ...rest
   } = props;
 
@@ -65,7 +65,7 @@ export default function Button(props: ButtonProps) {
             'h-4 w-4 animate-spin text-gray-200 dark:text-gray-600',
             {
               'fill-blue-600': colorSpinner === 'blue',
-              'fill-gray-700': colorSpinner
+              'fill-gray-700': colorSpinner === 'dark'
             }
           )}
           viewBox='0 0 100 101'
@@ -82,7 +82,7 @@ export default function Button(props: ButtonProps) {
           />
         </svg>
       )}
-      {children}
+      {!isLoading && children}
     </button>
   );
 }

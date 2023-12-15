@@ -13,7 +13,10 @@ export default function ImageItem({ post }: { post: Post }) {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
-      <img src='/src/assets/images/user.jpg' alt='Post Item' />
+      <img
+        src={`https://res.cloudinary.com/daszajz9a/image/upload/v${post.imgVersion}/${post.imgId}`}
+        alt='Post Item'
+      />
       {isHover && (
         <div className='absolute inset-0 flex justify-center bg-black/30'>
           <ul className='flex items-center'>

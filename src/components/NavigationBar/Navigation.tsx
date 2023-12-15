@@ -9,16 +9,18 @@ import { useAppContext } from 'src/contexts/app.contexts';
 import { clearLS } from 'src/utils/auth';
 import NotificationBar from '../NotificationBar';
 
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import {
+  FloatingOverlay,
   FloatingPortal,
   autoUpdate,
   flip,
   offset,
   shift,
-  useFloating
+  useDismiss,
+  useFloating,
+  useInteractions
 } from '@floating-ui/react';
-import { clear } from 'console';
 
 interface Props {
   classNameNav?: string;
@@ -101,7 +103,7 @@ export default function Navigation(props: Props) {
     }
   ];
 
-  const { refs, floatingStyles } = useFloating({
+  const { refs, floatingStyles, context } = useFloating({
     open: isNotificationBarOpen,
     onOpenChange: setIsNotificationBarOpen,
     placement: 'left',
@@ -109,6 +111,24 @@ export default function Navigation(props: Props) {
     whileElementsMounted: autoUpdate,
     middleware: [shift(), flip(), offset(13)]
   });
+  const dismiss = useDismiss(context);
+  const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);
+
+  // useEffect(() => {
+  //   document.addEventListener('keydown', e => {
+  //     if (isNotificationBarOpen && e.key === 'Escape') {
+  //       setIsNotificationBarOpen(false);
+  //     }
+  //   });
+
+  //   return () => {
+  //     document.removeEventListener('keydown', e => {
+  //       if (isNotificationBarOpen && e.key === 'Escape') {
+  //         setIsNotificationBarOpen(false);
+  //       }
+  //     });
+  //   };
+  // }, [isNotificationBarOpen]);
 
   return (
     <nav className={classNameNav}>
@@ -132,7 +152,11 @@ export default function Navigation(props: Props) {
           {Links.map(link => {
             if (link?.isButton && link?.name === 'Notifications') {
               return (
-                <div key={link.name} ref={refs.setReference}>
+                <div
+                  key={link.name}
+                  ref={refs.setReference}
+                  {...getReferenceProps()}
+                >
                   <ButtonNav
                     text={link.name}
                     svg={iconsSvg.notification}
@@ -144,15 +168,19 @@ export default function Navigation(props: Props) {
                       setIsNotificationBarOpen(prev => !prev);
                     }}
                   >
-                    {/* <span className='absolute -right-1 -top-1 flex h-3 w-3'>
+                    <span className='absolute -right-1 -top-1 flex h-3 w-3'>
                       <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75' />
                       <span className='relative inline-flex h-3 w-3 rounded-full bg-red-400' />
-                    </span> */}
+                    </span>
                   </ButtonNav>
 
                   {isNotificationBarOpen && (
                     <FloatingPortal id={id}>
-                      <div style={floatingStyles} ref={refs.setFloating}>
+                      <div
+                        style={floatingStyles}
+                        ref={refs.setFloating}
+                        {...getFloatingProps()}
+                      >
                         <NotificationBar className='overflow-y-auto bg-white shadow-[5px_0px_11px_-1px_rgba(0,0,0,0.2)]' />
                       </div>
                     </FloatingPortal>

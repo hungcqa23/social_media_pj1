@@ -108,6 +108,7 @@ export default function PostItem({
         textareaRef.current.scrollHeight + 'px'; // Set the height to the scrollHeight
     }
   };
+
   // Get Data for comments
   const { data: commentsData, isLoading: isLoadingComment } = useQuery({
     queryKey: ['comments', post._id],
@@ -155,11 +156,18 @@ export default function PostItem({
     savePostMutation.mutate(post._id || '', {
       onSuccess: () => {
         setTimeout(() => {
+          // queryClient.invalidateQueries({
+          //   queryKey: ['saved-posts', post._id]
+          // });
+          // queryClient.invalidateQueries({
+          //   queryKey: ['profile-materials', post.userId]
+          // });
           queryClient.invalidateQueries({
-            queryKey: ['saved-posts', post._id]
-          });
-          queryClient.invalidateQueries({
-            queryKey: ['profile-materials', post.userId]
+            predicate: query =>
+              (query.queryKey[0] === 'saved-posts' &&
+                query.queryKey[1] === post._id) ||
+              (query.queryKey[0] === 'profile-materials' &&
+                query.queryKey[1] === post.userId)
           });
         }, 500);
       }
@@ -183,7 +191,14 @@ export default function PostItem({
         profilePicture: profile?.profilePicture || ''
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reactions', post._id] });
+      // queryClient.invalidateQueries({ queryKey: ['reactions', post._id] });
+      queryClient.invalidateQueries({
+        predicate: query =>
+          (query.queryKey[0] === 'reactions' &&
+            query.queryKey[1] === post._id) ||
+          (query.queryKey[0] === 'profile-materials' &&
+            query.queryKey[1] === post.userId)
+      });
     }
   });
   const unlikeMutation = useMutation({
@@ -207,6 +222,9 @@ export default function PostItem({
       });
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['posts'] });
+        queryClient.invalidateQueries({
+          queryKey: ['profile-materials', post.userId]
+        });
       }, 2000);
     }
   });
