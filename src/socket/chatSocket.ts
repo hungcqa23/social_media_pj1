@@ -1,7 +1,12 @@
 import { User } from 'src/types/user.type';
 import { socketIOService } from './socket';
-import { IMessageData, ISenderReceiver } from 'src/types/conversation.type';
+import {
+  IMessageData,
+  ISenderReceiver,
+  ICallUser
+} from 'src/types/conversation.type';
 import { cloneDeep, findIndex, remove } from 'lodash';
+import SimplePeer, { SignalData } from 'simple-peer';
 
 export class ChatSocket {
   static chatMessages: IMessageData[] = [];
@@ -70,4 +75,87 @@ export class ChatSocket {
       }
     });
   }
+
+  static callUser(callData: ICallUser) {
+    console.log('calling ', callData.message.senderUsername);
+    if (!socketIOService.getSocket()) return;
+    const peer: SimplePeer.Instance = new SimplePeer({
+      initiator: true,
+      trickle: false,
+      stream: callData.currentUserStream
+    });
+
+    peer.on('signal', (data: SignalData) => {
+      socketIOService.getSocket().emit('call user', {
+        signal: data,
+        message: callData.message
+      });
+    });
+
+    peer.on('stream', (stream: MediaStream) => {
+      if (callData.userVideoRef.current) {
+        callData.userVideoRef.current.srcObject = stream;
+      }
+    });
+
+    socketIOService.getSocket().on('call accepted', (signal: SignalData) => {
+      callData.setCallAccepted(true);
+      peer.signal(signal);
+    });
+
+    peer.on('close', () => {
+      console.log('peer close');
+      callData.setCallEnded(true);
+      callData.setCallAccepted(false);
+      callData.setReceivingCall(false);
+      socketIOService.getSocket().off('call accepted');
+    });
+
+    if (callData.connectionRef.current) {
+      callData.connectionRef.current = peer;
+    }
+  }
+
+  static answerCall(callData: ICallUser) {
+    if (!socketIOService.getSocket()) return;
+    callData.setCallAccepted(true);
+    const peer = new SimplePeer({
+      initiator: false,
+      trickle: false,
+      stream: callData.currentUserStream
+    });
+
+    peer.on('signal', (data: SignalData) => {
+      socketIOService.getSocket().emit('answer call', {
+        signal: data,
+        message: callData.message
+      });
+    });
+
+    peer.on('stream', (stream: MediaStream) => {
+      if (callData.userVideoRef.current) {
+        callData.userVideoRef.current.srcObject = stream;
+      }
+    });
+
+    if (callData.callSignal) {
+      peer.signal(callData.callSignal);
+    }
+
+    peer.on('close', () => {
+      console.log('peer close');
+      callData.setCallEnded(true);
+      callData.setCallAccepted(false);
+      callData.setReceivingCall(false);
+      socketIOService.getSocket().off('call accepted');
+    });
+
+    callData.connectionRef.current = peer;
+  }
+
+  static leaveCall(connectionRef: React.RefObject<SimplePeer.Instance>) {
+    connectionRef.current?.destroy();
+  }
+
+  // static call()
 }

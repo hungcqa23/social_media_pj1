@@ -15,8 +15,8 @@ export default function MessageUser({ item, onClick }: Props) {
       onClick={onClick}
     >
       <Profile
-        classNameImage='h-13 w-13 rounded-full object-cover'
-        className='h-13 w-13 block'
+        classNameImage='h-14 w-14 rounded-full object-cover'
+        className='block h-14 w-14'
         src={
           profile?._id === item.receiverId
             ? item.senderProfilePicture

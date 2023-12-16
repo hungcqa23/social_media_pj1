@@ -1,5 +1,4 @@
 import { io, Socket } from 'socket.io-client';
-import { BASE_ENDPOINT } from 'src/utils/http';
 
 class SocketIOService {
   private socket!: Socket;

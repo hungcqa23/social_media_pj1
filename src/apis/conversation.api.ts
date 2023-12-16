@@ -36,4 +36,11 @@ export const sendMessage = async (body: ISendMessageData) => {
   return response;
 };
 
+export const callVideo = async (body: ISendMessageData) => {
+  const response = await http.post<ISendMessage>('/chat/call-video', body, {
+    withCredentials: true
+  });
+  return response;
+};
+
 // export const conversationApi: ConversationApi = new ConversationApi();
