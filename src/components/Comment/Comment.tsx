@@ -11,7 +11,6 @@ interface Props {
 
 export default function Comment({ comment }: Props) {
   const { profile } = useAppContext();
-  // const [hover, setHover] = useState(false);
   const [showSeeMore, setShowSeeMore] = useState(() => {
     if (comment.comment.length > 100) {
       return true;
@@ -28,7 +27,7 @@ export default function Comment({ comment }: Props) {
   const commentText = showSeeMore
     ? `${comment.comment.slice(0, 100)}...`
     : comment.comment;
-  console.log(openOptions);
+
   return (
     <div className='px-4 py-2'>
       <div
