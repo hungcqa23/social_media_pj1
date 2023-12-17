@@ -14,6 +14,8 @@ export interface IMessageData {
   body: string;
   isRead: boolean;
   gifUrl: string;
+  isVideoCall: string;
+  isAudioCall: string;
   selectedImage: string;
   createdAt: Date | string;
   deleteForMe: boolean;

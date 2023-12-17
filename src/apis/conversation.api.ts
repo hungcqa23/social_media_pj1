@@ -43,4 +43,42 @@ export const callVideo = async (body: ISendMessageData) => {
   return response;
 };
 
+export const callVideoReq = async (body: ISendMessageData) => {
+  const response = await http.post<ISendMessage>(
+    '/chat/call-video-socket',
+    body,
+    {
+      withCredentials: true
+    }
+  );
+  return response;
+};
+
+export const callAudio = async (body: ISendMessageData) => {
+  const response = await http.post<ISendMessage>('/chat/call-audio', body, {
+    withCredentials: true
+  });
+  return response;
+};
+
+export const callAudioReq = async (body: ISendMessageData) => {
+  const response = await http.post<ISendMessage>(
+    '/chat/call-audio-socket',
+    body,
+    {
+      withCredentials: true
+    }
+  );
+  return response;
+};
+
+export const markAsSeen = async (receiverId: string) => {
+  const response = await http.put<ISendMessage>(
+    '/chat/mark-as-seen/',
+    { receiverId },
+    { withCredentials: true }
+  );
+  return response;
+}
+
 // export const conversationApi: ConversationApi = new ConversationApi();

@@ -55,6 +55,19 @@ export class ChatSocket {
           setConversations(conversations);
         }
       });
+    socketIOService.getSocket().on('message read', (data: IMessageData) => {
+      if (
+        data.senderUsername.toLowerCase() === profile.username ||
+        data.senderUsername.toLowerCase() === profile.username
+      ) {
+        const messageIndex: number = findIndex(this.chatMessages, ['_id', data._id]);
+        if (messageIndex > -1) {
+          this.chatMessages.splice(messageIndex, 1, data);
+          conversations = [...this.chatMessages];
+          setConversations(conversations);
+        }
+      }
+    });
   }
 
   static receiveMessage(

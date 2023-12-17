@@ -3,7 +3,10 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import IconProfile from '../IconProfile';
 import { useParams } from 'react-router-dom';
 import {
+  callAudioReq,
   callVideo,
+  callVideoReq,
+  markAsSeen,
   retrieveMessages,
   sendMessage
 } from 'src/apis/conversation.api';
@@ -25,6 +28,7 @@ export default function Conversation() {
   const [receiver, setReceiver] = useState<User>();
   const [callAccepted, setCallAccepted] = useState<boolean>(false);
   const [callEnded, setCallEnded] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [receiverPeerId, setReceiverPeerId] = useState<string>('');
   const scrollRef = useScrollToBottom(messages);
 
@@ -35,8 +39,13 @@ export default function Conversation() {
     console.log('sender', profile?._id, peerId);
     console.log('receiver', receiver?._id, receiverPeerId);
     setIsWindowOpen(true);
-    callChatVideo(receiverPeerId);
+    callChatVideoReq();
   };
+
+  const handleAudioCallClick = () => {
+    setIsWindowOpen(true);
+    callChatAudioReq();
+  }
 
   const getMessages = useCallback(async (receiverId: string) => {
     const response: IMessageData[] = (await retrieveMessages(
@@ -44,6 +53,10 @@ export default function Conversation() {
     )) as IMessageData[];
     ChatSocket.chatMessages = [...response];
     setMessages([...ChatSocket.chatMessages]);
+  }, []);
+
+  const markMessagesAsSeen = useCallback(async (receiverId: string) => {
+    await markAsSeen(receiverId);
   }, []);
 
   const getProfile = useCallback(
@@ -56,6 +69,7 @@ export default function Conversation() {
   );
 
   useEffect(() => {
+    setIsLoading(true);
     if (fetched) {
       getProfile(receiverId.id as string);
       getMessages(receiverId.id as string);
@@ -72,14 +86,8 @@ export default function Conversation() {
 
   useEffect(() => {
     if (fetched) {
-      socketIOService.getSocket().emit('get peerId', {
-        userToGet: receiverId.id,
-        userWhoAsk: profile?._id
-      });
-      socketIOService.getSocket().on('receive id', id => {
-        setReceiverPeerId(id);
-      });
       ChatSocket.receiveMessage(messages, profile!.username, setMessages);
+      setIsLoading(false);
     }
     if (!fetched) {
       setFetched(true);
@@ -87,9 +95,10 @@ export default function Conversation() {
     return () => {
       if (fetched) {
         socketIOService.getSocket().off('message receive');
+        socketIOService.getSocket().off('message read');
       }
     };
-  }, [fetched, receiverId.id, receiverPeerId]);
+  }, [fetched, profile, receiverId.id]);
 
   const sendChatMessage = async (
     message: string,
@@ -102,22 +111,36 @@ export default function Conversation() {
       receiverUsername: receiver.username,
       body: message,
       selectedImage: selectedImage ? selectedImage : undefined,
-      conversationId: messages[0].conversationId
+      conversationId:
+        messages.length > 0 ? messages[0].conversationId : undefined
     } as ISendMessageData;
     await sendMessage(reqBody);
   };
 
-  const callChatVideo = async (peerId: string) => {
+  const callChatVideoReq = async () => {
     if (!receiver) return;
     const reqBody: ISendMessageData = {
       receiverId: receiver._id,
       receiverProfilePicture: receiver.profilePicture,
       receiverUsername: receiver.username,
       body: `${profile?.username} called you!`,
-      conversationId: messages[0].conversationId,
+      conversationId: messages[0].conversationId, //problem if conversationId is null
       peerId
     } as ISendMessageData;
-    await callVideo(reqBody);
+    await callVideoReq(reqBody);
+  };
+
+  const callChatAudioReq = async () => {
+    if (!receiver) return;
+    const reqBody: ISendMessageData = {
+      receiverId: receiver._id,
+      receiverProfilePicture: receiver.profilePicture,
+      receiverUsername: receiver.username,
+      body: `${profile?.username} called you!`,
+      conversationId: messages[0].conversationId, //problem if conversationId is null
+      peerId
+    } as ISendMessageData;
+    await callAudioReq(reqBody);
   };
 
   return (
@@ -131,7 +154,10 @@ export default function Conversation() {
             </span>
           </div>
           <div className='flex gap-2'>
-            <button className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300'>
+            <button
+              className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300'
+              onClick={handleAudioCallClick}
+            >
               <svg
                 width={24}
                 height={24}
@@ -196,6 +222,15 @@ export default function Conversation() {
               isReceived={profile?._id === item.receiverId}
             />
           ))}
+          {isLoading && (
+            <button type='button' className='bg-indigo-500' disabled>
+              <svg
+                className='mr-3 h-5 w-5 animate-spin'
+                viewBox='0 0 24 24'
+              ></svg>
+              Processing...
+            </button>
+          )}
         </div>
         <MessageInput setChatMessage={sendChatMessage} />
       </div>
@@ -204,7 +239,11 @@ export default function Conversation() {
           onClose={() => setIsWindowOpen(!isWindowOpen)}
           peer={peer}
           isReceiver={false}
-          receiverPeerId={receiverPeerId}
+          receiverId={receiverId.id}
+          senderProfilePicture={profile?.profilePicture}
+          receiverProfilePicture={receiver?.profilePicture}
+          isVideoCall={false}
+          senderId={profile?._id}
           username={profile?.username}
         />
       )}

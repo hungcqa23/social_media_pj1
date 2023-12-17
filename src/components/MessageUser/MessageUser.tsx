@@ -2,6 +2,8 @@ import { IMessageData } from 'src/types/conversation.type';
 import Profile from '../IconProfile';
 import { useContext } from 'react';
 import { AppContext } from 'src/contexts/app.contexts';
+import { formatTimeDifference } from 'src/utils/utils';
+import { User } from 'src/types/user.type';
 
 interface Props {
   item: IMessageData;
@@ -11,11 +13,11 @@ export default function MessageUser({ item, onClick }: Props) {
   const { profile } = useContext(AppContext);
   return (
     <button
-      className='flex w-full items-center gap-1 overflow-x-hidden px-6 py-3 hover:bg-gray-100'
+      className='flex w-full items-center gap-3 overflow-x-hidden px-6 py-3 hover:bg-gray-100'
       onClick={onClick}
     >
       <Profile
-        classNameImage='h-14 w-14 rounded-full object-cover'
+        classNameImage='h-14 w-14 rounded-full object-cover outline outline-1 outline-slate-200 outline-offset-2'
         className='block h-14 w-14'
         src={
           profile?._id === item.receiverId
@@ -35,12 +37,19 @@ export default function MessageUser({ item, onClick }: Props) {
         <div className='flex w-5/6 flex-col items-start'>
           <span
             className={`w-full text-sm ${
-              !item.isRead ? 'font-medium' : 'font-normal text-slate-500'
-            } text-slate-600`}
+              !item.isRead && item.senderId !== profile?._id
+                ? 'font-medium text-black'
+                : 'font-light text-slate-500'
+            }`}
           >
-            <p className='w-full overflow-x-hidden truncate text-left'>
-              {item.body}
-            </p>
+            <div className='flex w-full flex-row items-center'>
+              <p className='w-fit max-w-[70%] overflow-x-hidden truncate text-left'>
+                {item.senderId === profile?._id ? 'You: ' : null} {item.body}
+              </p>
+              <p className='w-fit min-w-[30%]'>
+                • {formatTimeDifference(new Date(item.createdAt))}
+              </p>
+            </div>
           </span>
         </div>
       </div>

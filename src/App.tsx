@@ -13,7 +13,7 @@ function App() {
   const [callAccepted, SetCallAccepted] = useState<boolean>(false);
   const [isWindowOpen, setIsWindowOpen] = useState<boolean>(false);
   const [callEnded, setCallEnded] = useState<boolean>(false);
-
+  const [message, setMessage] = useState<IMessageData>();
   useEffect(() => {
     socketIOService.setUpConnection();
 
@@ -21,32 +21,17 @@ function App() {
       socketIOService.getSocket().emit('setup', { userId: profile._id });
     }
 
-    // peer.on('call', call => {
-    //   console.log('on call');
-    //   // SetReceivingCall(true);
-    //   navigator.mediaDevices
-    //     .getUserMedia({ video: true, audio: true })
-    //     .then((incomeStream: MediaStream) => {
-    //       call.answer(incomeStream);
-    //       call.on('stream', (remoteStream: MediaStream) => {
-    //         console.log(remoteStream);
-    //       });
-    //     })
-    //     .catch(error => {
-    //       console.log(error);
-    //     });
-    // });
-
-    peer.on('open', (id: string) => {
-      setPeerId(id);
-      console.log('peerId', id);
-      socketIOService
-        .getSocket()
-        .emit('peer connect', { peerId: id, userId: profile?._id });
-    });
+    if (profile && socketIOService.getSocket()) {
+      peer.on('open', (id: string) => {
+        setPeerId(id);
+        console.log('peerId', id);
+        socketIOService
+          .getSocket()
+          .emit('peer connect', { peerId: id, userId: profile?._id });
+      });
+    }
 
     peer.on('disconnected', (id: string) => {
-      // peer.reconnect();
       socketIOService.getSocket().emit('peer disconnected', id);
     });
 
@@ -58,6 +43,7 @@ function App() {
         ) {
           console.log(`You have a call from ${data.senderUsername}`);
           SetCallAccepted(true);
+          setMessage(data);
           setIsWindowOpen(true);
         }
       });
@@ -77,6 +63,9 @@ function App() {
           peer={peer}
           isReceiver={true}
           callAccepted={callAccepted}
+          senderProfilePicture={message?.senderProfilePicture}
+          receiverProfilePicture={message?.receiverProfilePicture}
+          isVideoCall={message?.isVideoCall ? true : false}
           username={profile?.username}
           onClose={handleOnClose}
         />

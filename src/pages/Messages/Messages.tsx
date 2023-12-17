@@ -8,10 +8,27 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { AppContext } from 'src/contexts/app.contexts';
 import { ChatSocket } from 'src/socket/chatSocket';
 import { User } from 'src/types/user.type';
+import SearchBox from 'src/components/SearchBox';
 
 export default function Messages() {
   const [conversations, setConversations] = useState<IMessageData[]>([]);
+  const [results, setResults] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const { profile } = useContext(AppContext);
+
+  const handleSearch = async (value: string, results: User[]) => {
+    setSearchTerm(value);
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/v1/user/search?q=${value}`
+      );
+      const data = await response.json();
+      setResults(data.users);
+    } catch(error) {
+      console.error('Error fetching search results:', error);
+    }
+  }
 
   const getConversations = useCallback(async () => {
     const response: IMessageData[] =
@@ -35,7 +52,7 @@ export default function Messages() {
   return (
     <>
       <div className='ml-[4.5rem] flex h-screen bg-slate-200'>
-        <div className='h-full min-w-[22rem] basis-96 border-r bg-white'>
+        <div className='h-full min-w-[22rem] max-w-[22rem] basis-96 border-r bg-white'>
           <div className='flex items-center justify-between px-6 pb-3 pt-9'>
             <p className='text-lg font-bold text-black'>{profile?.username}</p>
             <Button className='h-6 w-6'>
@@ -53,6 +70,10 @@ export default function Messages() {
             </Link>
           </div>
 
+          <div className='absolute z-20 flex min-w-[22rem] items-baseline px-6 py-3'>
+            <SearchBox />
+          </div>
+
           {List<IMessageData>({
             listItems: conversations,
             mapFn: (item, index) => (
@@ -62,7 +83,8 @@ export default function Messages() {
                 onClick={() => handleClick(item)}
               />
             ),
-            className: 'h-[calc(100%-9.5rem)] overflow-y-auto w-full'
+            className:
+              'h-[calc(100%-9.5rem)] overflow-y-auto w-full relative z-10 top-20'
           })}
         </div>
 

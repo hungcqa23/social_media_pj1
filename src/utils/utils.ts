@@ -127,3 +127,27 @@ export function readAsBase64(file: File): Promise<string | ArrayBuffer | null> {
 
   return fileValue;
 }
+
+export function formatTimeDifference(sendTime: Date): string {
+  const currentTime = new Date();
+  const timeDifference = currentTime.getTime() - sendTime.getTime();
+
+  // Calculate time units
+  const seconds = Math.floor(timeDifference / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const months = Math.floor(days / 30);
+
+  if (months > 0) {
+    return `${months}m ${days % 30}d`;
+  } else if (days > 0) {
+    return `${days}d`;
+  } else if (hours > 0) {
+    return `${hours}h`;
+  } else if (minutes > 0) {
+    return `${minutes}m`;
+  } else {
+    return 'now';
+  }
+}

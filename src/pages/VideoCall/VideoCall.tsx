@@ -3,14 +3,18 @@ import Peer, { MediaConnection } from 'peerjs';
 import React, { useEffect, useRef, useState } from 'react';
 import NewWindow from 'react-new-window';
 import hangUpIcon from '../../assets/icons/end-call-end-call-svgrepo-com.svg';
-import Webcam from 'react-webcam';
+import { socketIOService } from 'src/socket/socket';
 
 type Props = {
   callAccepted?: boolean;
   callEnded?: boolean;
   isReceiver?: boolean;
   username?: string;
-  receiverPeerId?: string;
+  receiverId?: string;
+  receiverProfilePicture?: string;
+  senderProfilePicture?: string;
+  senderId?: string;
+  isVideoCall?: boolean;
   peer?: Peer;
   onClose: () => void;
 };
@@ -19,24 +23,61 @@ let stream: MediaStream;
 let receiverStream: MediaStream;
 let callRef: MediaConnection;
 
-const videoConstraints = {
-  width: 1280,
-  height: 720,
-  facingMode: 'user'
-};
-
 const VideoCall = (props: Props) => {
   const currentUserVideoRef = useRef<HTMLVideoElement>(null);
   const remoteUserVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    console.log(props.callAccepted);
+    if (!props.isReceiver) {
+      socketIOService.getSocket().emit('get peerId', {
+        userToGet: props.receiverId,
+        userWhoAsk: props.senderId
+      });
+      socketIOService.getSocket().on('receive id', id => {
+        navigator.mediaDevices
+          .getUserMedia({
+            video: props.isVideoCall ? true : false,
+            audio: true
+          })
+          .then((incomeStream: MediaStream) => {
+            stream = incomeStream;
+            if (currentUserVideoRef.current) {
+              currentUserVideoRef.current.srcObject = incomeStream;
+              currentUserVideoRef.current.play();
+            }
+            if (props.peer && !props.isReceiver) {
+              console.log(id);
+              const call: MediaConnection = props.peer.call(id, incomeStream);
+              callRef = call;
+              call.on('stream', (remoteStream: MediaStream) => {
+                console.log('come on sender stream');
+                if (remoteUserVideoRef.current) {
+                  remoteUserVideoRef.current.srcObject = remoteStream;
+                  remoteUserVideoRef.current.play();
+                }
+                console.log('local', currentUserVideoRef.current?.srcObject);
+                console.log('remote', remoteUserVideoRef.current?.srcObject);
+              });
+              call.on('close', () => {
+                props.onClose();
+              });
+            }
+          })
+          .catch(error => console.log(error));
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     if (props.isReceiver && props.peer) {
       props.peer.on('call', call => {
         callRef = call;
         console.log('on call');
         navigator.mediaDevices
-          .getUserMedia({ video: false, audio: true })
+          .getUserMedia({
+            video: props.isVideoCall ? true : false,
+            audio: true
+          })
           .then((incomeStream: MediaStream) => {
             receiverStream = incomeStream;
             if (currentUserVideoRef.current) {
@@ -59,36 +100,6 @@ const VideoCall = (props: Props) => {
           })
           .catch(error => console.log(error));
       });
-    } else {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((incomeStream: MediaStream) => {
-          stream = incomeStream;
-          if (currentUserVideoRef.current) {
-            currentUserVideoRef.current.srcObject = incomeStream;
-            currentUserVideoRef.current.play();
-          }
-          if (props.peer && !props.isReceiver) {
-            const call: MediaConnection = props.peer.call(
-              '370c0216-2ae3-4233-b3cb-19a67e4e7819',
-              incomeStream
-            );
-            callRef = call;
-            call.on('stream', (remoteStream: MediaStream) => {
-              console.log('come on sender stream');
-              if (remoteUserVideoRef.current) {
-                remoteUserVideoRef.current.srcObject = remoteStream;
-                remoteUserVideoRef.current.play();
-              }
-              console.log('local', currentUserVideoRef.current?.srcObject);
-              console.log('remote', remoteUserVideoRef.current?.srcObject);
-            });
-            call.on('close', () => {
-              props.onClose();
-            });
-          }
-        })
-        .catch(error => console.log(error));
     }
     return () => {
       if (stream) {
@@ -121,15 +132,19 @@ const VideoCall = (props: Props) => {
     >
       <div className='flex h-full w-full flex-col gap-1 bg-slate-800'>
         <div className='flex h-[80%] w-full flex-row justify-between'>
-          <div className='flex h-full w-[48%] items-center justify-center border'>
-            {/* {!props.callAccepted && <h1 className='text-white'>Calling</h1>}
-            {props.callAccepted && (
-              
-            )} */}
-            <video ref={currentUserVideoRef} muted playsInline />
+          <div className='flex h-full w-[48%] items-center justify-center'>
+            {props.isVideoCall ? (
+              <video ref={currentUserVideoRef} muted playsInline />
+            ) : (
+              <img src={props.senderProfilePicture} alt='profile' />
+            )}
           </div>
-          <div className='flex h-full w-[48%] items-center justify-center border'>
-            <video ref={remoteUserVideoRef} muted playsInline />
+          <div className='flex h-full w-[48%] items-center justify-center'>
+            {props.isVideoCall ? (
+              <video ref={remoteUserVideoRef} muted playsInline />
+            ) : (
+              <img src={props.receiverProfilePicture} alt='profile' />
+            )}
           </div>
         </div>
         <div className='flex h-[20%] w-full items-center justify-center'>
