@@ -1,4 +1,4 @@
-import { useReducer, useRef } from 'react';
+import { useReducer, useRef, useState } from 'react';
 import Profile from '../IconProfile';
 import Comment from '../Comment';
 import List from '../List';
@@ -87,10 +87,11 @@ export default function PostItem({
   const { profile } = useAppContext();
   const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [contentTextarea, setContentTextarea] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   // Form data for comment and submit comment
-  const { register, handleSubmit, watch, reset } = useForm<{
+  const { register, handleSubmit, watch, reset, getValues } = useForm<{
     comment: string;
   }>();
   const watchContentComment = watch('comment');
@@ -114,13 +115,12 @@ export default function PostItem({
       queryClient.invalidateQueries({ queryKey: ['comments', post._id] });
     }
   });
-  const onPostComment = handleSubmit(data => {
-    console.log(textareaRef?.current);
-    console.log('Data: ', commentRegister.ref);
-    addCommentMutation.mutate({
-      comment: data.comment
-    });
-  });
+  const onPostComment = (e: React.FormEvent) => {
+    console.log('onPostComment');
+    e.preventDefault();
+    addCommentMutation.mutate({ comment: contentTextarea });
+    setContentTextarea('');
+  };
 
   // Saved Posts
   const { data: savedPostData } = useQuery({
@@ -181,7 +181,7 @@ export default function PostItem({
     onSuccess: () => {
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['reactions', post._id] });
-      }, 300);
+      }, 200);
     }
   });
 
@@ -397,7 +397,7 @@ export default function PostItem({
                 viewBox='0 0 24 24'
                 fill='none'
                 className={classNames(
-                  'absolute left-0 top-0 transition-opacity duration-300',
+                  'absolute left-0 top-0 transition-opacity duration-200',
                   {
                     'opacity-0': !liked
                   }
@@ -406,9 +406,7 @@ export default function PostItem({
               >
                 <path
                   d='M12 21.35L10.55 20.03C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5C22 12.27 18.6 15.36 13.45 20.03L12 21.35Z'
-                  className={classNames('fill-red-500', {
-                    // 'opacity-0': !liked
-                  })}
+                  className={classNames('fill-red-500')}
                 />
               </svg>
 
@@ -417,7 +415,7 @@ export default function PostItem({
                 height='24'
                 viewBox='0 0 24 24'
                 className={classNames(
-                  'absolute left-0 top-0 fill-gray-400 transition-opacity duration-300',
+                  'absolute left-0 top-0 fill-gray-400 transition-opacity duration-200',
                   {
                     'opacity-0': liked,
                     'opacity-100': !liked
@@ -524,26 +522,23 @@ export default function PostItem({
                 className='h-9 w-full flex-grow resize-none overflow-y-hidden bg-transparent p-2 text-sm font-normal text-gray-700 outline-none transition-all'
                 placeholder='Write a comment...'
                 onChange={event => {
-                  commentRegister.onChange(event);
+                  setContentTextarea(event.target.value);
                   handleTextAreaChange(textareaRef);
                 }}
                 ref={e => {
-                  console.log('Add Ref');
-                  commentRegister.ref(e);
                   textareaRef.current = e;
                 }}
-                onBlur={commentRegister.onBlur}
-                name={commentRegister.name}
+                // name={commentRegister.name}
                 onKeyDown={event => {
                   if (event.key === 'Enter' && !event.shiftKey) {
                     event.preventDefault();
-                    onPostComment();
-                    reset();
+                    onPostComment(event);
                   }
                 }}
+                value={contentTextarea}
               />
 
-              {watchContentComment !== '' && (
+              {contentTextarea !== '' && (
                 <button
                   className='mb-1 mr-3 flex h-8 w-8 items-center justify-center self-end rounded-full hover:bg-gray-200'
                   type='submit'

@@ -35,12 +35,10 @@ export default function Comment({ comment }: Props) {
     options: false,
     delete: false
   });
-
   const isOwner = comment.username === profile?.username;
   const commentText = showSeeMore
     ? `${comment.comment.slice(0, 100)}...`
     : comment.comment;
-
   const deleteCommentMutation = useMutation({
     mutationFn: () =>
       commentApi.deleteComment({
@@ -96,16 +94,40 @@ export default function Comment({ comment }: Props) {
     reset();
   });
 
-  // Get Data for comments
-  // const { data: commentsData, isLoading: isLoadingComment } = useQuery({
-  //   queryKey: ['comments', comment._id],
-  //   queryFn: () =>
-  //     commentApi.getCommentById({
-  //       postId: comment.postId,
-  //       commentId: comment._id
-  //     })
-  // });
-  // console.log(commentsData?.data.singleComment[0]);
+  // Like comment mutation
+  const likeCommentMutation = useMutation({
+    mutationFn: () =>
+      commentApi.likeComment({
+        userTo: comment.userTo,
+        commentId: comment._id,
+        profilePicture: comment.profilePicture
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['comment/reactions', comment._id]
+      });
+    }
+  });
+  // Unlike comment mutation
+  const unlikeCommentMutation = useMutation({
+    mutationFn: () => commentApi.unlikeComment(comment._id),
+    onSuccess: () => {
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          queryKey: ['comment/reactions', comment._id]
+        });
+      }, 200);
+    }
+  });
+
+  // Get data for comment
+  const { data: reactionDatas } = useQuery({
+    queryKey: ['comment/reactions', comment._id],
+    queryFn: () => commentApi.getReactions(comment._id)
+  });
+
+  const reactions = reactionDatas?.data.reactions || [];
+  const liked = reactions.some(reaction => reaction.userId === profile?._id);
 
   useEffect(() => {
     if (isEditing) handleTextAreaChange(textAreaRef);
@@ -157,10 +179,10 @@ export default function Comment({ comment }: Props) {
 
                   <button
                     className='relative flex h-6 w-6 items-center justify-center'
-                    // onClick={() => {
-                    //   if (!liked) likePostMutation.mutate(post._id || '');
-                    //   else unlikeMutation.mutate(post._id || '');
-                    // }}
+                    onClick={() => {
+                      if (!liked) likeCommentMutation.mutate();
+                      else unlikeCommentMutation.mutate();
+                    }}
                   >
                     <svg
                       viewBox='0 0 24 24'
@@ -168,16 +190,14 @@ export default function Comment({ comment }: Props) {
                       className={classNames(
                         'absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300',
                         {
-                          'opacity-0': !false
+                          'opacity-0': !liked
                         }
                       )}
                       xmlns='http://www.w3.org/2000/svg'
                     >
                       <path
                         d='M12 21.35L10.55 20.03C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5C22 12.27 18.6 15.36 13.45 20.03L12 21.35Z'
-                        className={classNames('fill-red-500', {
-                          'opacity-0': !false
-                        })}
+                        className={classNames('fill-red-500')}
                       />
                     </svg>
 
@@ -186,8 +206,8 @@ export default function Comment({ comment }: Props) {
                       className={classNames(
                         'absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 fill-gray-500  transition-opacity duration-300',
                         {
-                          'opacity-0': false,
-                          'opacity-100': !false
+                          'opacity-0': liked,
+                          'opacity-100': !liked
                         }
                       )}
                       xmlns='http://www.w3.org/2000/svg'
@@ -209,7 +229,7 @@ export default function Comment({ comment }: Props) {
                     {calculateTimeAgo(comment.createdAt)}
                   </span>
                   <span className='mx-2 font-semibold'>
-                    {formatSocialNumber(1000)} like
+                    {formatSocialNumber(reactions.length)} like
                   </span>
                   {/* Edit comment */}
                   {isOwner && (
@@ -229,7 +249,7 @@ export default function Comment({ comment }: Props) {
                             });
                       }}
                       renderDialog={
-                        <div className='text-normal flex w-[28rem] flex-col rounded-lg bg-white text-base font-normal text-black'>
+                        <div className='text-normal flex w-96 flex-col rounded-lg bg-white text-base font-normal text-black'>
                           {openOptions.options && (
                             <>
                               {/* Delete */}
@@ -331,7 +351,7 @@ export default function Comment({ comment }: Props) {
               </>
             )}
 
-            {/* Content */}
+            {/* Content Editing*/}
             {isEditing && (
               <form onSubmit={updateComment}>
                 <div className='flex gap-2'>

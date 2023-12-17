@@ -28,6 +28,10 @@ interface GetProfileMaterial extends SuccessResponse {
   following: Follower[];
 }
 
+interface GetCurrentUser extends SuccessResponse {
+  user: User;
+}
+
 export const profileApi = {
   getProfile: (userId: string) => {
     return http.get<GetProfile>(`user/profile/${userId}`);
@@ -50,5 +54,8 @@ export const profileApi = {
     followingId: string;
   }) => {
     return http.put<SuccessResponse>(`user/unfollow/${followingId}/${userId}`);
+  },
+  getCurrentProfile: () => {
+    return http.get<GetCurrentUser>('current-user');
   }
 };

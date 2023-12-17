@@ -35,7 +35,7 @@ export default function SettingLayout() {
         </div>
       </nav>
 
-      <div className='h-screen flex-grow px-10 py-10'>
+      <div className='h-screen flex-grow p-0 md:p-10'>
         <Outlet />
       </div>
     </div>

@@ -114,22 +114,6 @@ export default function Navigation(props: Props) {
   const dismiss = useDismiss(context);
   const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);
 
-  // useEffect(() => {
-  //   document.addEventListener('keydown', e => {
-  //     if (isNotificationBarOpen && e.key === 'Escape') {
-  //       setIsNotificationBarOpen(false);
-  //     }
-  //   });
-
-  //   return () => {
-  //     document.removeEventListener('keydown', e => {
-  //       if (isNotificationBarOpen && e.key === 'Escape') {
-  //         setIsNotificationBarOpen(false);
-  //       }
-  //     });
-  //   };
-  // }, [isNotificationBarOpen]);
-
   return (
     <nav className={classNameNav}>
       <div className='flex h-full flex-col gap-6 px-3 py-5'>
@@ -217,7 +201,7 @@ export default function Navigation(props: Props) {
                 />
 
                 <ButtonNav
-                  to={`/${profile?.username.toLowerCase()}/saved`}
+                  to={`/${profile?._id}/saved`}
                   text='Saved'
                   svg={iconsSvg.saved}
                 />
