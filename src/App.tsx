@@ -65,7 +65,7 @@ function App() {
           callAccepted={callAccepted}
           senderProfilePicture={message?.senderProfilePicture}
           receiverProfilePicture={message?.receiverProfilePicture}
-          isVideoCall={message?.isVideoCall ? true : false}
+          isVideoCall={message!.isVideoCall as unknown as boolean}
           username={profile?.username}
           onClose={handleOnClose}
         />

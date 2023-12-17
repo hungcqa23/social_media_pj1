@@ -3,6 +3,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import IconProfile from '../IconProfile';
 import { useParams } from 'react-router-dom';
 import {
+  callAudio,
   callAudioReq,
   callVideo,
   callVideoReq,
@@ -31,21 +32,22 @@ export default function Conversation() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [receiverPeerId, setReceiverPeerId] = useState<string>('');
   const scrollRef = useScrollToBottom(messages);
+  const [isVideoCall, setisVideoCall] = useState<boolean>();
 
   const receiverId = useParams();
   const { profile, peer, peerId } = useContext(AppContext);
 
   const handleVideoCallClick = () => {
-    console.log('sender', profile?._id, peerId);
-    console.log('receiver', receiver?._id, receiverPeerId);
     setIsWindowOpen(true);
+    setisVideoCall(true);
     callChatVideoReq();
   };
 
   const handleAudioCallClick = () => {
     setIsWindowOpen(true);
+    setisVideoCall(false);
     callChatAudioReq();
-  }
+  };
 
   const getMessages = useCallback(async (receiverId: string) => {
     const response: IMessageData[] = (await retrieveMessages(
@@ -67,6 +69,18 @@ export default function Conversation() {
     },
     [profile]
   );
+
+  useEffect(() => {
+    if (isVideoCall) {
+      if (callEnded) {
+        callChatVideo();
+      }
+    } else {
+      if (callEnded) {
+        callChatAudio();
+      }
+    }
+  }, [callEnded, isVideoCall]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -128,6 +142,32 @@ export default function Conversation() {
       peerId
     } as ISendMessageData;
     await callVideoReq(reqBody);
+  };
+
+  const callChatVideo = async () => {
+    if (!receiver) return;
+    const reqBody: ISendMessageData = {
+      receiverId: receiver._id,
+      receiverProfilePicture: receiver.profilePicture,
+      receiverUsername: receiver.username,
+      body: `${profile?.username} called you!`,
+      conversationId: messages[0].conversationId, //problem if conversationId is null
+      peerId
+    } as ISendMessageData;
+    await callVideo(reqBody);
+  };
+
+  const callChatAudio = async () => {
+    if (!receiver) return;
+    const reqBody: ISendMessageData = {
+      receiverId: receiver._id,
+      receiverProfilePicture: receiver.profilePicture,
+      receiverUsername: receiver.username,
+      body: `${profile?.username} called you!`,
+      conversationId: messages[0].conversationId, //problem if conversationId is null
+      peerId
+    } as ISendMessageData;
+    await callAudio(reqBody);
   };
 
   const callChatAudioReq = async () => {
@@ -242,7 +282,8 @@ export default function Conversation() {
           receiverId={receiverId.id}
           senderProfilePicture={profile?.profilePicture}
           receiverProfilePicture={receiver?.profilePicture}
-          isVideoCall={false}
+          isVideoCall={isVideoCall}
+          setCallEnded={setCallEnded}
           senderId={profile?._id}
           username={profile?.username}
         />

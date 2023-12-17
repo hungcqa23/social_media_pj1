@@ -16,6 +16,7 @@ type Props = {
   senderId?: string;
   isVideoCall?: boolean;
   peer?: Peer;
+  setCallEnded?: (ended: boolean) => void;
   onClose: () => void;
 };
 
@@ -26,8 +27,11 @@ let callRef: MediaConnection;
 const VideoCall = (props: Props) => {
   const currentUserVideoRef = useRef<HTMLVideoElement>(null);
   const remoteUserVideoRef = useRef<HTMLVideoElement>(null);
+  const currentAudioRef = useRef<HTMLAudioElement>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
+    console.log(props.isVideoCall);
     if (!props.isReceiver) {
       socketIOService.getSocket().emit('get peerId', {
         userToGet: props.receiverId,
@@ -41,9 +45,16 @@ const VideoCall = (props: Props) => {
           })
           .then((incomeStream: MediaStream) => {
             stream = incomeStream;
-            if (currentUserVideoRef.current) {
-              currentUserVideoRef.current.srcObject = incomeStream;
-              currentUserVideoRef.current.play();
+            if (props.isVideoCall) {
+              if (currentUserVideoRef.current) {
+                currentUserVideoRef.current.srcObject = incomeStream;
+                currentUserVideoRef.current.play();
+              }
+            } else {
+              if (currentAudioRef.current) {
+                currentAudioRef.current.srcObject = incomeStream;
+                currentAudioRef.current.play();
+              }
             }
             if (props.peer && !props.isReceiver) {
               console.log(id);
@@ -51,12 +62,21 @@ const VideoCall = (props: Props) => {
               callRef = call;
               call.on('stream', (remoteStream: MediaStream) => {
                 console.log('come on sender stream');
-                if (remoteUserVideoRef.current) {
-                  remoteUserVideoRef.current.srcObject = remoteStream;
-                  remoteUserVideoRef.current.play();
+                if (props.isVideoCall) {
+                  if (remoteUserVideoRef.current) {
+                    remoteUserVideoRef.current.srcObject = remoteStream;
+                    remoteUserVideoRef.current.play();
+                  }
+                } else {
+                  if (remoteAudioRef.current) {
+                    remoteAudioRef.current.srcObject = remoteStream;
+                    remoteAudioRef.current.play();
+                  }
                 }
                 console.log('local', currentUserVideoRef.current?.srcObject);
                 console.log('remote', remoteUserVideoRef.current?.srcObject);
+                console.log('local audio', currentAudioRef.current?.srcObject);
+                console.log('remote audio', remoteAudioRef.current?.srcObject);
               });
               call.on('close', () => {
                 props.onClose();
@@ -69,6 +89,7 @@ const VideoCall = (props: Props) => {
   }, []);
 
   useEffect(() => {
+    console.log(props.isVideoCall);
     if (props.isReceiver && props.peer) {
       props.peer.on('call', call => {
         callRef = call;
@@ -80,25 +101,83 @@ const VideoCall = (props: Props) => {
           })
           .then((incomeStream: MediaStream) => {
             receiverStream = incomeStream;
-            if (currentUserVideoRef.current) {
-              currentUserVideoRef.current.srcObject = incomeStream;
-              currentUserVideoRef.current.play();
+            if (props.isVideoCall) {
+              if (currentUserVideoRef.current) {
+                currentUserVideoRef.current.srcObject = incomeStream;
+                currentUserVideoRef.current.play();
+              }
+            } else {
+              if (currentAudioRef.current) {
+                currentAudioRef.current.srcObject = incomeStream;
+                currentAudioRef.current.play();
+              }
             }
             call.answer(incomeStream);
             call.on('stream', (remoteStream: MediaStream) => {
               console.log('come on receiver stream');
-              if (remoteUserVideoRef.current) {
-                remoteUserVideoRef.current.srcObject = remoteStream;
-                remoteUserVideoRef.current.play();
+              if (props.isVideoCall) {
+                if (remoteUserVideoRef.current) {
+                  remoteUserVideoRef.current.srcObject = remoteStream;
+                  remoteUserVideoRef.current.play();
+                }
+              } else {
+                if (remoteAudioRef.current) {
+                  remoteAudioRef.current.srcObject = remoteStream;
+                  remoteAudioRef.current.play();
+                }
               }
               console.log('local', currentUserVideoRef.current?.srcObject);
               console.log('remote', remoteUserVideoRef.current?.srcObject);
+              console.log('local audio', currentAudioRef.current?.srcObject);
+              console.log('remote audio', remoteAudioRef.current?.srcObject);
             });
             call.on('close', () => {
               props.onClose();
             });
           })
-          .catch(error => console.log(error));
+          .catch(error => {
+            navigator.mediaDevices
+              .getUserMedia({
+                video: false,
+                audio: true
+              })
+              .then((incomeStream: MediaStream) => {
+                receiverStream = incomeStream;
+                if (currentAudioRef.current) {
+                  currentAudioRef.current.srcObject = incomeStream;
+                  currentAudioRef.current.play();
+                }
+                call.answer(incomeStream);
+                call.on('stream', (remoteStream: MediaStream) => {
+                  console.log('come on receiver stream');
+                  if (props.isVideoCall) {
+                    if (remoteUserVideoRef.current) {
+                      remoteUserVideoRef.current.srcObject = remoteStream;
+                      remoteUserVideoRef.current.play();
+                    }
+                  } else {
+                    if (remoteAudioRef.current) {
+                      remoteAudioRef.current.srcObject = remoteStream;
+                      remoteAudioRef.current.play();
+                    }
+                  }
+                  console.log('local', currentUserVideoRef.current?.srcObject);
+                  console.log('remote', remoteUserVideoRef.current?.srcObject);
+                  console.log(
+                    'local audio',
+                    currentAudioRef.current?.srcObject
+                  );
+                  console.log(
+                    'remote audio',
+                    remoteAudioRef.current?.srcObject
+                  );
+                });
+                call.on('close', () => {
+                  props.onClose();
+                });
+                console.log(error);
+              });
+          });
       });
     }
     return () => {
@@ -119,6 +198,9 @@ const VideoCall = (props: Props) => {
       receiverStream.getTracks().forEach(track => track.stop());
     }
     if (callRef) {
+      if (props.setCallEnded) {
+        props.setCallEnded(true);
+      }
       callRef.close();
     }
   };
@@ -136,14 +218,28 @@ const VideoCall = (props: Props) => {
             {props.isVideoCall ? (
               <video ref={currentUserVideoRef} muted playsInline />
             ) : (
-              <img src={props.senderProfilePicture} alt='profile' />
+              <div className='max-w-full rounded-full'>
+                <img
+                  src={props.senderProfilePicture}
+                  alt='profile'
+                  className='max-w-full'
+                />
+                <audio ref={currentAudioRef} hidden={true} />
+              </div>
             )}
           </div>
           <div className='flex h-full w-[48%] items-center justify-center'>
             {props.isVideoCall ? (
               <video ref={remoteUserVideoRef} muted playsInline />
             ) : (
-              <img src={props.receiverProfilePicture} alt='profile' />
+              <div className='max-w-full rounded-full'>
+                <img
+                  src={props.receiverProfilePicture}
+                  alt='profile'
+                  className='max-w-full'
+                />
+                <audio ref={remoteAudioRef} hidden={true} />
+              </div>
             )}
           </div>
         </div>
