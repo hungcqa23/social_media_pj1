@@ -8,7 +8,7 @@ export default function ImageItem({ post }: { post: Post }) {
 
   return (
     <Link
-      to='/posts/6578758c1dce97fb1e9f2ea1'
+      to={`/posts/${post._id}`}
       className='relative basis-[calc((100%-0.5rem)/3)]'
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}

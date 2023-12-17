@@ -7,6 +7,7 @@ interface Props {
   to?: string;
   src?: string;
   isImage?: boolean;
+  onClick?: () => void;
 }
 export default function IconProfile(props: Props) {
   const { profile } = useAppContext();
@@ -15,7 +16,8 @@ export default function IconProfile(props: Props) {
     classNameImage = 'h-full w-full',
     src = '/src/assets/images/user.jpg',
     to = `${profile?._id}`,
-    isImage
+    isImage,
+    onClick
   } = props;
 
   if (isImage) {
@@ -31,7 +33,7 @@ export default function IconProfile(props: Props) {
   }
 
   return (
-    <Link to={to} className={'block ' + className}>
+    <Link to={to} className={'block ' + className} onClick={onClick}>
       <img
         src={src}
         alt='Profile User'

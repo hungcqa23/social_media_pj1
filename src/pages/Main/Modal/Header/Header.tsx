@@ -4,7 +4,6 @@ interface Props {
   closeModal: () => void;
 }
 function Header({ closeModal }: Props) {
-  console.log('Re render');
   return (
     <header className='relative flex h-14 items-center justify-center border-b p-5'>
       <div className='text-xl font-bold text-black'>Create Post</div>

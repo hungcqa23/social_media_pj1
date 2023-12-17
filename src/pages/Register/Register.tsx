@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import authApi from 'src/apis/auth.api';
 import Button from 'src/components/Button';
 import Input from 'src/components/Input';
@@ -16,6 +17,7 @@ interface FormData {
 
 export default function Register() {
   const {
+    reset,
     register,
     handleSubmit,
     getValues,
@@ -24,12 +26,27 @@ export default function Register() {
 
   const rules = getRules(getValues);
   const signUpMutation = useMutation({
-    mutationFn: (body: FormData) => authApi.registerAccount(body)
+    mutationFn: (body: Pick<FormData, 'email' | 'password' | 'username'>) =>
+      authApi.registerAccount(body)
   });
 
   const onSubmit = handleSubmit(
     data => {
-      signUpMutation.mutate(data);
+      signUpMutation.mutate(
+        {
+          username: data.username,
+          email: data.email,
+          password: data.password
+        },
+        {
+          onSuccess: () => {
+            reset(),
+              toast.success('Register successfully', {
+                position: toast.POSITION.TOP_RIGHT
+              });
+          }
+        }
+      );
     },
     data => {
       console.log(data);

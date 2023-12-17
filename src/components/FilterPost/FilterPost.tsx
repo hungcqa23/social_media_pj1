@@ -1,3 +1,4 @@
+import { calculateTimeAgo, formatSocialNumber } from 'src/utils/helper';
 import IconProfile from '../IconProfile';
 
 interface Props {
@@ -6,7 +7,7 @@ interface Props {
   likes: number;
   comments: number;
   image?: string;
-  date?: string;
+  date: string;
   video?: string;
 }
 export default function FilterPost(props: Props) {
@@ -19,15 +20,23 @@ export default function FilterPost(props: Props) {
           <div className='flex items-center gap-4'>
             <IconProfile />
             <span className='text-sm font-medium text-black'>{username}</span>
-            <span className='text-xs font-normal text-gray-300'>{date} ago</span>
-            <button className='text-xs font-semibold text-blue-500'>Follow</button>
+            <span className='text-xs font-normal text-gray-300'>
+              {calculateTimeAgo(date)} ago
+            </span>
+            <button className='text-xs font-semibold text-blue-500'>
+              Follow
+            </button>
           </div>
 
           <p className='mt-2 text-sm'>{description}</p>
 
           <div className='mt-4 flex gap-4'>
-            <p className='text-sm text-gray-500'>{likes} likes</p>
-            <p className='text-sm text-gray-500'>{comments} comments</p>
+            <p className='text-xs font-normal text-gray-950'>
+              {formatSocialNumber(likes)} likes
+            </p>
+            <p className='text-xs font-normal text-gray-950'>
+              {formatSocialNumber(comments)} comments
+            </p>
           </div>
         </div>
 

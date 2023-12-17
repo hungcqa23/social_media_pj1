@@ -4,8 +4,11 @@ import Comment from '../Comment';
 import List from '../List';
 import Dialog from '../Dialog';
 import { Post } from 'src/types/post.type';
-import { formatDate, formatSocialNumber } from 'src/utils/helper';
-import { calculateTextWidth } from 'src/utils/utils';
+import {
+  formatDate,
+  formatSocialNumber,
+  handleTextAreaChange
+} from 'src/utils/helper';
 import { useAppContext } from 'src/contexts/app.contexts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { postApi } from 'src/apis/post.api';
@@ -76,8 +79,6 @@ interface PostProps {
   innerRef?: React.Ref<HTMLParagraphElement>;
 }
 
-const originalHeight = 36;
-
 export default function PostItem({
   post,
   innerRef,
@@ -93,21 +94,7 @@ export default function PostItem({
     comment: string;
   }>();
   const watchContentComment = watch('comment');
-  const { onChange, name, ref } = register('comment');
-  const handleTextAreaChange = () => {
-    if (textareaRef.current) {
-      // Check if it's only 1 line
-      const textAreaWidth = textareaRef.current.clientWidth;
-      const textContentWidth = calculateTextWidth(textareaRef);
-      if ((textContentWidth || 0) < textAreaWidth) {
-        return (textareaRef.current.style.height = `${originalHeight}px`);
-      }
-
-      textareaRef.current.style.height = 'auto'; // Reset the height to auto to adjust to content
-      textareaRef.current.style.height =
-        textareaRef.current.scrollHeight + 'px'; // Set the height to the scrollHeight
-    }
-  };
+  const commentRegister = register('comment');
 
   // Get Data for comments
   const { data: commentsData, isLoading: isLoadingComment } = useQuery({
@@ -118,7 +105,7 @@ export default function PostItem({
   const addCommentMutation = useMutation({
     mutationFn: (body: { comment: string }) =>
       commentApi.addComment({
-        ...body,
+        comment: body.comment,
         postId: post._id || '',
         userTo: post?.userId || '',
         profilePicture: profile?.profilePicture || ''
@@ -128,19 +115,11 @@ export default function PostItem({
     }
   });
   const onPostComment = handleSubmit(data => {
-    addCommentMutation.mutate(
-      {
-        comment: data.comment
-      },
-      {
-        onSuccess: () => {
-          setTimeout(() => {
-            queryClient.invalidateQueries({ queryKey: ['comments', post._id] });
-          }, 1000);
-        }
-      }
-    );
-    reset();
+    console.log(textareaRef?.current);
+    console.log('Data: ', commentRegister.ref);
+    addCommentMutation.mutate({
+      comment: data.comment
+    });
   });
 
   // Saved Posts
@@ -156,12 +135,6 @@ export default function PostItem({
     savePostMutation.mutate(post._id || '', {
       onSuccess: () => {
         setTimeout(() => {
-          // queryClient.invalidateQueries({
-          //   queryKey: ['saved-posts', post._id]
-          // });
-          // queryClient.invalidateQueries({
-          //   queryKey: ['profile-materials', post.userId]
-          // });
           queryClient.invalidateQueries({
             predicate: query =>
               (query.queryKey[0] === 'saved-posts' &&
@@ -191,7 +164,6 @@ export default function PostItem({
         profilePicture: profile?.profilePicture || ''
       }),
     onSuccess: () => {
-      // queryClient.invalidateQueries({ queryKey: ['reactions', post._id] });
       queryClient.invalidateQueries({
         predicate: query =>
           (query.queryKey[0] === 'reactions' &&
@@ -402,7 +374,7 @@ export default function PostItem({
           <img
             src={`https://res.cloudinary.com/daszajz9a/image/upload/v${post.imgVersion}/${post.imgId}`}
             alt='Post'
-            className='w-full object-cover p-4'
+            className='w-4/5 object-cover p-4'
           />
         </div>
       )}
@@ -552,18 +524,21 @@ export default function PostItem({
                 className='h-9 w-full flex-grow resize-none overflow-y-hidden bg-transparent p-2 text-sm font-normal text-gray-700 outline-none transition-all'
                 placeholder='Write a comment...'
                 onChange={event => {
-                  onChange(event);
-                  handleTextAreaChange();
+                  commentRegister.onChange(event);
+                  handleTextAreaChange(textareaRef);
                 }}
                 ref={e => {
-                  ref(e);
+                  console.log('Add Ref');
+                  commentRegister.ref(e);
                   textareaRef.current = e;
                 }}
-                name={name}
+                onBlur={commentRegister.onBlur}
+                name={commentRegister.name}
                 onKeyDown={event => {
                   if (event.key === 'Enter' && !event.shiftKey) {
                     event.preventDefault();
                     onPostComment();
+                    reset();
                   }
                 }}
               />

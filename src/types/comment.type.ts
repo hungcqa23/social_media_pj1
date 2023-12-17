@@ -22,5 +22,6 @@ export interface IComment {
   reactions: {
     like: number;
   };
+  userId: string;
   createdAt: string;
 }

@@ -11,6 +11,7 @@ interface Follower {
   _id: string;
   username: string;
   profilePicture: string;
+  userProfile: User;
 }
 
 interface GetProfileMaterial extends SuccessResponse {
@@ -24,7 +25,7 @@ interface GetProfileMaterial extends SuccessResponse {
     authorName: string;
   } & Post)[];
   followers: Follower[];
-  followings: Follower[];
+  following: Follower[];
 }
 
 export const profileApi = {

@@ -61,16 +61,16 @@ export default function SearchPage() {
             {/* Filter Post */}
             <FilterPost
               username='AndreeeHandless'
-              date='2 months'
               description={`I'm a software engineer and a serial entrepreneur. I've started and sold
                     multiple businesses and I'm always looking for new opportunities.`}
               likes={10}
               comments={5}
+              date={new Date(Date.now() - 1000 * 60 * 60 * 24).toString()}
             />
 
             <FilterPost
               username='AndreeeHandless'
-              date='2 months'
+              date={new Date(Date.now() - 1000 * 60 * 60 * 24).toString()}
               description={`I'm a software engineer and a serial entrepreneur. I've started and sold
                     multiple businesses and I'm always looking for new opportunities.`}
               likes={2000}
@@ -80,7 +80,7 @@ export default function SearchPage() {
 
             <FilterPost
               username='AndreeeHandless'
-              date='2 months'
+              date={new Date(Date.now() - 1000 * 60 * 60 * 24).toString()}
               description={`I'm a software engineer and a serial entrepreneur. I've started and sold
                     multiple businesses and I'm always looking for new opportunities.`}
               likes={2000}

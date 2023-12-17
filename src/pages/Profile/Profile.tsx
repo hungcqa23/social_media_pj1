@@ -1,7 +1,7 @@
 import IconProfile from 'src/components/IconProfile';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from 'src/components/Button';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AppContext } from 'src/contexts/app.contexts';
 import classNames from 'classnames';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -14,11 +14,18 @@ import Spinner from 'src/components/Spinner';
 import NotFound from '../NotFound';
 import { User } from 'src/types/user.type';
 import { formatSocialNumber } from 'src/utils/helper';
+import Dialog from 'src/components/Dialog';
+import Modal from 'src/components/Modal';
 
 const classNamePath = ({ isMatch }: { isMatch: boolean }) =>
   classNames(``, { 'fill-gray-500': !isMatch, 'fill-black': isMatch });
 
 export default function Profile() {
+  const [openModalFollow, setOpenModalFollow] = useState({
+    following: false,
+    follower: false
+  });
+
   const queryClient = useQueryClient();
   const buttonsFilter = [
     {
@@ -125,11 +132,11 @@ export default function Profile() {
   const followMutation = useMutation({
     mutationFn: () => profileApi.follow(userId || '')
   });
-  const follower = profileData?.data.followers;
+  const followers = profileData?.data.followers;
+  const following = profileData?.data.following;
   const isFollowing =
-    follower?.map(follower => follower._id).includes(profile?._id || '') ||
+    followers?.map(follower => follower._id).includes(profile?._id || '') ||
     false;
-
   const unfollowMutation = useMutation({
     mutationFn: () =>
       profileApi.unfollow({
@@ -155,6 +162,8 @@ export default function Profile() {
       button.isMatch = true;
     } else button.isMatch = false;
   });
+
+  // console.log(openFollowModal);
 
   return (
     <main className='ml-auto w-[calc(100%-4.5rem)] lg:w-[calc(100%-14rem)]'>
@@ -183,7 +192,7 @@ export default function Profile() {
 
               {/* Follower information */}
               <section className='flex flex-grow-2 flex-col'>
-                {/*  */}
+                {/* Interaction */}
                 <div className='flex items-center'>
                   <h2 className='mr-3 text-xl font-normal text-black'>
                     {userProfile?.username}
@@ -249,6 +258,7 @@ export default function Profile() {
                   )}
                 </div>
 
+                {/* Statistics */}
                 <div className='mt-4 flex gap-4'>
                   <div className='font-normal'>
                     <span className='font-semibold text-black'>
@@ -256,20 +266,146 @@ export default function Profile() {
                     </span>{' '}
                     posts
                   </div>
-
-                  <button className='font-normal'>
+                  <button
+                    className='font-normal'
+                    onClick={() =>
+                      setOpenModalFollow({
+                        follower: true,
+                        following: false
+                      })
+                    }
+                  >
                     <span className='font-semibold text-black'>
                       {formatSocialNumber(userProfile?.followersCount || 0)}
                     </span>{' '}
                     followers
                   </button>
-
-                  <button className='font-normal'>
+                  <button
+                    className='font-normal'
+                    onClick={() => {
+                      setOpenModalFollow({
+                        follower: false,
+                        following: true
+                      });
+                    }}
+                  >
                     <span className='font-semibold text-black'>
                       {userProfile?.followingCount || 0}
                     </span>{' '}
                     following
                   </button>
+
+                  <Dialog
+                    isOpen={
+                      openModalFollow.follower || openModalFollow.following
+                    }
+                    setIsOpen={() => {
+                      setOpenModalFollow({
+                        follower: false,
+                        following: false
+                      });
+                    }}
+                    renderDialog={
+                      <Modal
+                        header={
+                          openModalFollow.follower ? 'Followers' : 'Following'
+                        }
+                        onCloseModal={() =>
+                          setOpenModalFollow({
+                            follower: false,
+                            following: false
+                          })
+                        }
+                      >
+                        <section className='overflow-y-auto'>
+                          {openModalFollow.follower &&
+                            List({
+                              as: 'ul',
+                              className: 'flex flex-col',
+                              listItems: followers || [],
+                              mapFn: follower => (
+                                <div
+                                  className='my-1 flex items-center justify-between px-4'
+                                  key={follower._id}
+                                >
+                                  <div className='flex items-center gap-1'>
+                                    <IconProfile
+                                      className='h-12 w-12'
+                                      classNameImage='h-12 w-12'
+                                      src={follower.profilePicture}
+                                      to={`/${follower._id}`}
+                                      onClick={() => {
+                                        setOpenModalFollow({
+                                          follower: false,
+                                          following: false
+                                        });
+                                      }}
+                                    />
+
+                                    <div className='flex flex-col text-sm'>
+                                      <span className='text-sm font-medium text-black'>
+                                        {follower.username}
+                                      </span>
+                                      <span className='text-[0.8125rem]'>
+                                        {follower.userProfile.fullname}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {/* <button className='flex h-8 basis-20 items-center justify-center rounded-md bg-gray-100 text-[0.8125rem] font-semibold text-black'>
+                                    Remove
+                                  </button> */}
+                                </div>
+                              )
+                            })}
+
+                          {openModalFollow.following &&
+                            List({
+                              as: 'ul',
+                              className: 'flex flex-col',
+                              listItems: following || [],
+                              mapFn: follower => (
+                                <div
+                                  className='flex items-center'
+                                  key={follower._id}
+                                >
+                                  <div
+                                    className='my-1 flex items-center justify-between px-4'
+                                    key={follower._id}
+                                  >
+                                    <div className='flex items-center gap-1'>
+                                      <IconProfile
+                                        className='h-12 w-12'
+                                        classNameImage='h-12 w-12'
+                                        src={follower.profilePicture}
+                                        to={`/${follower._id}`}
+                                        onClick={() => {
+                                          setOpenModalFollow({
+                                            follower: false,
+                                            following: false
+                                          });
+                                        }}
+                                      />
+
+                                      <div className='flex flex-col text-sm'>
+                                        <span className='text-sm font-medium text-black'>
+                                          {follower.username}
+                                        </span>
+                                        <span>
+                                          {follower.userProfile.fullname}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )
+                            })}
+                        </section>
+                      </Modal>
+                    }
+                  >
+                    <></>
+                  </Dialog>
                 </div>
 
                 <>
