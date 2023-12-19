@@ -25,7 +25,12 @@ export default function Profile() {
     following: false,
     follower: false
   });
-
+  const [openOptions, setOpenOptions] = useState({
+    menu: false,
+    options: false,
+    block: false
+  });
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const buttonsFilter = [
     {
@@ -99,7 +104,6 @@ export default function Profile() {
       )
     }
   ];
-  const navigate = useNavigate();
   const { profile } = useContext(AppContext);
   const { userId, type } = useParams<{
     userId: string;
@@ -113,7 +117,8 @@ export default function Profile() {
     isError
   } = useQuery({
     queryKey: ['profile-materials', userId],
-    queryFn: () => profileApi.getProfileMaterial(userId || '')
+    queryFn: () => profileApi.getProfileMaterial(userId || ''),
+    retry: false
   });
   const userProfile = profileData?.data.user as User;
   const posts = profileData?.data.posts || [];
@@ -163,7 +168,10 @@ export default function Profile() {
     } else button.isMatch = false;
   });
 
-  // console.log(openFollowModal);
+  const blockMutation = useMutation({
+    mutationFn: ({ userId }: { userId: string }) =>
+      profileApi.blockAccount(userId || '')
+  });
 
   return (
     <main className='ml-auto w-[calc(100%-4.5rem)] lg:w-[calc(100%-14rem)]'>
@@ -178,20 +186,22 @@ export default function Profile() {
         {/* Error */}
         {isError && <NotFound />}
 
-        {!isLoadingProfile && !isError && (
+        {blockMutation.isPending && <Spinner />}
+
+        {!isLoadingProfile && !isError && !blockMutation.isPending && (
           <>
-            <header className='flex min-w-fit pb-10'>
+            <header className='flex min-w-fit flex-col pb-10 md:flex-row'>
               <div className='my-6 flex flex-grow justify-center'>
                 <IconProfile
-                  className='h-40 w-40'
-                  classNameImage='h-40 w-40'
+                  className='h-32 w-32 md:h-40 md:w-40'
+                  classNameImage='md:h-40 md:w-40 w-32 h-32'
                   isImage
                   src={profile?.profilePicture}
                 />
               </div>
 
               {/* Follower information */}
-              <section className='flex flex-grow-2 flex-col'>
+              <section className='flex flex-grow-2 flex-col items-center md:items-start'>
                 {/* Interaction */}
                 <div className='flex items-center'>
                   <h2 className='mr-3 text-xl font-normal text-black'>
@@ -209,36 +219,113 @@ export default function Profile() {
 
                   {!isProfile && (
                     <div className='flex gap-2'>
-                      {
-                        <Button
-                          className={classNames(
-                            'flex h-8 w-24 items-center justify-center rounded-lg text-[0.8125rem] font-semibold',
-                            {
-                              'bg-gray-200 text-black': isFollowing,
-                              'bg-blue-500 text-white': !isFollowing
-                            }
-                          )}
-                          onClick={handleFollow}
-                          isLoading={
-                            followMutation.isPending ||
-                            unfollowMutation.isPending
+                      <Button
+                        className={classNames(
+                          'flex h-8 w-24 items-center justify-center rounded-lg text-[0.8125rem] font-semibold',
+                          {
+                            'bg-gray-200 text-black': isFollowing,
+                            'bg-blue-500 text-white': !isFollowing
                           }
-                          disabled={
-                            followMutation.isPending ||
-                            unfollowMutation.isPending
-                          }
-                          colorSpinner={
-                            classNames('', {
-                              dark: followMutation.isPending,
-                              blue: unfollowMutation.isPending
-                            }) as 'dark' | 'blue'
-                          }
-                        >
-                          {isFollowing ? 'Following' : 'Follow'}
-                        </Button>
-                      }
+                        )}
+                        onClick={handleFollow}
+                        isLoading={
+                          followMutation.isPending || unfollowMutation.isPending
+                        }
+                        disabled={
+                          followMutation.isPending || unfollowMutation.isPending
+                        }
+                        colorSpinner={
+                          classNames('', {
+                            dark: followMutation.isPending,
+                            blue: unfollowMutation.isPending
+                          }) as 'dark' | 'blue'
+                        }
+                      >
+                        {isFollowing ? 'Following' : 'Follow'}
+                      </Button>
 
-                      <button className='rounded-full hover:bg-gray-100'>
+                      <Dialog
+                        as='button'
+                        className='rounded-full hover:bg-gray-100'
+                        isOpen={openOptions.menu}
+                        setIsOpen={() => {
+                          if (openOptions.menu)
+                            setOpenOptions({
+                              menu: false,
+                              options: false,
+                              block: false
+                            });
+                          else
+                            setOpenOptions({
+                              menu: true,
+                              options: true,
+                              block: false
+                            });
+                        }}
+                        renderDialog={
+                          <Modal
+                            type='option'
+                            onCloseModal={() => {
+                              setOpenOptions({
+                                menu: false,
+                                options: false,
+                                block: false
+                              });
+                            }}
+                          >
+                            <ul className='flex flex-col'>
+                              {openOptions.options && (
+                                <button
+                                  className='p-3 font-semibold text-red-500'
+                                  onClick={() =>
+                                    setOpenOptions({
+                                      menu: true,
+                                      options: false,
+                                      block: true
+                                    })
+                                  }
+                                >
+                                  Block
+                                </button>
+                              )}
+
+                              {openOptions.block && (
+                                <>
+                                  <div className='border-b border-gray-300 p-6 text-center'>
+                                    <h1 className='my-2 text-2xl'>
+                                      Block user?
+                                    </h1>
+                                    <span className='text-sm font-light text-gray-500'>
+                                      Are you sure you want to block this user?
+                                    </span>
+                                  </div>
+
+                                  <button
+                                    className='p-3 font-semibold text-red-500'
+                                    onClick={() =>
+                                      blockMutation.mutate(
+                                        { userId: userId || '' },
+                                        {
+                                          onSuccess: () => {
+                                            location.reload();
+                                            setOpenOptions({
+                                              menu: false,
+                                              options: true,
+                                              block: false
+                                            });
+                                          }
+                                        }
+                                      )
+                                    }
+                                  >
+                                    Block
+                                  </button>
+                                </>
+                              )}
+                            </ul>
+                          </Modal>
+                        }
+                      >
                         <span>
                           <svg
                             width='32'
@@ -253,7 +340,7 @@ export default function Profile() {
                             />
                           </svg>
                         </span>
-                      </button>
+                      </Dialog>
                     </div>
                   )}
                 </div>
@@ -266,8 +353,9 @@ export default function Profile() {
                     </span>{' '}
                     posts
                   </div>
+
                   <button
-                    className='font-normal'
+                    className='font-normal active:opacity-50'
                     onClick={() =>
                       setOpenModalFollow({
                         follower: true,
@@ -280,8 +368,9 @@ export default function Profile() {
                     </span>{' '}
                     followers
                   </button>
+
                   <button
-                    className='font-normal'
+                    className='font-normal active:opacity-50'
                     onClick={() => {
                       setOpenModalFollow({
                         follower: false,
@@ -409,7 +498,7 @@ export default function Profile() {
                 </div>
 
                 <>
-                  <p className='mt-5 text-sm font-medium text-black'>
+                  <p className='mt-5 hidden text-sm font-medium text-black md:block'>
                     {userProfile?.fullname}
                   </p>
                   <p className='mt-4 max-w-[22rem] whitespace-pre-wrap text-sm text-black'>

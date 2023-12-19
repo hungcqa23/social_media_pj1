@@ -1,15 +1,35 @@
+import classNames from 'classnames';
+
 interface Props {
-  header: string;
-  onCloseModal: () => void;
+  header?: string;
+  onCloseModal?: () => void;
   children: React.ReactNode;
   classNameModal?: string;
+  type?: 'default' | 'option';
 }
 export default function Modal({
   header,
   onCloseModal,
   children,
-  classNameModal = 'flex min-h-[24rem] w-[26rem] flex-col justify-between rounded-xl bg-white shadow'
+  type = 'default',
+  classNameModal = 'flex min-h-[24rem] md:w-[26rem] w-96 flex-col justify-between rounded-xl bg-white shadow'
 }: Props) {
+  if (type === 'option') {
+    return (
+      <div className='text-normal flex min-h-[2rem] w-80 flex-col  rounded-lg bg-white text-base font-normal text-black md:w-96'>
+        {children}
+        <button
+          onClick={onCloseModal}
+          className={classNames('text-normal p-3 font-normal', {
+            'border-t border-gray-300': children
+          })}
+        >
+          Cancel
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className={classNameModal}>
       <header className='relative flex h-14 items-center justify-center border-b p-5'>

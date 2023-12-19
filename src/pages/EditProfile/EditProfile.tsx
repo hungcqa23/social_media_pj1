@@ -18,7 +18,7 @@ export default function EditProfile() {
 
   return (
     <form>
-      <h1 className='mb-5 text-xl font-normal'>Edit profile</h1>
+      <h1 className='mb-5 text-xl font-semibold'>Edit profile</h1>
 
       <div className='flex flex-col items-center gap-2'>
         <IconProfile

@@ -32,6 +32,9 @@ interface GetCurrentUser extends SuccessResponse {
   user: User;
 }
 
+const URL_BLOCK_ACCOUNT = 'user/block';
+const URL_UNBLOCK_ACCOUNT = 'user/unblock';
+
 export const profileApi = {
   getProfile: (userId: string) => {
     return http.get<GetProfile>(`user/profile/${userId}`);
@@ -57,5 +60,19 @@ export const profileApi = {
   },
   getCurrentProfile: () => {
     return http.get<GetCurrentUser>('current-user');
+  },
+  blockAccount: (accountId: string) => {
+    return http.put<SuccessResponse>(`${URL_BLOCK_ACCOUNT}/${accountId}`);
+  },
+  unBlockAccount: (accountId: string) => {
+    return http.put<SuccessResponse>(`${URL_UNBLOCK_ACCOUNT}/${accountId}`);
+  },
+  updateNotifications: (body: {
+    messages: boolean;
+    reactions: boolean;
+    comments: boolean;
+    follows: boolean;
+  }) => {
+    return http.put<SuccessResponse>(`user/update-notification-settings`, body);
   }
 };

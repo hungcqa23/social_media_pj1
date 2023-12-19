@@ -132,10 +132,6 @@ export default function useRouteElement() {
                   element: <EditProfile />
                 },
                 {
-                  path: path.emails,
-                  element: <EmailSetting />
-                },
-                {
                   path: path.who_can_see_your_content,
                   element: <YourContent />
                 },

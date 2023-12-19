@@ -1,8 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-interface Props {
-  query: string;
-  setQuery: Dispatch<SetStateAction<string>>;
-}
+import { useEffect, useState } from 'react';
 export default function Search() {
   const [query, setQuery] = useState<string>('');
 

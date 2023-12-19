@@ -16,10 +16,10 @@ import { reactionApi } from 'src/apis/reaction.api';
 import classNames from 'classnames';
 import commentApi from 'src/apis/comment.api';
 import { IComment } from 'src/types/comment.type';
-import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import Button from '../Button';
 import CopyButton from './CopyButton';
+import Modal from '../Modal';
 
 interface ButtonType {
   text: string;
@@ -91,11 +91,11 @@ export default function PostItem({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   // Form data for comment and submit comment
-  const { register, handleSubmit, watch, reset, getValues } = useForm<{
-    comment: string;
-  }>();
-  const watchContentComment = watch('comment');
-  const commentRegister = register('comment');
+  // const { register, handleSubmit, watch, reset, getValues } = useForm<{
+  //   comment: string;
+  // }>();
+  // const watchContentComment = watch('comment');
+  // const commentRegister = register('comment');
 
   // Get Data for comments
   const { data: commentsData, isLoading: isLoadingComment } = useQuery({
@@ -112,11 +112,19 @@ export default function PostItem({
         profilePicture: profile?.profilePicture || ''
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', post._id] });
+      // queryClient.invalidateQueries({ queryKey: ['comments', post._id] });
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          predicate: query =>
+            (query.queryKey[0] === 'comments' &&
+              query.queryKey[1] === post._id) ||
+            (query.queryKey[0] === 'profile-materials' &&
+              query.queryKey[1] === post.userId)
+        });
+      }, 200);
     }
   });
   const onPostComment = (e: React.FormEvent) => {
-    console.log('onPostComment');
     e.preventDefault();
     addCommentMutation.mutate({ comment: contentTextarea });
     setContentTextarea('');
@@ -160,17 +168,19 @@ export default function PostItem({
     mutationFn: (postId: string) =>
       reactionApi.likePost({
         postId,
-        userTo: profile?._id || '',
+        userTo: post.userId || '',
         profilePicture: profile?.profilePicture || ''
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        predicate: query =>
-          (query.queryKey[0] === 'reactions' &&
-            query.queryKey[1] === post._id) ||
-          (query.queryKey[0] === 'profile-materials' &&
-            query.queryKey[1] === post.userId)
-      });
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          predicate: query =>
+            (query.queryKey[0] === 'reactions' &&
+              query.queryKey[1] === post._id) ||
+            (query.queryKey[0] === 'profile-materials' &&
+              query.queryKey[1] === post.userId)
+        });
+      }, 200);
     }
   });
   const unlikeMutation = useMutation({
@@ -180,7 +190,13 @@ export default function PostItem({
       }),
     onSuccess: () => {
       setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['reactions', post._id] });
+        queryClient.invalidateQueries({
+          predicate: query =>
+            (query.queryKey[0] === 'reactions' &&
+              query.queryKey[1] === post._id) ||
+            (query.queryKey[0] === 'profile-materials' &&
+              query.queryKey[1] === post.userId)
+        });
       }, 200);
     }
   });
@@ -189,15 +205,15 @@ export default function PostItem({
   const deletePostMutation = useMutation({
     mutationFn: (postId: string) => postApi.deletePost(postId),
     onSuccess: () => {
-      toast.success('Delete post successfully!', {
-        position: 'top-right'
-      });
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['posts'] });
         queryClient.invalidateQueries({
           queryKey: ['profile-materials', post.userId]
         });
-      }, 2000);
+      }, 2500);
+      toast.success('Delete post successfully!', {
+        position: 'top-right'
+      });
     }
   });
   const handleDeletePost = () => {
@@ -205,22 +221,13 @@ export default function PostItem({
     dispatch({ type: ACTION_TYPES.CLOSE });
   };
 
-  const buttons: ButtonType[] = [
-    {
-      text: 'Cancel',
-      onClick: () => {
-        dispatch({ type: ACTION_TYPES.CLOSE });
-      }
-    }
-  ];
-
   const isOwner = post.username === profile?.username;
 
   return (
     <div className={classNames(className)} ref={innerRef}>
       {/* Header */}
       <div className='flex h-16 items-center justify-between p-4'>
-        <div className='flex'>
+        <div className='flex items-center md:items-start'>
           <div className='mr-2'>
             <Profile src={post.profilePicture} to={post.userId} />
           </div>
@@ -229,7 +236,7 @@ export default function PostItem({
               <span className='text-sm font-medium'>{post.username}</span>
             </div>
             <div className='-mt-1'>
-              <span className='text-xs text-gray-500 '>
+              <span className='hidden text-xs text-gray-500 md:block'>
                 {formatDate(post.createdAt as string)}
               </span>
             </div>
@@ -276,90 +283,66 @@ export default function PostItem({
           </Button>
 
           {/* Edit post */}
-          <Dialog
-            isOpen={state.openMenu}
-            setIsOpen={() => {
-              !state.openMenu
-                ? dispatch({ type: ACTION_TYPES.OPEN_OPTIONS })
-                : dispatch({ type: ACTION_TYPES.CLOSE });
-            }}
-            renderDialog={
-              <div className='text-normal flex w-[28rem] flex-col rounded-lg bg-white text-base font-normal text-black'>
-                {state.openOptions && (
-                  <>
-                    {isOwner && (
-                      <button
-                        className='p-3 font-semibold text-red-500'
-                        onClick={() =>
-                          dispatch({ type: ACTION_TYPES.OPEN_DELETE })
-                        }
-                      >
-                        Deleted
-                      </button>
-                    )}
-
-                    {buttons.map(({ important, onClick, text }, index) => (
-                      <button
-                        key={index}
-                        className={classNames(
-                          `border-t border-gray-300
-                        p-3`,
-                          {
-                            'font-semibold text-red-500': important
-                          }
-                        )}
-                        onClick={onClick}
-                      >
-                        {text}
-                      </button>
-                    ))}
-                  </>
-                )}
-
-                {state.openDelete && (
-                  <>
-                    <div className='border-b p-6 text-center'>
-                      <h1 className='my-2 text-2xl'>Delete post?</h1>
-                      <span className='text-sm font-light text-gray-500'>
-                        Are you sure you want to delete this post?
-                      </span>
-                    </div>
-
+          {isOwner && (
+            <Dialog
+              isOpen={state.openMenu}
+              setIsOpen={() => {
+                !state.openMenu
+                  ? dispatch({ type: ACTION_TYPES.OPEN_OPTIONS })
+                  : dispatch({ type: ACTION_TYPES.CLOSE });
+              }}
+              renderDialog={
+                <Modal
+                  type='option'
+                  onCloseModal={() => dispatch({ type: ACTION_TYPES.CLOSE })}
+                >
+                  {state.openOptions && isOwner && (
                     <button
-                      className='border-b p-3 font-semibold text-red-500'
-                      onClick={handleDeletePost}
+                      className='justify-center p-3 font-semibold text-red-500'
+                      onClick={() =>
+                        dispatch({ type: ACTION_TYPES.OPEN_DELETE })
+                      }
                     >
                       Deleted
                     </button>
+                  )}
 
-                    <button
-                      onClick={() => {
-                        dispatch({ type: ACTION_TYPES.CLOSE });
-                      }}
-                      className='py-3 font-light'
-                    >
-                      Cancel
-                    </button>
-                  </>
-                )}
-              </div>
-            }
-            className='flex items-center'
-          >
-            <button className='rounded-full hover:bg-gray-100'>
-              <span>
-                <svg
-                  width='32'
-                  height='32'
-                  viewBox='0 0 32 32'
-                  className='fill-gray-400'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path d='M18 16C18 16.3956 17.8827 16.7822 17.6629 17.1111C17.4432 17.44 17.1308 17.6964 16.7654 17.8478C16.3999 17.9991 15.9978 18.0387 15.6098 17.9616C15.2219 17.8844 14.8655 17.6939 14.5858 17.4142C14.3061 17.1345 14.1156 16.7781 14.0384 16.3902C13.9613 16.0022 14.0009 15.6001 14.1522 15.2346C14.3036 14.8692 14.56 14.5568 14.8889 14.3371C15.2178 14.1173 15.6044 14 16 14C16.5304 14 17.0391 14.2107 17.4142 14.5858C17.7893 14.9609 18 15.4696 18 16ZM7.5 14C7.10444 14 6.71776 14.1173 6.38886 14.3371C6.05996 14.5568 5.80362 14.8692 5.65224 15.2346C5.50087 15.6001 5.46126 16.0022 5.53843 16.3902C5.6156 16.7781 5.80608 17.1345 6.08579 17.4142C6.36549 17.6939 6.72186 17.8844 7.10982 17.9616C7.49778 18.0387 7.89992 17.9991 8.26537 17.8478C8.63082 17.6964 8.94318 17.44 9.16294 17.1111C9.3827 16.7822 9.5 16.3956 9.5 16C9.5 15.4696 9.28929 14.9609 8.91421 14.5858C8.53914 14.2107 8.03043 14 7.5 14ZM24.5 14C24.1044 14 23.7178 14.1173 23.3889 14.3371C23.06 14.5568 22.8036 14.8692 22.6522 15.2346C22.5009 15.6001 22.4613 16.0022 22.5384 16.3902C22.6156 16.7781 22.8061 17.1345 23.0858 17.4142C23.3655 17.6939 23.7219 17.8844 24.1098 17.9616C24.4978 18.0387 24.8999 17.9991 25.2654 17.8478C25.6308 17.6964 25.9432 17.44 26.1629 17.1111C26.3827 16.7822 26.5 16.3956 26.5 16C26.5 15.4696 26.2893 14.9609 25.9142 14.5858C25.5391 14.2107 25.0304 14 24.5 14Z' />
-                </svg>
-              </span>
-            </button>
-          </Dialog>
+                  {state.openDelete && (
+                    <>
+                      <div className='border-b border-gray-300 p-6 text-center'>
+                        <h1 className='my-2 text-2xl'>Delete post?</h1>
+                        <span className='text-sm font-light text-gray-500'>
+                          Are you sure you want to delete this post?
+                        </span>
+                      </div>
+
+                      <button
+                        className='p-3 font-semibold text-red-500'
+                        onClick={handleDeletePost}
+                      >
+                        Deleted
+                      </button>
+                    </>
+                  )}
+                </Modal>
+              }
+              className='flex items-center'
+            >
+              <button className='rounded-full hover:bg-gray-100'>
+                <span>
+                  <svg
+                    width='32'
+                    height='32'
+                    viewBox='0 0 32 32'
+                    className='fill-gray-500'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path d='M18 16C18 16.3956 17.8827 16.7822 17.6629 17.1111C17.4432 17.44 17.1308 17.6964 16.7654 17.8478C16.3999 17.9991 15.9978 18.0387 15.6098 17.9616C15.2219 17.8844 14.8655 17.6939 14.5858 17.4142C14.3061 17.1345 14.1156 16.7781 14.0384 16.3902C13.9613 16.0022 14.0009 15.6001 14.1522 15.2346C14.3036 14.8692 14.56 14.5568 14.8889 14.3371C15.2178 14.1173 15.6044 14 16 14C16.5304 14 17.0391 14.2107 17.4142 14.5858C17.7893 14.9609 18 15.4696 18 16ZM7.5 14C7.10444 14 6.71776 14.1173 6.38886 14.3371C6.05996 14.5568 5.80362 14.8692 5.65224 15.2346C5.50087 15.6001 5.46126 16.0022 5.53843 16.3902C5.6156 16.7781 5.80608 17.1345 6.08579 17.4142C6.36549 17.6939 6.72186 17.8844 7.10982 17.9616C7.49778 18.0387 7.89992 17.9991 8.26537 17.8478C8.63082 17.6964 8.94318 17.44 9.16294 17.1111C9.3827 16.7822 9.5 16.3956 9.5 16C9.5 15.4696 9.28929 14.9609 8.91421 14.5858C8.53914 14.2107 8.03043 14 7.5 14ZM24.5 14C24.1044 14 23.7178 14.1173 23.3889 14.3371C23.06 14.5568 22.8036 14.8692 22.6522 15.2346C22.5009 15.6001 22.4613 16.0022 22.5384 16.3902C22.6156 16.7781 22.8061 17.1345 23.0858 17.4142C23.3655 17.6939 23.7219 17.8844 24.1098 17.9616C24.4978 18.0387 24.8999 17.9991 25.2654 17.8478C25.6308 17.6964 25.9432 17.44 26.1629 17.1111C26.3827 16.7822 26.5 16.3956 26.5 16C26.5 15.4696 26.2893 14.9609 25.9142 14.5858C25.5391 14.2107 25.0304 14 24.5 14Z' />
+                  </svg>
+                </span>
+              </button>
+            </Dialog>
+          )}
         </div>
       </div>
 

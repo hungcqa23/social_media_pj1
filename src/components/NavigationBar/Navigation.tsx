@@ -3,7 +3,7 @@ import { iconsSvg } from 'src/constants/icons';
 import ButtonNav from '../ButtonNav/ButtonNav';
 import { isActiveRoute } from 'src/utils/utils';
 import Popover from '../Popover';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import authApi from 'src/apis/auth.api';
 import { useAppContext } from 'src/contexts/app.contexts';
 import { clearLS } from 'src/utils/auth';
@@ -21,6 +21,7 @@ import {
   useFloating,
   useInteractions
 } from '@floating-ui/react';
+import { notificationApi } from 'src/apis/notification.api';
 
 interface Props {
   classNameNav?: string;
@@ -113,6 +114,12 @@ export default function Navigation(props: Props) {
   });
   const dismiss = useDismiss(context);
   const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);
+  const { data } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => notificationApi.getAllNotifications()
+  });
+  const hasNotifications =
+    data?.data.notification.some(notification => !notification.read) || false;
 
   return (
     <nav className={classNameNav}>
@@ -151,12 +158,8 @@ export default function Navigation(props: Props) {
                     onClick={() => {
                       setIsNotificationBarOpen(prev => !prev);
                     }}
-                  >
-                    <span className='absolute -right-1 -top-1 flex h-3 w-3'>
-                      <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75' />
-                      <span className='relative inline-flex h-3 w-3 rounded-full bg-red-400' />
-                    </span>
-                  </ButtonNav>
+                    hasNotification={hasNotifications}
+                  />
 
                   {isNotificationBarOpen && (
                     <FloatingPortal id={id}>
@@ -165,7 +168,7 @@ export default function Navigation(props: Props) {
                         ref={refs.setFloating}
                         {...getFloatingProps()}
                       >
-                        <NotificationBar className='overflow-y-auto bg-white shadow-[5px_0px_11px_-1px_rgba(0,0,0,0.2)]' />
+                        <NotificationBar className='min-h-[20rem] overflow-y-auto bg-white shadow-[5px_0px_11px_-1px_rgba(0,0,0,0.2)] md:min-w-[24rem]' />
                       </div>
                     </FloatingPortal>
                   )}

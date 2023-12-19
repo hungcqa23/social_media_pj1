@@ -1,11 +1,19 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { profileApi } from 'src/apis/profile.api';
+import Button from 'src/components/Button';
 import IconProfile from 'src/components/IconProfile';
 
 export default function AccountItem({ accountId }: { accountId?: string }) {
+  const queryClient = useQueryClient();
   const { data: profileData, isLoading } = useQuery({
     queryKey: ['profile', accountId],
     queryFn: () => profileApi.getProfile(accountId || '')
+  });
+  const unBlockedMutation = useMutation({
+    mutationFn: () => profileApi.unBlockAccount(accountId || ''),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['current-user'] });
+    }
   });
 
   const profile = profileData?.data.user;
@@ -29,9 +37,15 @@ export default function AccountItem({ accountId }: { accountId?: string }) {
               </span>
             </div>
           </div>
-          <button className='-ml-6 min-h-[2rem] rounded-lg bg-gray-200 px-3 py-2 text-sm font-semibold text-black'>
+
+          <Button
+            className='min-h-[2rem] rounded-lg bg-gray-200 px-3 py-2 text-sm font-semibold text-black'
+            onClick={() => unBlockedMutation.mutate()}
+            disabled={unBlockedMutation.isPending}
+            isLoading={unBlockedMutation.isPending}
+          >
             Unblock
-          </button>
+          </Button>
         </div>
       )}
 

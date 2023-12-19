@@ -18,6 +18,7 @@ interface Props {
   classNameText?: string;
   isOpen?: boolean;
   onClick?: () => void;
+  hasNotification?: boolean;
 }
 
 export default function ButtonNav(props: Props) {
@@ -76,7 +77,7 @@ export default function ButtonNav(props: Props) {
       >
         <div
           className={classNames(
-            `${lgImg} flex h-6 w-6 items-center justify-center transition-all duration-150`,
+            `${lgImg} relative  flex h-6 w-6 items-center justify-center transition-all duration-150`,
             {
               'scale-105': isHover || isOpen
             }
@@ -89,9 +90,14 @@ export default function ButtonNav(props: Props) {
             })}
             alt={`${text} logo`}
           />
+          {text === 'Notifications' && props.hasNotification && (
+            <span className='absolute -right-1 -top-1 flex h-3 w-3'>
+              <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75' />
+              <span className='relative inline-flex h-3 w-3 rounded-full bg-red-400' />
+            </span>
+          )}
         </div>
-        <p className={`hidden ${lgP}`}>{text}</p>
-        {children}
+        <p className={`hidden ${lgP} capitalize`}>{text}</p>
       </button>
     );
   }

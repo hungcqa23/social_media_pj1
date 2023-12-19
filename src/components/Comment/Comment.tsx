@@ -39,6 +39,7 @@ export default function Comment({ comment }: Props) {
   const commentText = showSeeMore
     ? `${comment.comment.slice(0, 100)}...`
     : comment.comment;
+  // Delete comment
   const deleteCommentMutation = useMutation({
     mutationFn: () =>
       commentApi.deleteComment({
@@ -57,7 +58,7 @@ export default function Comment({ comment }: Props) {
         queryClient.invalidateQueries({
           queryKey: ['comments', comment.postId]
         });
-      }, 1000);
+      }, 1500);
     }
   });
 
@@ -98,7 +99,7 @@ export default function Comment({ comment }: Props) {
   const likeCommentMutation = useMutation({
     mutationFn: () =>
       commentApi.likeComment({
-        userTo: comment.userTo,
+        userTo: comment.userId,
         commentId: comment._id,
         profilePicture: comment.profilePicture
       }),
@@ -108,6 +109,7 @@ export default function Comment({ comment }: Props) {
       });
     }
   });
+
   // Unlike comment mutation
   const unlikeCommentMutation = useMutation({
     mutationFn: () => commentApi.unlikeComment(comment._id),
