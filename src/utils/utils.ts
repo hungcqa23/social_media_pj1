@@ -1,4 +1,5 @@
 import { AxiosError, HttpStatusCode, isAxiosError } from 'axios';
+import { User } from 'src/types/user.type';
 
 export const isAxiosUnprocessableEntityError = <FormError>(
   error: unknown
@@ -101,11 +102,14 @@ function checkFileSize(file, type?: 'image' | 'video') {
 
 export function checkFile(file, type?: 'image' | 'video') {
   if (!validateFile(file, type)) {
-    return window.alert(`File ${file.name} not accepted`);
+    window.alert(`File ${file.name} not accepted`);
+    return false;
   }
   if (checkFileSize(file, type)) {
-    return window.alert(checkFileSize(file, type));
+    window.alert(checkFileSize(file, type));
+    return false;
   }
+  return true;
 }
 
 export function readAsBase64(file: File): Promise<string | ArrayBuffer | null> {
@@ -150,4 +154,12 @@ export function formatTimeDifference(sendTime: Date): string {
   } else {
     return 'now';
   }
+}
+
+export function checkIfCurrentUserBeingBannedOrBanThePartner(
+  partner: User,
+  currentUserId: string
+) {
+  const arr = [...partner.blocked, ...partner.blockedBy];
+  return arr.toString().includes(currentUserId);
 }

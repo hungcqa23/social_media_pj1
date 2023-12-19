@@ -1,20 +1,22 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
 import ImagePreview from '../ImagePreview';
-import { calculateTextWidth, checkFile, readAsBase64 } from 'src/utils/utils';
+import { calculateTextWidth, checkFile, checkIfCurrentUserBeingBannedOrBanThePartner, readAsBase64 } from 'src/utils/utils';
 import { default_image_sent_message } from '../Message/Message';
+import { User } from 'src/types/user.type';
 
 const maxTextAreaHeight = 48;
 const originalHeight = 24;
 
 interface Props {
+  isBlocked: boolean;
   setChatMessage: (
     message: string,
     selectedImage: string | ArrayBuffer | null
   ) => void;
 }
 
-const MessageInput = ({ setChatMessage }: Props) => {
+const MessageInput = ({ setChatMessage, isBlocked }: Props) => {
   const [message, setMessage] = useState<string>();
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [file, setFile] = useState('');
@@ -29,11 +31,12 @@ const MessageInput = ({ setChatMessage }: Props) => {
     setMessage('');
   };
   const addToPreview = async (file: File) => {
-    checkFile(file);
-    setFile(URL.createObjectURL(file));
-    const image_b64 = await readAsBase64(file);
-    setBase64File(image_b64);
-    setShowImagePreview(!showImagePreview);
+    if (checkFile(file)) {
+      setFile(URL.createObjectURL(file));
+      const image_b64 = await readAsBase64(file);
+      setBase64File(image_b64);
+      setShowImagePreview(!showImagePreview);
+    }
   };
 
   const handleClick = (event: React.FormEvent<HTMLFormElement>) => {
@@ -127,6 +130,7 @@ const MessageInput = ({ setChatMessage }: Props) => {
             type='file'
             id='file-input'
             className='hidden'
+            disabled={isBlocked}
             onClick={() => {
               if (fileInputRef.current) {
                 fileInputRef.current.value = '';
@@ -145,11 +149,12 @@ const MessageInput = ({ setChatMessage }: Props) => {
           <textarea
             ref={messageInputRef}
             value={message}
+            disabled={isBlocked}
             onChange={handleTextChange}
-            className='ml-4 h-6 basis-11/12 resize-none whitespace-pre-wrap bg-slate-50 px-2 text-sm font-normal text-gray-950 outline-none'
+            className='ml-4 h-6 basis-11/12 resize-none whitespace-pre-wrap px-2 text-sm font-normal text-gray-950 outline-none'
             placeholder='Write a message...'
           />
-          <button className='mr-2'>
+          <button className='mr-2' disabled={isBlocked}>
             <svg
               width={24}
               height={24}

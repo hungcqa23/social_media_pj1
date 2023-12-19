@@ -31,7 +31,6 @@ const VideoCall = (props: Props) => {
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    console.log(props.isVideoCall);
     if (!props.isReceiver) {
       socketIOService.getSocket().emit('get peerId', {
         userToGet: props.receiverId,
@@ -61,7 +60,6 @@ const VideoCall = (props: Props) => {
               const call: MediaConnection = props.peer.call(id, incomeStream);
               callRef = call;
               call.on('stream', (remoteStream: MediaStream) => {
-                console.log('come on sender stream');
                 if (props.isVideoCall) {
                   if (remoteUserVideoRef.current) {
                     remoteUserVideoRef.current.srcObject = remoteStream;
@@ -73,10 +71,6 @@ const VideoCall = (props: Props) => {
                     remoteAudioRef.current.play();
                   }
                 }
-                console.log('local', currentUserVideoRef.current?.srcObject);
-                console.log('remote', remoteUserVideoRef.current?.srcObject);
-                console.log('local audio', currentAudioRef.current?.srcObject);
-                console.log('remote audio', remoteAudioRef.current?.srcObject);
               });
               call.on('close', () => {
                 props.onClose();
@@ -89,11 +83,9 @@ const VideoCall = (props: Props) => {
   }, []);
 
   useEffect(() => {
-    console.log(props.isVideoCall);
     if (props.isReceiver && props.peer) {
       props.peer.on('call', call => {
         callRef = call;
-        console.log('on call');
         navigator.mediaDevices
           .getUserMedia({
             video: props.isVideoCall ? true : false,
@@ -114,7 +106,6 @@ const VideoCall = (props: Props) => {
             }
             call.answer(incomeStream);
             call.on('stream', (remoteStream: MediaStream) => {
-              console.log('come on receiver stream');
               if (props.isVideoCall) {
                 if (remoteUserVideoRef.current) {
                   remoteUserVideoRef.current.srcObject = remoteStream;
@@ -126,10 +117,6 @@ const VideoCall = (props: Props) => {
                   remoteAudioRef.current.play();
                 }
               }
-              console.log('local', currentUserVideoRef.current?.srcObject);
-              console.log('remote', remoteUserVideoRef.current?.srcObject);
-              console.log('local audio', currentAudioRef.current?.srcObject);
-              console.log('remote audio', remoteAudioRef.current?.srcObject);
             });
             call.on('close', () => {
               props.onClose();
@@ -149,7 +136,6 @@ const VideoCall = (props: Props) => {
                 }
                 call.answer(incomeStream);
                 call.on('stream', (remoteStream: MediaStream) => {
-                  console.log('come on receiver stream');
                   if (props.isVideoCall) {
                     if (remoteUserVideoRef.current) {
                       remoteUserVideoRef.current.srcObject = remoteStream;

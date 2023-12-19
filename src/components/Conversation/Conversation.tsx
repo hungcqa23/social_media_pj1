@@ -21,18 +21,19 @@ import useScrollToBottom from 'src/hooks/useScrollToBottom';
 import { ChatSocket } from 'src/socket/chatSocket';
 import { socketIOService } from 'src/socket/socket';
 import VideoCall from 'src/pages/VideoCall';
+import { checkIfCurrentUserBeingBannedOrBanThePartner } from 'src/utils/utils';
+import { Link } from 'react-router-dom';
 
 export default function Conversation() {
   const [messages, setMessages] = useState<IMessageData[]>([]);
   const [fetched, setFetched] = useState<boolean>(false);
   const [isWindowOpen, setIsWindowOpen] = useState<boolean>(false);
   const [receiver, setReceiver] = useState<User>();
-  const [callAccepted, setCallAccepted] = useState<boolean>(false);
   const [callEnded, setCallEnded] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [receiverPeerId, setReceiverPeerId] = useState<string>('');
   const scrollRef = useScrollToBottom(messages);
   const [isVideoCall, setisVideoCall] = useState<boolean>();
+  const [isBlocked, setIsBlocked] = useState<boolean>(false);
 
   const receiverId = useParams();
   const { profile, peer, peerId } = useContext(AppContext);
@@ -64,6 +65,9 @@ export default function Conversation() {
   const getProfile = useCallback(
     async (id: string) => {
       const response: User = (await getUserProfile(id)) as unknown as User;
+      setIsBlocked(
+        checkIfCurrentUserBeingBannedOrBanThePartner(response, profile!._id)
+      );
       setReceiver(response);
       ChatSocket.joinRoom(response, profile as User);
     },
@@ -101,6 +105,7 @@ export default function Conversation() {
   useEffect(() => {
     if (fetched) {
       ChatSocket.receiveMessage(messages, profile!.username, setMessages);
+      markMessagesAsSeen(receiverId.id as string);
       setIsLoading(false);
     }
     if (!fetched) {
@@ -112,7 +117,9 @@ export default function Conversation() {
         socketIOService.getSocket().off('message read');
       }
     };
-  }, [fetched, profile, receiverId.id]);
+    },
+    [fetched, profile, receiverId.id, ChatSocket.receiveMessage]
+  );
 
   const sendChatMessage = async (
     message: string,
@@ -138,7 +145,7 @@ export default function Conversation() {
       receiverProfilePicture: receiver.profilePicture,
       receiverUsername: receiver.username,
       body: `${profile?.username} called you!`,
-      conversationId: messages[0].conversationId, //problem if conversationId is null
+      // conversationId: messages[0].conversationId,
       peerId
     } as ISendMessageData;
     await callVideoReq(reqBody);
@@ -151,7 +158,8 @@ export default function Conversation() {
       receiverProfilePicture: receiver.profilePicture,
       receiverUsername: receiver.username,
       body: `${profile?.username} called you!`,
-      conversationId: messages[0].conversationId, //problem if conversationId is null
+      conversationId:
+        messages.length > 0 ? messages[0].conversationId : undefined,
       peerId
     } as ISendMessageData;
     await callVideo(reqBody);
@@ -164,7 +172,8 @@ export default function Conversation() {
       receiverProfilePicture: receiver.profilePicture,
       receiverUsername: receiver.username,
       body: `${profile?.username} called you!`,
-      conversationId: messages[0].conversationId, //problem if conversationId is null
+      conversationId:
+        messages.length > 0 ? messages[0].conversationId : undefined,
       peerId
     } as ISendMessageData;
     await callAudio(reqBody);
@@ -177,7 +186,7 @@ export default function Conversation() {
       receiverProfilePicture: receiver.profilePicture,
       receiverUsername: receiver.username,
       body: `${profile?.username} called you!`,
-      conversationId: messages[0].conversationId, //problem if conversationId is null
+      // conversationId: messages[0].conversationId,
       peerId
     } as ISendMessageData;
     await callAudioReq(reqBody);
@@ -196,6 +205,7 @@ export default function Conversation() {
           <div className='flex gap-2'>
             <button
               className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300'
+              disabled={isBlocked}
               onClick={handleAudioCallClick}
             >
               <svg
@@ -212,7 +222,8 @@ export default function Conversation() {
               </svg>
             </button>
             <button
-              className='flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-300'
+              className='flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-300 disabled:opacity-80'
+              disabled={isBlocked}
               onClick={handleVideoCallClick}
             >
               <svg
@@ -228,7 +239,7 @@ export default function Conversation() {
                 />
               </svg>
             </button>
-            <button className='flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-300'>
+            <button className='flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-300 disabled:opacity-80'>
               <svg
                 width='24'
                 height='24'
@@ -252,7 +263,7 @@ export default function Conversation() {
           </div>
         </header>
         <div
-          className='mx-2 w-full flex-1 items-end justify-center overflow-y-scroll'
+          className='w-full flex-1 items-end justify-center overflow-y-scroll'
           ref={scrollRef}
         >
           {messages.map((item: IMessageData, index: number) => (
@@ -262,17 +273,20 @@ export default function Conversation() {
               isReceived={profile?._id === item.receiverId}
             />
           ))}
-          {isLoading && (
-            <button type='button' className='bg-indigo-500' disabled>
-              <svg
-                className='mr-3 h-5 w-5 animate-spin'
-                viewBox='0 0 24 24'
-              ></svg>
-              Processing...
-            </button>
+          {isBlocked && (
+            <div className='bg-slate-200 p-4'>
+              You have been blocked by this user or blocked this user. Check in{' '}
+              <Link
+                className='w-fit text-cyan-500 underline'
+                to={'/accounts/who_can_see_your_content'}
+              >
+                Blocked list
+              </Link>
+              to see more information.
+            </div>
           )}
         </div>
-        <MessageInput setChatMessage={sendChatMessage} />
+        <MessageInput isBlocked={isBlocked} setChatMessage={sendChatMessage} />
       </div>
       {isWindowOpen && (
         <VideoCall
