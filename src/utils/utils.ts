@@ -102,7 +102,7 @@ function checkFileSize(file, type?: 'image' | 'video') {
 
 export function checkFile(file, type?: 'image' | 'video') {
   if (!validateFile(file, type)) {
-    window.alert(`File ${file.name} not accepted`);
+    window.alert(`File ${file.name} is not accepted`);
     return false;
   }
   if (checkFileSize(file, type)) {

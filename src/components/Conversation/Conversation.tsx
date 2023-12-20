@@ -23,6 +23,7 @@ import { socketIOService } from 'src/socket/socket';
 import VideoCall from 'src/pages/VideoCall';
 import { checkIfCurrentUserBeingBannedOrBanThePartner } from 'src/utils/utils';
 import { Link } from 'react-router-dom';
+import { orderBy } from 'lodash';
 
 export default function Conversation() {
   const [messages, setMessages] = useState<IMessageData[]>([]);
@@ -105,7 +106,9 @@ export default function Conversation() {
   useEffect(() => {
     if (fetched) {
       ChatSocket.receiveMessage(messages, profile!.username, setMessages);
-      markMessagesAsSeen(receiverId.id as string);
+      if (messages.length > 0) {
+        markMessagesAsSeen(receiverId.id as string);
+      }
       setIsLoading(false);
     }
     if (!fetched) {
@@ -281,7 +284,7 @@ export default function Conversation() {
                 to={'/accounts/who_can_see_your_content'}
               >
                 Blocked list
-              </Link>
+              </Link>{' '}
               to see more information.
             </div>
           )}

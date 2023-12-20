@@ -1,5 +1,7 @@
 import { IMessageData } from 'src/types/conversation.type';
 import { formatMessageDateTime } from 'src/utils/utils';
+import Linkify from 'react-linkify';
+import ModalImage from 'react-modal-image';
 
 interface Props {
   item: IMessageData;
@@ -47,15 +49,16 @@ const Message = ({ item, isReceived }: Props) => {
                 isReceived ? 'bg-sky-50 text-black' : 'bg-sky-500 text-white'
               } p-2`}
             >
-              {item.body}
+              <Linkify>{item.body}</Linkify>
             </div>
           )}
         {item.selectedImage && (
           <div className='mt-1 flex w-[70%] items-center justify-center rounded-lg'>
-            <img
-              className='rounded-lg object-cover'
-              src={item.selectedImage}
-              alt='img'
+            <ModalImage
+              small={item.selectedImage}
+              large={item.selectedImage}
+              imageBackgroundColor='transparent'
+              alt='image'
             />
           </div>
         )}

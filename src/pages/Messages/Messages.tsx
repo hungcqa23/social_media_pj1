@@ -9,31 +9,17 @@ import { AppContext } from 'src/contexts/app.contexts';
 import { ChatSocket } from 'src/socket/chatSocket';
 import { User } from 'src/types/user.type';
 import SearchBox from 'src/components/SearchBox';
+import { orderBy } from 'lodash';
 
 export default function Messages() {
   const [conversations, setConversations] = useState<IMessageData[]>([]);
-  const [results, setResults] = useState<User[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>('');
   const { profile } = useContext(AppContext);
-
-  const handleSearch = async (value: string, results: User[]) => {
-    setSearchTerm(value);
-
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/v1/user/search?q=${value}`
-      );
-      const data = await response.json();
-      setResults(data.users);
-    } catch(error) {
-      console.error('Error fetching search results:', error);
-    }
-  }
 
   const getConversations = useCallback(async () => {
     const response: IMessageData[] =
       (await retrieveConversations()) as IMessageData[];
-    setConversations(response);
+    const data: IMessageData[] = orderBy(response, 'createdAt', 'desc');
+    setConversations(data);
     ChatSocket.conversation(profile as User, conversations, setConversations);
   }, [conversations, profile]);
 

@@ -166,14 +166,6 @@ const VideoCall = (props: Props) => {
           });
       });
     }
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-      if (receiverStream) {
-        receiverStream.getTracks().forEach(track => track.stop());
-      }
-    };
   }, []);
 
   const handleTurnOff = () => {
@@ -183,6 +175,19 @@ const VideoCall = (props: Props) => {
     if (receiverStream) {
       receiverStream.getTracks().forEach(track => track.stop());
     }
+    if (currentUserVideoRef.current) {
+      currentUserVideoRef.current.srcObject = null;
+    }
+    if (remoteUserVideoRef.current) {
+      remoteUserVideoRef.current.srcObject = null;
+    }
+    if (currentAudioRef.current) {
+      currentAudioRef.current.srcObject = null;
+    }
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.srcObject = null;
+    }
+
     if (callRef) {
       if (props.setCallEnded) {
         props.setCallEnded(true);

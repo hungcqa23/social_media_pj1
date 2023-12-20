@@ -14,7 +14,7 @@ export default function ChatUser({ item, onClick }: Props) {
     >
       <Profile
         classNameImage='h-14 w-14 rounded-full object-cover outline outline-1 outline-slate-200 outline-offset-2'
-        className='block h-14 w-14'
+        className='block h-14 min-h-[3.5rem] w-14 min-w-[3.5rem]'
         src={item.profilePicture}
         isImage
       />

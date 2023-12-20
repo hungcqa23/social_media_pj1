@@ -1,5 +1,3 @@
-import SimplePeer, { SignalData } from 'simple-peer';
-
 export interface IMessageData {
   _id: string;
   conversationId: string;
@@ -37,17 +35,6 @@ export interface ISenderReceiver {
   receiverId: string;
   senderName: string;
   receiverName: string;
-}
-
-export interface ICallUser {
-  currentUserStream: MediaStream;
-  message: IMessageData;
-  userVideoRef: React.RefObject<HTMLVideoElement>;
-  connectionRef: React.MutableRefObject<SimplePeer.Instance>;
-  callSignal?: SignalData;
-  setCallAccepted: (accepted: boolean) => void;
-  setCallEnded: (ended: boolean) => void;
-  setReceivingCall: (receivingCall: boolean) => void;
 }
 
 export interface ILinks {

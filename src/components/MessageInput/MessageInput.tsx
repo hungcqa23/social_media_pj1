@@ -31,7 +31,7 @@ const MessageInput = ({ setChatMessage, isBlocked }: Props) => {
     setMessage('');
   };
   const addToPreview = async (file: File) => {
-    if (checkFile(file)) {
+    if (checkFile(file, 'image')) {
       setFile(URL.createObjectURL(file));
       const image_b64 = await readAsBase64(file);
       setBase64File(image_b64);
