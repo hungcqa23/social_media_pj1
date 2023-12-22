@@ -13,6 +13,8 @@ interface FormData {
   email: string;
   password: string;
   confirmPassword: string;
+  firstName: string;
+  lastName: string;
 }
 
 export default function Register() {
@@ -26,8 +28,12 @@ export default function Register() {
 
   const rules = getRules(getValues);
   const signUpMutation = useMutation({
-    mutationFn: (body: Pick<FormData, 'email' | 'password' | 'username'>) =>
-      authApi.registerAccount(body)
+    mutationFn: (
+      body: Pick<
+        FormData,
+        'email' | 'password' | 'username' | 'firstName' | 'lastName'
+      >
+    ) => authApi.registerAccount(body)
   });
 
   const onSubmit = handleSubmit(
@@ -36,7 +42,9 @@ export default function Register() {
         {
           username: data.username,
           email: data.email,
-          password: data.password
+          password: data.password,
+          firstName: data.firstName,
+          lastName: data.lastName
         },
         {
           onSuccess: () => {
@@ -60,6 +68,25 @@ export default function Register() {
       </h1>
 
       <form className='flex flex-col' onSubmit={onSubmit} noValidate>
+        <div className='flex gap-2'>
+          <Input
+            type='text'
+            placeholder='First Name...'
+            name='firstName'
+            register={register}
+            ruleName={rules.username}
+            errorMessage={errors.username?.message}
+          />
+          <Input
+            type='text'
+            placeholder='Last Name...'
+            name='lastName'
+            register={register}
+            ruleName={rules.username}
+            errorMessage={errors.username?.message}
+          />
+        </div>
+
         <Input
           type='text'
           placeholder='Username...'

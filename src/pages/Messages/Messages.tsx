@@ -2,32 +2,35 @@ import Button from 'src/components/Button';
 import MessageUser from 'src/pages/Messages/MessageUser';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import List from 'src/components/List';
-import { retrieveConversations } from 'src/apis/conversation.api';
+import conversationApi from 'src/apis/conversation.api';
 import { IMessageData } from 'src/types/conversation.type';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { AppContext } from 'src/contexts/app.contexts';
 import { ChatSocket } from 'src/socket/chatSocket';
 import { User } from 'src/types/user.type';
 import SearchBox from 'src/components/SearchBox';
 import { orderBy } from 'lodash';
+import { useQuery } from '@tanstack/react-query';
 
 export default function Messages() {
-  const [conversations, setConversations] = useState<IMessageData[]>([]);
   const { profile } = useContext(AppContext);
-
-  const getConversations = useCallback(async () => {
-    const response: IMessageData[] =
-      (await retrieveConversations()) as IMessageData[];
-    const data: IMessageData[] = orderBy(response, 'createdAt', 'desc');
-    setConversations(data);
-    ChatSocket.conversation(profile as User, conversations, setConversations);
-  }, [conversations, profile]);
-
-  useEffect(() => {
-    getConversations();
-  }, [getConversations]);
-
   const navigate = useNavigate();
+  const { data: conversationsData } = useQuery({
+    queryKey: ['conversations'],
+    queryFn: conversationApi.getAllConversations
+  });
+
+  const conversations = orderBy(
+    conversationsData?.data.conversations || [],
+    'createdAt',
+    'desc'
+  );
+
+  const getConversations = async () => {
+    ChatSocket.conversation(profile as User, conversations);
+  };
+  getConversations();
+
   const handleClick = (item: IMessageData) => {
     if (profile?._id === item.receiverId) {
       navigate(`/messages/${item.senderId}`);
@@ -35,6 +38,7 @@ export default function Messages() {
       navigate(`/messages/${item.receiverId}`);
     }
   };
+
   return (
     <>
       <div className='ml-[4.5rem] flex h-screen bg-slate-200'>
@@ -61,7 +65,7 @@ export default function Messages() {
           </div>
 
           {List<IMessageData>({
-            listItems: conversations,
+            listItems: conversations ?? [],
             mapFn: (item, index) => (
               <MessageUser
                 key={index}

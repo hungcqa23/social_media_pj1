@@ -18,11 +18,7 @@ export class ChatSocket {
     socketIOService.getSocket().emit('join room', users);
   }
 
-  static conversation(
-    profile: User,
-    conversations: IMessageData[],
-    setConversations: (data: IMessageData[]) => void
-  ) {
+  static conversation(profile: User, conversations: IMessageData[]) {
     if (!socketIOService.getSocket()) return;
     socketIOService
       .getSocket()
@@ -47,7 +43,7 @@ export class ChatSocket {
           } else {
             conversations.push(data);
           }
-          setConversations(conversations);
+          // setConversations(conversations);
         }
       });
     socketIOService.getSocket().on('message read', (data: IMessageData) => {
@@ -79,7 +75,10 @@ export class ChatSocket {
         data.senderUsername.toLowerCase() === username.toLowerCase() ||
         data.receiverUsername.toLowerCase() === username.toLowerCase()
       ) {
-        if (ChatSocket.chatMessages.length === 0 || data.conversationId === ChatSocket.chatMessages[0].conversationId) {
+        if (
+          ChatSocket.chatMessages.length === 0 ||
+          data.conversationId === ChatSocket.chatMessages[0].conversationId
+        ) {
           ChatSocket.chatMessages.push(data);
           messages = [...this.chatMessages];
           setMessages(messages);

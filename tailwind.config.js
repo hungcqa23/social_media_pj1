@@ -31,5 +31,5 @@ export default {
       }
     }
   },
-  plugins: ['prettier-plugin-tailwindcss']
+  plugins: [require('autoprefixer'), 'prettier-plugin-tailwindcss']
 };

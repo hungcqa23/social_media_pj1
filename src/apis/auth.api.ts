@@ -9,7 +9,13 @@ export const URL_FORGOT_PASSWORD = 'forgot-password';
 export const URL_RESET_PASSWORD = 'reset-password';
 
 const authApi = {
-  registerAccount(body: {
+  registerAccount({
+    email,
+    password,
+    username,
+    firstName = 'Anonymous',
+    lastName = 'User'
+  }: {
     email: string;
     password: string;
     username: string;
@@ -17,9 +23,11 @@ const authApi = {
     lastName?: string;
   }) {
     return http.post<AuthResponse>(URL_REGISTER, {
-      ...body,
-      firstname: 'User',
-      lastname: 'Anonymous'
+      email,
+      password,
+      username,
+      firstname: firstName,
+      lastname: lastName
     });
   },
   login(body: { username: string; password: string }) {

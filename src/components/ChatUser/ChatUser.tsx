@@ -9,21 +9,19 @@ interface Props {
 export default function ChatUser({ item, onClick }: Props) {
   return (
     <button
-      className='flex w-full items-center gap-3 overflow-x-hidden px-3 py-3 hover:bg-gray-100'
+      className='flex w-full items-center gap-3 overflow-x-hidden rounded-lg px-3 py-3 hover:bg-gray-100'
       onClick={onClick}
     >
       <Profile
-        classNameImage='h-14 w-14 rounded-full object-cover outline outline-1 outline-slate-200 outline-offset-2'
-        className='block h-14 min-h-[3.5rem] w-14 min-w-[3.5rem]'
+        classNameImage='h-10 w-10 outline outline-1 outline-slate-200 outline-offset-2'
+        className='h-10 w-10'
         src={item.profilePicture}
         isImage
       />
       <div className='flex h-[100%] w-[calc(100%-3.5rem)] flex-col items-start justify-between'>
-        <div>
-          <span className='text-lg font-semibold '>{item.username}</span>
-        </div>
+        <span className='text-sm font-semibold'>{item.username}</span>
         <div className='flex w-5/6 flex-col items-start'>
-          <span className='w-fit max-w-[90%] overflow-x-hidden truncate text-left'>
+          <span className='w-fit max-w-[90%] overflow-x-hidden truncate text-left text-sm text-gray-400'>
             {item.fullname}
           </span>
         </div>

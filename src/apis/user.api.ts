@@ -17,11 +17,16 @@ export const getUserProfile = async (userId: string) => {
   });
   return response.data.user;
 };
+function newAbortSignal(timeoutMs: number) {
+  const abortController = new AbortController();
+  setTimeout(() => abortController.abort(), timeoutMs || 0);
 
+  return abortController.signal;
+}
 export const searchUsers = async (query: string) => {
   if (query) {
     const response = await http.get<TSearchUser>(`user/search?q=${query}`, {
-      withCredentials: true
+      signal: newAbortSignal(5000)
     });
     return response.data.users;
   } else {

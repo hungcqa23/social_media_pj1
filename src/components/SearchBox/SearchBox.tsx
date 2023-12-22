@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { searchUsers } from 'src/apis/user.api';
 import { User } from 'src/types/user.type';
-import MessageUser from '../../pages/Messages/MessageUser';
 import List from '../List';
 import ChatUser from '../ChatUser';
 import { useNavigate } from 'react-router-dom';
+import classNames from 'classnames';
 
 const SearchBox = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -53,11 +53,16 @@ const SearchBox = () => {
   };
   return (
     <div
-      className='flex max-h-[40rem] w-full flex-col rounded-3xl border border-slate-300 bg-white px-6 py-3 focus-within:border-slate-700 focus-within:drop-shadow-xl'
+      className={classNames(
+        'flex max-h-[40rem] w-full flex-col overflow-y-hidden rounded-3xl border-2 border-slate-300 bg-white px-4 py-1 focus-within:drop-shadow-xl',
+        {
+          'py-2': result.length > 0 && isFocused
+        }
+      )}
       ref={searchBoxRef}
     >
-      <div className='flex w-full flex-col gap-4 overflow-y-auto'>
-        <div className='z-1 sticky top-0 flex w-full flex-row items-center justify-between bg-white py-2 focus-within:border-b-2'>
+      <div className='flex w-full flex-col gap-4 overflow-y-hidden transition-all duration-200'>
+        <div className='z-1 sticky top-2 flex w-full flex-row items-center justify-between py-2'>
           <svg
             className='w-[10%]'
             width='21'
@@ -82,7 +87,7 @@ const SearchBox = () => {
           />
         </div>
         {result.length > 0 && isFocused && (
-          <div>
+          <>
             {List<User>({
               listItems: result,
               mapFn: (item: User, index: number) => (
@@ -92,9 +97,9 @@ const SearchBox = () => {
                   onClick={() => handleClick(item)}
                 />
               ),
-              className: 'h-fit w-full'
+              className: 'max-h-[20rem] w-full overflow-y-auto scroll-smooth'
             })}
-          </div>
+          </>
         )}
       </div>
     </div>

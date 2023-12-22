@@ -1,8 +1,8 @@
 import { IMessageData, ISendMessageData } from 'src/types/conversation.type';
+import { SuccessResponse } from 'src/types/utils.type';
 import http from 'src/utils/http';
 
-export interface IGetConversations {
-  message?: string;
+export interface GetConversations extends SuccessResponse {
   conversations?: IMessageData[];
   messages?: IMessageData[];
 }
@@ -13,14 +13,14 @@ export interface ISendMessage {
 }
 
 export const retrieveConversations = async () => {
-  const response = await http.get<IGetConversations>('/chat/conversations', {
+  const response = await http.get<GetConversations>('/chat/conversations', {
     withCredentials: true
   });
   return response.data.conversations;
 };
 
 export const retrieveMessages = async (receiverId: string) => {
-  const response = await http.get<IGetConversations>(
+  const response = await http.get<GetConversations>(
     `/chat/message/user/${receiverId}`,
     {
       withCredentials: true
@@ -79,6 +79,12 @@ export const markAsSeen = async (receiverId: string) => {
     { withCredentials: true }
   );
   return response;
-}
+};
 
 // export const conversationApi: ConversationApi = new ConversationApi();
+const conversationApi = {
+  getAllConversations() {
+    return http.get<GetConversations>('/chat/conversations');
+  }
+};
+export default conversationApi;
