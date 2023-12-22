@@ -36,6 +36,14 @@ export const postApi = {
     );
     return response.data;
   },
+  getPosts(search: string, signal?: AbortSignal) {
+    return http.get<GetAllPosts>('search/post', {
+      params: {
+        query: search
+      },
+      signal
+    });
+  },
 
   createPostWithMedia(body: Post) {
     return http.post<CreatePost>(URL_CREATE_POST_WITH_MEDIA, body);

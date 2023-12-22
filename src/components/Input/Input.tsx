@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { InputHTMLAttributes } from 'react';
 import { RegisterOptions, UseFormRegister } from 'react-hook-form';
 
@@ -27,7 +28,7 @@ export default function Input(props: Props) {
   return (
     <div className={className}>
       <input className={classNameInput} {...registerResult} {...rest} />
-      <p className={classNameError}>{errorMessage}</p>
+      <p className={classNames(classNameError, {})}>{errorMessage}</p>
     </div>
   );
 }

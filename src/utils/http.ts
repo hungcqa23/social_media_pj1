@@ -44,7 +44,8 @@ class Http {
         const { url } = response.config;
         if (url === URL_LOGIN || url === URL_REGISTER) {
           const data = response.data as AuthResponse;
-          setProfileToLS(data.user);
+          console.log(data);
+          // setProfileToLS(data.user);
         } else if (url === URL_LOGOUT) {
           this.accessToken = '';
           // this.refreshToken = '';

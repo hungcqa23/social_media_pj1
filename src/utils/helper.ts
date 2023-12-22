@@ -1,5 +1,4 @@
 import moment from 'moment';
-import { calculateTextWidth } from './utils';
 
 export const formatDate = (inputDateString: string): string => {
   const inputDate = moment(inputDateString);
@@ -48,19 +47,78 @@ export const formatSocialNumber = (number: number): string => {
     .replace('.', ',');
 };
 
-export const handleTextAreaChange = (
-  textareaRef: React.RefObject<HTMLTextAreaElement>,
+const calculateNumLines = (
+  textarea: React.RefObject<HTMLTextAreaElement>
+): number => {
+  const parseValue = (v: string): number =>
+    v.endsWith('px') ? parseInt(v.slice(0, -2), 10) : 0;
+
+  if (!textarea.current) {
+    // Handle the case where the textarea is not available
+    return 0;
+  }
+
+  const textareaStyles = window.getComputedStyle(textarea.current);
+  const font = `${textareaStyles.fontSize} ${textareaStyles.fontFamily}`;
+  const paddingLeft = parseValue(textareaStyles.paddingLeft);
+  const paddingRight = parseValue(textareaStyles.paddingRight);
+  const textareaWidth =
+    textarea.current.getBoundingClientRect().width - paddingLeft - paddingRight;
+
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  if (!context) {
+    // Context not available, return a default value
+    return 0;
+  }
+  context.font = font;
+
+  const words = textarea.current.value.split(' ');
+  let lineCount = 0;
+  let currentLine = '';
+  for (let i = 0; i < words.length; i++) {
+    const wordWidth = context.measureText(words[i] + ' ').width;
+    const lineWidth = context.measureText(currentLine).width;
+
+    if (lineWidth + wordWidth > textareaWidth) {
+      lineCount++;
+      currentLine = words[i] + ' ';
+    } else {
+      currentLine += words[i] + ' ';
+    }
+  }
+
+  if (currentLine.trim() !== '') {
+    lineCount++;
+  }
+
+  return lineCount;
+};
+
+export const handleTextAreaChange = ({
+  textAreaRef,
   originalHeight = 36
-) => {
-  if (textareaRef.current) {
+}: {
+  textAreaRef: React.RefObject<HTMLTextAreaElement>;
+  originalHeight?: number;
+  valueTextArea?: string;
+}) => {
+  if (textAreaRef.current) {
     // Check if it's only 1 line
-    const textAreaWidth = textareaRef.current.clientWidth;
-    const textContentWidth = calculateTextWidth(textareaRef);
-    if ((textContentWidth || 0) < textAreaWidth) {
-      return (textareaRef.current.style.height = `${originalHeight}px`);
+    const lineOfText = calculateNumLines(textAreaRef);
+    console.log(lineOfText);
+    if (lineOfText <= 1) {
+      return (textAreaRef.current.style.height = `${originalHeight}px`);
     }
 
-    textareaRef.current.style.height = 'auto'; // Reset the height to auto to adjust to content
-    textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px'; // Set the height to the scrollHeight
+    // const textAreaWidth = textAreaRef.current.clientWidth;
+    // const textContentWidth = calculateTextWidth(textAreaRef);
+
+    // if ((textContentWidth || 0) < textAreaWidth) {
+    //   return (textAreaRef.current.style.height = `${originalHeight}px`);
+    // }
+
+    textAreaRef.current.style.height = 'auto'; // Reset the height to auto to adjust to content
+    textAreaRef.current.style.height = textAreaRef.current.scrollHeight + 'px'; // Set the height to the scrollHeight
   }
 };

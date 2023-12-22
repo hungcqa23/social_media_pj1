@@ -1,4 +1,4 @@
-import { useReducer, useRef, useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import Profile from '../IconProfile';
 import Comment from '../Comment';
 import List from '../List';
@@ -20,12 +20,7 @@ import { toast } from 'react-toastify';
 import Button from '../Button';
 import CopyButton from './CopyButton';
 import Modal from '../Modal';
-
-interface ButtonType {
-  text: string;
-  important?: boolean;
-  onClick: () => void;
-}
+import { useForm } from 'react-hook-form';
 
 interface States {
   openOptions: boolean;
@@ -82,20 +77,29 @@ interface PostProps {
 export default function PostItem({
   post,
   innerRef,
-  className = 'max-w-[40rem] w-full rounded-lg border shadow'
+  className = 'max-w-xl w-full rounded-lg border shadow'
 }: PostProps) {
   const { profile } = useAppContext();
   const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initialState);
   const [contentTextarea, setContentTextarea] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const contentRef = useRef<HTMLTextAreaElement | null>(null);
 
   // Form data for comment and submit comment
-  // const { register, handleSubmit, watch, reset, getValues } = useForm<{
-  //   comment: string;
-  // }>();
-  // const watchContentComment = watch('comment');
-  // const commentRegister = register('comment');
+  const { register, handleSubmit, watch, reset, setValue } = useForm<{
+    content: string;
+  }>();
+
+  useEffect(() => {
+    if (isEditing) {
+      setValue('content', post.post || '');
+      contentRef.current?.focus();
+    }
+  }, [isEditing, post.post, setValue]);
+
+  const { ref, onChange, name } = register('content');
 
   // Get Data for comments
   const { data: commentsData, isLoading: isLoadingComment } = useQuery({
@@ -229,7 +233,7 @@ export default function PostItem({
       <div className='flex h-16 items-center justify-between p-4'>
         <div className='flex items-center md:items-start'>
           <div className='mr-2'>
-            <Profile src={post.profilePicture} to={post.userId} />
+            <Profile src={post.profilePicture} to={`/${post.userId}`} />
           </div>
           <div>
             <div>
@@ -297,14 +301,25 @@ export default function PostItem({
                   onCloseModal={() => dispatch({ type: ACTION_TYPES.CLOSE })}
                 >
                   {state.openOptions && isOwner && (
-                    <button
-                      className='justify-center p-3 font-semibold text-red-500'
-                      onClick={() =>
-                        dispatch({ type: ACTION_TYPES.OPEN_DELETE })
-                      }
-                    >
-                      Deleted
-                    </button>
+                    <>
+                      <button
+                        className='justify-center p-3 font-semibold text-red-500'
+                        onClick={() =>
+                          dispatch({ type: ACTION_TYPES.OPEN_DELETE })
+                        }
+                      >
+                        Deleted
+                      </button>
+                      <button
+                        className='justify-center border-t border-gray-300 p-3 font-semibold text-red-500'
+                        onClick={() => {
+                          setIsEditing(true);
+                          dispatch({ type: ACTION_TYPES.CLOSE });
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </>
                   )}
 
                   {state.openDelete && (
@@ -347,8 +362,54 @@ export default function PostItem({
       </div>
 
       {/* Text */}
-      <div className='px-4'>
-        <p className='pb-4 text-sm font-normal text-gray-950'>{post.post}</p>
+      <div className='px-4 pb-4'>
+        {!isEditing && (
+          <p className='text-sm font-normal text-gray-950'>{post.post}</p>
+        )}
+        {isEditing && (
+          <>
+            <textarea
+              className='h-12 max-h-20 w-full resize-none overflow-y-hidden whitespace-pre-wrap text-base font-normal text-black placeholder:text-gray-600 focus:outline-none'
+              onChange={event => {
+                handleTextAreaChange({
+                  textAreaRef: contentRef,
+                  originalHeight: 48
+                });
+                onChange(event);
+              }}
+              ref={e => {
+                ref(e);
+                contentRef.current = e;
+              }}
+              onKeyDown={event => {
+                if (event.key === 'Escape') {
+                  setIsEditing(false);
+                }
+              }}
+              name={name}
+            />
+            <p className='text-xs text-black'>
+              Press{' '}
+              <button
+                className='text-blue-500 hover:underline'
+                onClick={() => setIsEditing(false)}
+              >
+                Enter
+              </button>{' '}
+              to save or{' '}
+              <button
+                className='text-blue-500 hover:underline'
+                onClick={() => {
+                  setIsEditing(false);
+                  contentRef.current?.blur();
+                }}
+              >
+                Esc
+              </button>{' '}
+              to cancel
+            </p>
+          </>
+        )}
       </div>
 
       {/* Image or video */}
@@ -506,7 +567,9 @@ export default function PostItem({
                 placeholder='Write a comment...'
                 onChange={event => {
                   setContentTextarea(event.target.value);
-                  handleTextAreaChange(textareaRef);
+                  handleTextAreaChange({
+                    textAreaRef: textareaRef
+                  });
                 }}
                 ref={e => {
                   textareaRef.current = e;

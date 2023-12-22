@@ -105,3 +105,21 @@ export const schema = object({
 export interface Schema extends InferType<typeof schema> {
   confirmPassword: string;
 }
+
+export const profile = yup.object({
+  facebook: yup.string().max(100, 'Độ dài tối đa là 100 ký tự'),
+  youtube: yup.string().max(100, 'Độ dài tối đa là 100 ký tự'),
+  twitter: yup.string().max(100, 'Độ dài tối đa là 100 ký tự'),
+  quote: yup.string().max(150, 'Độ dài tối đa là 150 ký tự'),
+  work: yup.string().max(100, 'Độ dài tối đa là 100 ký tự'),
+  school: yup.string().max(100, 'Độ dài tối đa là 100 ký tự'),
+  location: yup.string().max(100, 'Độ dài tối đa là 100 ký tự'),
+  password: schema.fields['password'] as yup.StringSchema<
+    string | undefined,
+    yup.AnyObject,
+    undefined,
+    ''
+  >
+});
+
+export type ProfileSchema = yup.InferType<typeof profile>;

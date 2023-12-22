@@ -1,42 +1,14 @@
 import { useRef, useState } from 'react';
 import IconProfile from '../IconProfile';
-import { calculateTextWidth } from 'src/utils/utils';
+import { handleTextAreaChange } from 'src/utils/helper';
 
-const maxTextAreaHeight = 48;
-const originalHeight = 24;
 export default function Conversation() {
   const [value, setValue] = useState<string>('');
   const send = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const onTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setValue(e.target.value);
-    if (textareaRef.current) {
-      // Check if it's only 1 line
-      const textAreaWidth = textareaRef.current.clientWidth;
-      const textWidth = calculateTextWidth(textareaRef);
-      if ((textWidth || 0) < textAreaWidth) {
-        return (textareaRef.current.style.height = `${originalHeight}px`);
-      }
-
-      // Calculate the new height
-      const newHeight = Math.min(
-        maxTextAreaHeight,
-        textareaRef.current.scrollHeight
-      );
-      // Set the new height to the textarea
-      textareaRef.current.style.height = `${newHeight}px`;
-
-      if (textareaRef.current.scrollHeight > maxTextAreaHeight) {
-        textareaRef.current.style.overflowY = 'scroll';
-      } else {
-        textareaRef.current.style.overflowY = 'hidden';
-      }
-    }
-  };
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   return (
     <div className='flex h-full w-full flex-col justify-between'>
@@ -125,8 +97,11 @@ export default function Conversation() {
 
         <div className='mx-2 my-2 flex h-12 flex-grow items-center justify-between rounded-full border'>
           <textarea
-            ref={textareaRef}
-            onChange={onTextChange}
+            ref={textAreaRef}
+            onChange={e => {
+              setValue(e.target.value);
+              handleTextAreaChange({ textAreaRef, originalHeight: 24 });
+            }}
             className='ml-4 h-6 basis-11/12 resize-none whitespace-pre-wrap bg-slate-50 px-2 text-sm font-normal text-gray-950 outline-none'
             placeholder='Write a message...'
             value={value}

@@ -7,6 +7,11 @@ interface GetProfile extends SuccessResponse {
   user: User;
 }
 
+interface Search {
+  users: User[];
+  posts: Post[];
+}
+
 interface Follower {
   _id: string;
   username: string;
@@ -26,10 +31,6 @@ interface GetProfileMaterial extends SuccessResponse {
   } & Post)[];
   followers: Follower[];
   following: Follower[];
-}
-
-interface GetCurrentUser extends SuccessResponse {
-  user: User;
 }
 
 const URL_BLOCK_ACCOUNT = 'user/block';
@@ -59,7 +60,7 @@ export const profileApi = {
     return http.put<SuccessResponse>(`user/unfollow/${followingId}/${userId}`);
   },
   getCurrentProfile: () => {
-    return http.get<GetCurrentUser>('current-user');
+    return http.get<GetProfile>('current-user');
   },
   blockAccount: (accountId: string) => {
     return http.put<SuccessResponse>(`${URL_BLOCK_ACCOUNT}/${accountId}`);
@@ -74,5 +75,42 @@ export const profileApi = {
     follows: boolean;
   }) => {
     return http.put<SuccessResponse>(`user/update-notification-settings`, body);
+  },
+  updateProfile: (body: {
+    facebook?: string | undefined;
+    twitter?: string | undefined;
+    quote?: string | undefined;
+    work?: string | undefined;
+    school?: string | undefined;
+    location?: string | undefined;
+  }) => {
+    return http.put<GetProfile>(`user/update-background-info`, body);
+  },
+  uploadImageProfile: (body: { image: string }) => {
+    return http.post<SuccessResponse>(`image/upload`, {
+      image: body.image
+    });
+  },
+  searchUsers: (
+    keyword: string,
+    type?: string,
+    signal?: AbortSignal,
+    date?: Date
+  ) => {
+    if (!type) {
+      return http.get<Search>(`search/post`, {
+        params: {
+          query: keyword,
+          date: date?.toISOString()
+        },
+        signal
+      });
+    }
+    return http.get<Search>(`user/search`, {
+      params: {
+        q: keyword
+      },
+      signal
+    });
   }
 };

@@ -22,7 +22,7 @@ export default function IconProfile(props: Props) {
 
   if (isImage) {
     return (
-      <div className={'block ' + className}>
+      <div className={'block shrink-0 ' + className}>
         <img
           src={src}
           alt='Profile User'
@@ -33,7 +33,7 @@ export default function IconProfile(props: Props) {
   }
 
   return (
-    <Link to={to} className={'block ' + className} onClick={onClick}>
+    <Link to={to} className={'block shrink-0 ' + className} onClick={onClick}>
       <img
         src={src}
         alt='Profile User'

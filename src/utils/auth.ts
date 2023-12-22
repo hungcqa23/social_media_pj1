@@ -18,11 +18,8 @@ export const getRefreshTokenFromLS = () =>
 
 export const clearLS = () => {
   localStorage.removeItem('refresh_token');
-
   localStorage.removeItem('access_token');
-
   localStorage.removeItem('profile');
-
   const clearLSEvent = new Event('clearLS');
   LocalStorageEventTarget.dispatchEvent(clearLSEvent);
 };

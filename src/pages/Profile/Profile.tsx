@@ -174,7 +174,7 @@ export default function Profile() {
   });
 
   return (
-    <main className='ml-auto w-[calc(100%-4.5rem)] lg:w-[calc(100%-14rem)]'>
+    <main className='ml-auto max-h-screen w-[calc(100%-4.5rem)] overflow-y-auto lg:w-[calc(100%-14rem)]'>
       <div className='mx-auto max-w-4xl px-5 pt-8'>
         {/* Header */}
         {isLoadingProfile && (
@@ -211,7 +211,7 @@ export default function Profile() {
                   {isProfile && (
                     <Link
                       to='/accounts/profile'
-                      className='rounded-lg bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900'
+                      className='rounded-lg bg-gray-300 px-3 py-2 text-sm font-semibold text-gray-900 hover:opacity-60'
                     >
                       Edit profile
                     </Link>
@@ -501,9 +501,8 @@ export default function Profile() {
                   <p className='mt-5 hidden text-sm font-medium text-black md:block'>
                     {userProfile?.fullname}
                   </p>
-                  <p className='mt-4 max-w-[22rem] whitespace-pre-wrap text-sm text-black'>
-                    𝑺𝒉𝒂𝒍𝒍 𝑰 𝒄𝒐𝒎𝒑𝒂𝒓𝒆 𝒚𝒐𝒖 𝒕𝒐 𝒂 𝒔𝒖𝒎𝒎𝒆𝒓’𝒔 𝒅𝒂𝒚. 𝑻𝒉𝒐𝒖 𝒂𝒓𝒕 𝒎𝒐𝒓𝒆 𝒍𝒐𝒗𝒆𝒍𝒚
-                    𝒂𝒏𝒅 𝒎𝒐𝒓𝒆 𝒕𝒆𝒎𝒑𝒆𝒓𝒂𝒕𝒆.
+                  <p className='mt-4 max-w-[22rem] whitespace-pre-wrap text-sm font-normal text-black'>
+                    {userProfile?.quote}
                   </p>
                 </>
               </section>
@@ -551,7 +550,7 @@ export default function Profile() {
                   listItems: posts || [],
                   mapFn: post => <PostItem key={post._id} post={post} />,
                   as: 'ul',
-                  className: 'mb-2 flex flex-col gap-2 items-center'
+                  className: 'mb-2 flex flex-col gap-4 items-center'
                 })}
 
               {/* Saved Post */}

@@ -3,7 +3,6 @@ import IconProfile from '../IconProfile';
 import { IComment } from 'src/types/comment.type';
 import {
   calculateTimeAgo,
-  formatDate,
   formatSocialNumber,
   handleTextAreaChange
 } from 'src/utils/helper';
@@ -132,7 +131,10 @@ export default function Comment({ comment }: Props) {
   const liked = reactions.some(reaction => reaction.userId === profile?._id);
 
   useEffect(() => {
-    if (isEditing) handleTextAreaChange(textAreaRef);
+    if (isEditing)
+      handleTextAreaChange({
+        textAreaRef
+      });
   }, [isEditing]);
 
   return (
@@ -180,7 +182,7 @@ export default function Comment({ comment }: Props) {
                   </div>
 
                   <button
-                    className='relative flex h-6 w-6 items-center justify-center'
+                    className='relative flex h-6 w-6 shrink-0 items-center justify-center'
                     onClick={() => {
                       if (!liked) likeCommentMutation.mutate();
                       else unlikeCommentMutation.mutate();
@@ -365,7 +367,10 @@ export default function Comment({ comment }: Props) {
                         placeholder='Write a comment...'
                         onChange={event => {
                           registerComment.onChange(event);
-                          handleTextAreaChange(textAreaRef);
+                          handleTextAreaChange({
+                            textAreaRef,
+                            originalHeight: 36
+                          });
                         }}
                         ref={e => {
                           registerComment.ref(e);

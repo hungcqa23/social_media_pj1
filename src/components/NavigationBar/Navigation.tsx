@@ -78,7 +78,7 @@ export default function Navigation(props: Props) {
     },
     {
       name: 'Search',
-      to: '/search?type=posts',
+      to: '/search',
       svg: iconsSvg.search,
       svgActive: iconsSvg.searchFilled
     },
