@@ -1,6 +1,12 @@
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import authApi from 'src/apis/auth.api';
 import Button from 'src/components/Button';
 import Input from 'src/components/Input';
+import { useQueryString } from 'src/hooks/useQueryString';
+import { clearLS } from 'src/utils/auth';
 import { getRules } from 'src/utils/rules';
 
 interface FormData {
@@ -15,11 +21,40 @@ export default function ResetPassword() {
     handleSubmit,
     formState: { errors }
   } = useForm<FormData>();
+  const { token } = useQueryString();
+  const navigate = useNavigate();
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: (body: {
+      password: string;
+      confirmPassword: string;
+      token: string;
+    }) => authApi.resetPassword(body)
+  });
 
   const rules = getRules(getValues);
   const onSubmit = handleSubmit(
     data => {
-      console.log(data);
+      resetPasswordMutation.mutate(
+        { ...data, token: token || '' },
+        {
+          onSuccess: data => {
+            clearLS();
+            toast.success('Reset password successfully', {
+              position: toast.POSITION.TOP_RIGHT
+            });
+
+            setTimeout(() => {
+              navigate('/login');
+            });
+          },
+          onError: () => {
+            toast.error('Reset password failed. Please try again', {
+              position: toast.POSITION.TOP_RIGHT
+            });
+          }
+        }
+      );
     },
     data => {
       console.log(data);
@@ -53,6 +88,7 @@ export default function ResetPassword() {
           placeholder='Confirm password...'
           ruleName={rules.confirmPassword}
           errorMessage={errors.confirmPassword?.message}
+          classNameError='ml-1 mt-1 min-h-[3rem] text-sm font-medium text-red-600'
         />
 
         <Button

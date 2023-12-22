@@ -87,18 +87,18 @@ export const schema = object({
   username: yup
     .string()
     .required('Username is required')
-    .min(5, 'The length of username should be 5 - 100 characters')
-    .max(100, 'The length of username should be 5 - 100 characters'),
+    .min(4, 'The length of username should be 4 - 20 characters')
+    .max(20, 'The length of username should be 4 - 20 characters'),
   password: yup
     .string()
     .required('Password is required')
-    .min(5, 'The length of password should be 5 - 255 characters')
-    .max(255, 'The length of password should be 5 - 255 characters'),
+    .min(4, 'The length of password should be 4 - 255 characters')
+    .max(255, 'The length of password should be 4 - 255 characters'),
   confirmPassword: yup
     .string()
     .required('Confirm password is required')
-    .min(5, 'The length of confirm password should be 5 - 255 characters')
-    .max(255, 'The length of confirm password should be 5 - 255 characters')
+    .min(4, 'The length of confirm password should be 4 - 255 characters')
+    .max(255, 'The length of confirm password should be 4 - 255 characters')
     .oneOf([ref('password')], 'Password confirm do not match')
 });
 
@@ -106,5 +106,20 @@ export interface Schema extends InferType<typeof schema> {
   confirmPassword: string;
 }
 
-//Make rulesType to interface
-// export interface rulesType extends Pick<Schema, 'password' | 'confirmPassword'> {}
+export const profile = yup.object({
+  facebook: yup.string().max(100, 'Độ dài tối đa là 100 ký tự'),
+  youtube: yup.string().max(100, 'Độ dài tối đa là 100 ký tự'),
+  twitter: yup.string().max(100, 'Độ dài tối đa là 100 ký tự'),
+  quote: yup.string().max(150, 'Độ dài tối đa là 150 ký tự'),
+  work: yup.string().max(100, 'Độ dài tối đa là 100 ký tự'),
+  school: yup.string().max(100, 'Độ dài tối đa là 100 ký tự'),
+  location: yup.string().max(100, 'Độ dài tối đa là 100 ký tự'),
+  password: schema.fields['password'] as yup.StringSchema<
+    string | undefined,
+    yup.AnyObject,
+    undefined,
+    ''
+  >
+});
+
+export type ProfileSchema = yup.InferType<typeof profile>;

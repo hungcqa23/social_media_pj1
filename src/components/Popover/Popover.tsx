@@ -9,7 +9,9 @@ import {
   autoUpdate,
   useClick,
   useInteractions,
-  offset
+  offset,
+  useHover,
+  safePolygon
 } from '@floating-ui/react';
 // import { motion } from 'framer-motion';
 import { ElementType, useId, useRef, useState } from 'react';
@@ -33,7 +35,7 @@ export default function Popover({
   as: Element = 'div',
   renderPopover,
   placement = 'top',
-  offsetNum = 5,
+  offsetNum = 0,
   initialOpen = false
 }: Props) {
   const [isOpen, setIsOpen] = useState(initialOpen);
@@ -54,14 +56,15 @@ export default function Popover({
     ]
   });
 
+  // const hover = useHover(context, { handleClose: safePolygon() });
   const click = useClick(context);
   const { getReferenceProps, getFloatingProps } = useInteractions([click]);
 
   return (
     <Element
+      className={className}
       {...getReferenceProps()}
       ref={refs.setReference}
-      className={className}
     >
       {children}
 

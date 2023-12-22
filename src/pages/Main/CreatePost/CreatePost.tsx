@@ -1,27 +1,24 @@
 import { useState } from 'react';
-import Dialog from '../Dialog';
-import IconProfile from '../IconProfile';
+import Dialog from '../../../components/Dialog';
+import IconProfile from '../../../components/IconProfile';
 import Modal from '../Modal';
 import { useAppContext } from 'src/contexts/app.contexts';
-// import { useDialogManager } from 'src/hooks/useDialogManager';
-
 export default function CreatePost() {
-  const { profile, setProfile } = useAppContext();
+  const { profile } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
   const [includesMedia, setIncludesMedia] = useState(false);
-
   const handleClick = () => {
     setIsOpen(true);
     setIncludesMedia(true);
   };
 
   return (
-    <div className='mb-4 h-36 w-[34rem] max-w-full rounded-md border shadow'>
+    <div className='mb-4 w-[34rem] max-w-full rounded-md border shadow'>
       <div className='p-4'>
         <div className='flex items-center gap-2 border-b pb-3'>
           <IconProfile
-            to={`${profile?.username}`}
             src={profile?.profilePicture}
+            className='h-11 w-11 shrink-0'
           />
 
           <Dialog
@@ -38,8 +35,8 @@ export default function CreatePost() {
             }
           >
             <div className='py-2 pl-3'>
-              <span className='block text-left text-base font-normal text-gray-500'>
-                {`What's on your thought, ${profile?.fullname} ?`}
+              <span className='line-clamp-1 text-left text-sm font-normal text-gray-500 md:text-base'>
+                {`What's on your thought, ${profile?.fullname}`}
               </span>
             </div>
           </Dialog>

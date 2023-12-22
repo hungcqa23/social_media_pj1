@@ -15,9 +15,13 @@ export default function YourContent() {
 
   return (
     <>
-      <h1 className='mb-6 mt-8 text-2xl font-normal text-gray-900'>Who can see your content</h1>
+      <h1 className='mb-6 mt-8 text-2xl font-normal text-gray-900'>
+        Who can see your content
+      </h1>
       <div className='border-b border-t py-4'>
-        <p className='mb-2 text-base font-medium text-gray-900'>Blocked accounts</p>
+        <p className='mb-2 text-base font-medium text-gray-900'>
+          Blocked accounts
+        </p>
         <Link
           to={`/accounts/${path.blocked_accounts}`}
           className='text-sm font-medium text-blue-500'

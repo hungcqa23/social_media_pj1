@@ -28,7 +28,7 @@ export default function Dialog({
   as: Element = 'div',
   isOpen,
   setIsOpen,
-  classNameOverlay = 'flex items-center justify-center bg-black/80'
+  classNameOverlay = 'flex items-center justify-center bg-black/70'
 }: Props) {
   const { refs, context } = useFloating({
     open: isOpen,

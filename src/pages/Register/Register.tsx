@@ -1,9 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import authApi from 'src/apis/auth.api';
 import Button from 'src/components/Button';
 import Input from 'src/components/Input';
+import path from 'src/constants/path';
 import { getRules } from 'src/utils/rules';
 
 interface FormData {
@@ -15,6 +17,7 @@ interface FormData {
 
 export default function Register() {
   const {
+    reset,
     register,
     handleSubmit,
     getValues,
@@ -23,12 +26,27 @@ export default function Register() {
 
   const rules = getRules(getValues);
   const signUpMutation = useMutation({
-    mutationFn: (body: FormData) => authApi.registerAccount(body)
+    mutationFn: (body: Pick<FormData, 'email' | 'password' | 'username'>) =>
+      authApi.registerAccount(body)
   });
 
   const onSubmit = handleSubmit(
     data => {
-      signUpMutation.mutate(data);
+      signUpMutation.mutate(
+        {
+          username: data.username,
+          email: data.email,
+          password: data.password
+        },
+        {
+          onSuccess: () => {
+            reset(),
+              toast.success('Register successfully', {
+                position: toast.POSITION.TOP_RIGHT
+              });
+          }
+        }
+      );
     },
     data => {
       console.log(data);
@@ -37,14 +55,14 @@ export default function Register() {
 
   return (
     <>
-      <h1 className='mb-8 text-center text-4xl font-semibold drop-shadow-font md:mb-10 md:text-5xl lg:-mx-40 lg:text-6xl'>
+      <h1 className='mb-8 text-center font-cookie text-4xl font-semibold drop-shadow-font md:mb-10 md:text-5xl lg:-mx-40 lg:text-5xl'>
         Create account
       </h1>
 
       <form className='flex flex-col' onSubmit={onSubmit} noValidate>
         <Input
           type='text'
-          placeholder='Username'
+          placeholder='Username...'
           name='username'
           register={register}
           ruleName={rules.username}
@@ -53,7 +71,7 @@ export default function Register() {
 
         <Input
           type='email'
-          placeholder='Email'
+          placeholder='Email...'
           name='email'
           register={register}
           ruleName={rules.email}
@@ -62,7 +80,7 @@ export default function Register() {
 
         <Input
           type='password'
-          placeholder='Password'
+          placeholder='Password...'
           name='password'
           register={register}
           ruleName={rules.password}
@@ -71,7 +89,7 @@ export default function Register() {
 
         <Input
           type='password'
-          placeholder='Confirm password'
+          placeholder='Confirm password...'
           name='confirmPassword'
           register={register}
           ruleName={rules.confirmPassword}
@@ -79,16 +97,18 @@ export default function Register() {
         />
 
         <Button
-          className='rounded-lg bg-black px-4 py-3 text-sm font-normal text-white md:px-5 md:py-4 md:text-base md:font-semibold'
+          className='flex items-center justify-center gap-1 rounded bg-black px-2 py-3 text-sm font-normal text-white md:px-4 md:py-3 md:text-sm md:font-semibold'
+          type='submit'
+          isLoading={signUpMutation.isPending}
           disabled={signUpMutation.isPending}
         >
           Create account
         </Button>
 
-        <p className='mt-10 text-center text-sm font-medium text-gray-500 md:text-base'>
+        <p className='mt-10 text-center text-sm font-medium text-gray-500'>
           Already have an account?{' '}
           <Link
-            to={'/login'}
+            to={path.login}
             className='font-medium text-black hover:underline'
           >
             Log in

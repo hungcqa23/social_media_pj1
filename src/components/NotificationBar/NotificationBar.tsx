@@ -1,6 +1,12 @@
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import IconProfile from '../IconProfile';
 import Button from '../Button';
+import classNames from 'classnames';
+import { useQueryString } from 'src/hooks/useQueryString';
+import { useQuery } from '@tanstack/react-query';
+import { notificationApi } from 'src/apis/notification.api';
+import List from '../List';
+import NotificationItem from './NotificationItem';
 
 interface Props {
   className?: string;
@@ -10,6 +16,22 @@ export default function NotificationBar({
   className = 'ml-[4.5rem] flex lg:ml-56 bg-white',
   children
 }: Props) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryStr = useQueryString();
+  const { type } = queryStr;
+  const { data: notificationsData, isLoading } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => notificationApi.getAllNotifications()
+  });
+
+  const notifications =
+    (type === 'unread'
+      ? notificationsData?.data?.notification.filter(
+          notification => notification.read === false
+        )
+      : notificationsData?.data?.notification) || [];
+  console.log(notifications);
+
   return (
     <div className={className}>
       <nav className='flex h-screen min-w-fit flex-col border-r'>
@@ -17,11 +39,17 @@ export default function NotificationBar({
         <p className='mb-2 ml-9 mr-12 mt-12 text-2xl font-bold text-black'>
           Notifications
         </p>
-        <div className='flex gap-2 border-t border-gray-200 pl-9 pt-2'>
+        <div className='flex gap-2 border-t border-gray-200 pl-6 pt-2'>
           <Button
             typeButton='filter'
             value='all'
-            className='w-18 py-2 hover:rounded-full hover:bg-gray-200'
+            className={classNames('w-18 rounded-full py-2', {
+              'border border-gray-600': !type
+            })}
+            onClick={() => {
+              searchParams.delete('type');
+              setSearchParams(searchParams);
+            }}
           >
             <span className='text-sm font-semibold text-gray-950'>All</span>
           </Button>
@@ -29,162 +57,64 @@ export default function NotificationBar({
           <Button
             typeButton='filter'
             value='unread'
-            className='w-20 py-2 hover:rounded-full hover:bg-gray-200'
+            className={classNames('w-18 rounded-full py-2', {
+              'border border-gray-600': type
+            })}
+            onClick={() => {
+              searchParams.set('type', 'unread');
+              setSearchParams(searchParams);
+            }}
           >
             <span className='text-sm font-semibold text-gray-950'>Unread</span>
           </Button>
         </div>
-        <Link to={'#'} className='block w-full hover:bg-gray-50'>
-          <div className='mx-9 my-4 flex flex-col gap-1'>
-            <div className='flex'>
-              <IconProfile
-                className='mr-3 h-16 w-16'
-                classNameImage='h-16 w-16'
-                isImage
-              />
-              <div className='flex flex-grow flex-col justify-between text-sm font-normal'>
-                <p>
-                  <span className='font-medium'>TaylorSwitch</span> and{' '}
-                  <span className='font-medium'>3 others</span> liked your post.
-                </p>
-                <span className='font-medium text-blue-500'>6 hours ago</span>
+
+        {isLoading && (
+          <ul>
+            <div className='mx-9 my-4'>
+              <div className='flex w-full items-center gap-2'>
+                <div className='h-12 w-12 animate-pulse rounded-full bg-slate-200' />
+                <div className='flex flex-grow flex-col gap-2'>
+                  <div className='h-4 flex-grow animate-pulse rounded-full bg-slate-200' />
+                  <div className='h-4 flex-grow animate-pulse rounded-full bg-slate-200' />
+                </div>
               </div>
             </div>
-          </div>
-        </Link>
-        <Link to={'#'} className='block w-full hover:bg-gray-50'>
-          <div className='mx-9 my-4 flex flex-col justify-center gap-1'>
-            <div className='flex items-center'>
-              <IconProfile
-                className='mr-3 flex h-16 w-16'
-                classNameImage='h-16 w-16'
-                isImage
-              />
-              <div className='flex flex-grow flex-col justify-between text-sm font-normal'>
-                <p className='w-64'>
-                  <span className='font-medium'>TaylorSwitch</span> and{' '}
-                  <span className='font-medium'>3 others</span> liked your
-                  comment on your post.
-                </p>
-                <span className='font-medium text-blue-500'>6 hours ago</span>
+            <div className='mx-9 my-4'>
+              <div className='flex w-full items-center gap-2'>
+                <div className='h-12 w-12 animate-pulse rounded-full bg-slate-200' />
+                <div className='flex flex-grow flex-col gap-2'>
+                  <div className='h-4 flex-grow animate-pulse rounded-full bg-slate-200' />
+                  <div className='h-4 flex-grow animate-pulse rounded-full bg-slate-200' />
+                </div>
               </div>
             </div>
-          </div>
-        </Link>
-        <Link to={'#'} className='block w-full hover:bg-gray-50'>
-          <div className='mx-9 my-4 flex flex-col justify-center gap-1'>
-            <div className='flex items-center'>
-              <IconProfile
-                className='mr-3 flex h-16 w-16'
-                classNameImage='h-16 w-16'
-                isImage
-              />
-              <div className='flex flex-grow flex-col justify-between text-sm font-normal'>
-                <p className='w-64'>
-                  <span className='font-medium'>TaylorSwitch</span> and{' '}
-                  <span className='font-medium'>3 others</span> liked your
-                  comment on your post.
-                </p>
-                <span className='font-medium text-blue-500'>6 hours ago</span>
+            <div className='mx-9 my-4'>
+              <div className='flex w-full items-center gap-2'>
+                <div className='h-12 w-12 animate-pulse rounded-full bg-slate-200' />
+                <div className='flex flex-grow flex-col gap-2'>
+                  <div className='h-4 flex-grow animate-pulse rounded-full bg-slate-200' />
+                  <div className='h-4 flex-grow animate-pulse rounded-full bg-slate-200' />
+                </div>
               </div>
             </div>
-          </div>
-        </Link>{' '}
-        <Link to={'#'} className='block w-full hover:bg-gray-50'>
-          <div className='mx-9 my-4 flex flex-col justify-center gap-1'>
-            <div className='flex items-center'>
-              <IconProfile
-                className='mr-3 flex h-16 w-16'
-                classNameImage='h-16 w-16'
-                isImage
+          </ul>
+        )}
+
+        {!isLoading &&
+          List({
+            listItems: notifications,
+            mapFn: notification => (
+              <NotificationItem
+                key={notification._id}
+                notification={notification}
               />
-              <div className='flex flex-grow flex-col justify-between text-sm font-normal'>
-                <p className='w-64'>
-                  <span className='font-medium'>TaylorSwitch</span> and{' '}
-                  <span className='font-medium'>3 others</span> liked your
-                  comment on your post.
-                </p>
-                <span className='font-medium text-blue-500'>6 hours ago</span>
-              </div>
-            </div>
-          </div>
-        </Link>{' '}
-        <Link to={'#'} className='block w-full hover:bg-gray-50'>
-          <div className='mx-9 my-4 flex flex-col justify-center gap-1'>
-            <div className='flex items-center'>
-              <IconProfile
-                className='mr-3 flex h-16 w-16'
-                classNameImage='h-16 w-16'
-                isImage
-              />
-              <div className='flex flex-grow flex-col justify-between text-sm font-normal'>
-                <p className='w-64'>
-                  <span className='font-medium'>TaylorSwitch</span> and{' '}
-                  <span className='font-medium'>3 others</span> liked your
-                  comment on your post.
-                </p>
-                <span className='font-medium text-blue-500'>6 hours ago</span>
-              </div>
-            </div>
-          </div>
-        </Link>{' '}
-        <Link to={'#'} className='block w-full hover:bg-gray-50'>
-          <div className='mx-9 my-4 flex flex-col justify-center gap-1'>
-            <div className='flex items-center'>
-              <IconProfile
-                className='mr-3 flex h-16 w-16'
-                classNameImage='h-16 w-16'
-                isImage
-              />
-              <div className='flex flex-grow flex-col justify-between text-sm font-normal'>
-                <p className='w-64'>
-                  <span className='font-medium'>TaylorSwitch</span> and{' '}
-                  <span className='font-medium'>3 others</span> liked your
-                  comment on your post.
-                </p>
-                <span className='font-medium text-blue-500'>6 hours ago</span>
-              </div>
-            </div>
-          </div>
-        </Link>{' '}
-        <Link to={'#'} className='block w-full hover:bg-gray-50'>
-          <div className='mx-9 my-4 flex flex-col justify-center gap-1'>
-            <div className='flex items-center'>
-              <IconProfile
-                className='mr-3 flex h-16 w-16'
-                classNameImage='h-16 w-16'
-                isImage
-              />
-              <div className='flex flex-grow flex-col justify-between text-sm font-normal'>
-                <p className='w-64'>
-                  <span className='font-medium'>TaylorSwitch</span> and{' '}
-                  <span className='font-medium'>3 others</span> liked your
-                  comment on your post.
-                </p>
-                <span className='font-medium text-blue-500'>6 hours ago</span>
-              </div>
-            </div>
-          </div>
-        </Link>{' '}
-        <Link to={'#'} className='block w-full hover:bg-gray-50'>
-          <div className='mx-9 my-4 flex flex-col justify-center gap-1'>
-            <div className='flex items-center'>
-              <IconProfile
-                className='mr-3 flex h-16 w-16'
-                classNameImage='h-16 w-16'
-                isImage
-              />
-              <div className='flex flex-grow flex-col justify-between text-sm font-normal'>
-                <p className='w-64'>
-                  <span className='font-medium'>TaylorSwitch</span> and{' '}
-                  <span className='font-medium'>3 others</span> liked your
-                  comment on your post.
-                </p>
-                <span className='font-medium text-blue-500'>6 hours ago</span>
-              </div>
-            </div>
-          </div>
-        </Link>
+            ),
+            as: 'ul',
+            className: classNames('', {
+              'mt-2': notifications.length > 0
+            })
+          })}
       </nav>
     </div>
   );

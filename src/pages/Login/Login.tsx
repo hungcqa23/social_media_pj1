@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation } from '@tanstack/react-query';
@@ -7,11 +7,16 @@ import { toast } from 'react-toastify';
 import Button from 'src/components/Button';
 import Input from 'src/components/Input';
 import authApi from 'src/apis/auth.api';
-import { setAccessTokenToLS, setProfileToLS } from 'src/utils/auth';
+import {
+  getProfileFromLS,
+  setAccessTokenToLS,
+  setProfileToLS
+} from 'src/utils/auth';
 import { ErrorResponse } from 'src/types/utils.type';
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils';
 import { schema } from 'src/utils/rules';
 import { useAppContext } from 'src/contexts/app.contexts';
+import path from 'src/constants/path';
 
 interface FormData {
   username: string;
@@ -21,8 +26,7 @@ interface FormData {
 const loginSchema = schema.pick(['username', 'password']);
 
 export default function Login() {
-  const navigate = useNavigate();
-  const { setIsAuthenticated } = useAppContext();
+  const { setIsAuthenticated, setProfile } = useAppContext();
 
   const {
     register,
@@ -40,18 +44,17 @@ export default function Login() {
   const onSubmit = handleSubmit(data => {
     loginMutation.mutate(data, {
       onSuccess: data => {
-        console.log(data.request);
+        setAccessTokenToLS(data.data.token as string);
         toast.success('Login successfully', {
           position: toast.POSITION.TOP_RIGHT
         });
+        setProfile(data.data.user);
+        setProfileToLS(data.data.user);
         setTimeout(() => {
-          setAccessTokenToLS(data.data.token as string);
-          setProfileToLS(data.data.user);
           setIsAuthenticated(true);
-          navigate('/');
         }, 1000);
       },
-      // Handle error
+
       onError: (error: unknown) => {
         toast.error('Login failed', {
           position: toast.POSITION.TOP_RIGHT
@@ -98,22 +101,26 @@ export default function Login() {
           />
           <Link
             to={'/forgot-password'}
-            className='self-end text-sm font-normal italic text-black hover:underline md:text-base md:font-semibold'
+            className='self-end text-sm font-normal italic text-black hover:underline md:font-semibold'
           >
             Forget password?
           </Link>
         </div>
 
-        <Button className='rounded-lg bg-black px-4 py-3 text-sm font-normal text-white md:px-5 md:py-4 md:text-base md:font-semibold'>
-          Log in
+        <Button
+          className='flex items-center justify-center gap-1 rounded bg-black px-2 py-3 text-sm font-normal text-white md:px-4 md:py-3 md:text-sm md:font-semibold'
+          isLoading={loginMutation.isPending}
+          disabled={loginMutation.isPending}
+        >
+          Login
         </Button>
       </form>
 
-      <p className='mt-10 text-center text-sm font-medium text-gray-500 md:text-base'>
+      <p className='mt-10 text-center text-sm font-medium text-gray-500 md:text-sm'>
         Don&apos;t have an account?
         <Link
-          to={'/sign-up'}
-          className='text-sm font-normal italic text-black hover:underline md:text-base md:font-semibold'
+          to={path.register}
+          className='text-sm font-normal text-black hover:underline md:text-sm md:font-semibold'
         >
           Sign up
         </Link>

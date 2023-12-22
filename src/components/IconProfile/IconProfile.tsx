@@ -1,6 +1,5 @@
-import { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { AppContext } from 'src/contexts/app.contexts';
+import { useAppContext } from 'src/contexts/app.contexts';
 
 interface Props {
   className?: string;
@@ -8,19 +7,22 @@ interface Props {
   to?: string;
   src?: string;
   isImage?: boolean;
+  onClick?: () => void;
 }
 export default function IconProfile(props: Props) {
+  const { profile } = useAppContext();
   const {
     className = 'h-11 w-11',
     classNameImage = 'h-full w-full',
     src = '/src/assets/images/user.jpg',
-    to = '/',
-    isImage
+    to = `${profile?._id}`,
+    isImage,
+    onClick
   } = props;
 
   if (isImage) {
     return (
-      <div className={'block ' + className}>
+      <div className={'block shrink-0 ' + className}>
         <img
           src={src}
           alt='Profile User'
@@ -31,7 +33,7 @@ export default function IconProfile(props: Props) {
   }
 
   return (
-    <Link to={to} className={'block ' + className}>
+    <Link to={to} className={'block shrink-0 ' + className} onClick={onClick}>
       <img
         src={src}
         alt='Profile User'

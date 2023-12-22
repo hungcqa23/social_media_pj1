@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import Profile from '../IconProfile';
-import List from '../List';
+import Profile from '../../../components/IconProfile';
+import List from '../../../components/List';
 import SuggestedFriend from '../SuggestedFriend';
 import { useAppContext } from 'src/contexts/app.contexts';
 
@@ -49,7 +49,8 @@ export default function SuggestedBar() {
       <div className='mt-9 flex flex-col gap-6'>
         {/* Profile */}
         <div className='flex items-center gap-2 px-4'>
-          <Profile src={profile?.profilePicture} />
+          <Profile src={profile?.profilePicture} to={`/${profile?._id}`} />
+
           <div className='flex flex-col'>
             <Link
               to={`/${profile?.username.toLowerCase()}`}

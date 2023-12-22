@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import Profile from '../IconProfile';
+import Profile from '../../../components/IconProfile';
 import { useState } from 'react';
 
 interface Props {
@@ -18,7 +18,9 @@ export default function SuggestedFriend(props: Props) {
     to = '/profile'
   } = props;
 
-  let userFollowStr = `Followed by ${followers[0]} + ${followers.length - 1} more`;
+  let userFollowStr = `Followed by ${followers[0]} + ${
+    followers.length - 1
+  } more`;
   if (userFollowStr.length > 28) {
     userFollowStr = userFollowStr.slice(0, 27) + '...';
   }

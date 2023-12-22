@@ -1,23 +1,27 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { iconsSvg } from 'src/constants/icons';
 import ButtonNav from '../ButtonNav/ButtonNav';
 import { isActiveRoute } from 'src/utils/utils';
 import Popover from '../Popover';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import authApi from 'src/apis/auth.api';
 import { useAppContext } from 'src/contexts/app.contexts';
 import { clearLS } from 'src/utils/auth';
 import NotificationBar from '../NotificationBar';
 
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import {
+  FloatingOverlay,
   FloatingPortal,
   autoUpdate,
   flip,
   offset,
   shift,
-  useFloating
+  useDismiss,
+  useFloating,
+  useInteractions
 } from '@floating-ui/react';
+import { notificationApi } from 'src/apis/notification.api';
 
 interface Props {
   classNameNav?: string;
@@ -36,26 +40,24 @@ interface LinkProps {
 }
 export default function Navigation(props: Props) {
   const [isNotificationBarOpen, setIsNotificationBarOpen] = useState(false);
-
   const location = useLocation();
   const id = useId();
+  const { profile, setIsAuthenticated, setProfile } = useAppContext();
+
   const isShorten =
     isActiveRoute(location.pathname, 'messages') || isNotificationBarOpen;
-
-  const { setIsAuthenticated } = useAppContext();
 
   const logoutMutation = useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
+      setProfile(null);
       setIsAuthenticated(false);
     },
     onError: () => {
-      window.location.reload();
+      setIsAuthenticated(false);
       clearLS();
     }
   });
-
-  const { profile } = useAppContext();
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -76,7 +78,7 @@ export default function Navigation(props: Props) {
     },
     {
       name: 'Search',
-      to: '/search?type=posts',
+      to: '/search',
       svg: iconsSvg.search,
       svgActive: iconsSvg.searchFilled
     },
@@ -95,14 +97,14 @@ export default function Navigation(props: Props) {
     },
     {
       name: 'Profile',
-      to: `${profile?.username.toLowerCase()}?type=posts`,
-      svg: iconsSvg.user,
-      svgActive: iconsSvg.user,
+      to: `${profile?._id}`,
+      svg: profile?.profilePicture || '',
+      svgActive: profile?.profilePicture || '',
       isProfile: true
     }
   ];
 
-  const { refs, floatingStyles } = useFloating({
+  const { refs, floatingStyles, context } = useFloating({
     open: isNotificationBarOpen,
     onOpenChange: setIsNotificationBarOpen,
     placement: 'left',
@@ -110,6 +112,14 @@ export default function Navigation(props: Props) {
     whileElementsMounted: autoUpdate,
     middleware: [shift(), flip(), offset(13)]
   });
+  const dismiss = useDismiss(context);
+  const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);
+  const { data } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => notificationApi.getAllNotifications()
+  });
+  const hasNotifications =
+    data?.data.notification.some(notification => !notification.read) || false;
 
   return (
     <nav className={classNameNav}>
@@ -133,7 +143,11 @@ export default function Navigation(props: Props) {
           {Links.map(link => {
             if (link?.isButton && link?.name === 'Notifications') {
               return (
-                <div key={link.name} ref={refs.setReference}>
+                <div
+                  key={link.name}
+                  ref={refs.setReference}
+                  {...getReferenceProps()}
+                >
                   <ButtonNav
                     text={link.name}
                     svg={iconsSvg.notification}
@@ -144,12 +158,17 @@ export default function Navigation(props: Props) {
                     onClick={() => {
                       setIsNotificationBarOpen(prev => !prev);
                     }}
+                    hasNotification={hasNotifications}
                   />
 
                   {isNotificationBarOpen && (
                     <FloatingPortal id={id}>
-                      <div style={floatingStyles} ref={refs.setFloating}>
-                        <NotificationBar className='overflow-y-auto bg-white shadow-[5px_0px_11px_-1px_rgba(0,0,0,0.2)]' />
+                      <div
+                        style={floatingStyles}
+                        ref={refs.setFloating}
+                        {...getFloatingProps()}
+                      >
+                        <NotificationBar className='min-h-[20rem] overflow-y-auto bg-white shadow-[5px_0px_11px_-1px_rgba(0,0,0,0.2)] md:min-w-[24rem]' />
                       </div>
                     </FloatingPortal>
                   )}
@@ -174,7 +193,6 @@ export default function Navigation(props: Props) {
         </div>
 
         <Popover
-          hasArrow={true}
           placement='top-start'
           renderPopover={
             <div className='rounded-lg bg-white shadow-[0_0_10px_rgba(0,0,0,0.25)]'>
@@ -184,13 +202,14 @@ export default function Navigation(props: Props) {
                   svg={iconsSvg.setting}
                   to='/accounts/profile'
                 />
-                {/* <ButtonNav isButton text='Your activity' /> */}
+
                 <ButtonNav
-                  to={`/${profile?.username.toLowerCase()}?type=saved`}
+                  to={`/${profile?._id}/saved`}
                   text='Saved'
                   svg={iconsSvg.saved}
                 />
               </div>
+
               <div className='flex w-full justify-center border-t py-2'>
                 <ButtonNav
                   isButton

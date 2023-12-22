@@ -13,7 +13,6 @@ interface FormData {
 const forgotPasswordSchema = schema.pick(['email']);
 export default function ForgotPassword() {
   const {
-    getValues,
     register,
     handleSubmit,
     reset,
@@ -24,13 +23,13 @@ export default function ForgotPassword() {
 
   const forgotPasswordMutation = useMutation({
     mutationFn: (body: FormData) => authApi.forgotPassword(body),
-    onSuccess: data => {
+    onSuccess: () => {
       toast.success('Forgot password successfully. Please check your email', {
         position: toast.POSITION.TOP_RIGHT
       });
     },
     onError: () => {
-      toast.error('Please check your email', {
+      toast.error('Please try again', {
         position: toast.POSITION.TOP_RIGHT
       });
     }
@@ -45,7 +44,7 @@ export default function ForgotPassword() {
 
   return (
     <>
-      <h1 className='mb-8 text-center text-4xl font-semibold drop-shadow-font md:mb-10 md:text-5xl lg:-mx-40 lg:text-6xl'>
+      <h1 className='mb-8 text-center font-cookie text-4xl font-semibold drop-shadow-font md:mb-10 md:text-5xl lg:-mx-40 lg:text-5xl'>
         Forgot password
       </h1>
 
@@ -69,8 +68,10 @@ export default function ForgotPassword() {
         />
 
         <Button
-          className='mt-2 rounded-lg bg-black px-4 py-3 text-sm font-normal text-white md:px-5 md:py-4 md:text-base md:font-semibold'
+          className='flex items-center justify-center gap-1 rounded bg-black px-2 py-3 text-sm font-normal text-white md:px-4 md:py-3 md:text-sm md:font-semibold'
           type='submit'
+          isLoading={forgotPasswordMutation.isPending}
+          disabled={forgotPasswordMutation.isPending}
         >
           Submit
         </Button>

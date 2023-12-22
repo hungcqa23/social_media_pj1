@@ -2,7 +2,6 @@ import { NavLink, Outlet } from 'react-router-dom';
 
 const Links = [
   { name: 'Edit profile', path: '/accounts/profile' },
-  { name: 'Email notification', path: '/accounts/emails' },
   { name: 'Push notifications', path: '/accounts/notifications' },
   {
     name: 'Who can see your content',
@@ -14,7 +13,7 @@ const Links = [
 export default function SettingLayout() {
   return (
     <div className='ml-[4.5rem] flex lg:ml-56'>
-      <nav className='flex h-screen w-72 min-w-fit flex-col border-r'>
+      <nav className='flex h-screen w-52 flex-col border-r md:w-72'>
         <p className='mb-2 ml-9 mr-12 mt-10 text-xl font-bold text-black'>
           Settings
         </p>
@@ -35,7 +34,7 @@ export default function SettingLayout() {
         </div>
       </nav>
 
-      <div className='h-screen flex-grow px-10 py-10'>
+      <div className='h-screen flex-grow overflow-y-auto overflow-x-hidden p-0 md:p-10'>
         <Outlet />
       </div>
     </div>

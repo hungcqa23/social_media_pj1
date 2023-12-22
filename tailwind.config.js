@@ -1,6 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  content: [
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
+    './node_modules/tailwind-datepicker-react/dist/**/*.js'
+  ],
   theme: {
     extend: {
       dropShadow: {
@@ -18,6 +22,12 @@ export default {
       },
       flexGrow: {
         2: 2
+      },
+      transitionProperty: {
+        height: 'height'
+      },
+      transitionTimingFunction: {
+        normal: 'cubic-bezier(0.25, 0.1, 0.25, 1.0)'
       }
     }
   },

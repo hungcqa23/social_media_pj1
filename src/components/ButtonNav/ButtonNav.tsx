@@ -1,8 +1,11 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { isActiveRoute } from 'src/utils/utils';
+import classNames from 'classnames';
+import { useAppContext } from 'src/contexts/app.contexts';
 
 interface Props {
+  children?: React.ReactNode;
   svg: string;
   svgActive?: string;
   text: string;
@@ -15,6 +18,7 @@ interface Props {
   classNameText?: string;
   isOpen?: boolean;
   onClick?: () => void;
+  hasNotification?: boolean;
 }
 
 export default function ButtonNav(props: Props) {
@@ -22,7 +26,9 @@ export default function ButtonNav(props: Props) {
   let lgImg = 'lg:ml-2 lg:w-6';
   let lgP = 'lg:block lg:font-medium lg:ml-2';
 
-  const { shorten } = props;
+  const { profile } = useAppContext();
+  const { shorten, children } = props;
+
   if (shorten) {
     lgNavLink = '';
     lgImg = '';
@@ -37,12 +43,15 @@ export default function ButtonNav(props: Props) {
     isProfile,
     classNameText,
     className = ({ isActive }: { isActive: boolean }) =>
-      `${
-        isActive ? 'border border-gray-300 font-medium' : ''
-      } flex h-12 w-12 items-center 
+      classNames(
+        `flex h-12 w-12 items-center 
     justify-center gap rounded-lg 
     transition-all hover:bg-gray-200 ${lgNavLink} active:bg-gray-100`,
-    classNameButton = `flex h-12 w-12 items-center 
+        {
+          'border border-gray-300 font-medium': isActive
+        }
+      ),
+    classNameButton = `flex relative h-12 w-12 items-center 
     justify-center gap rounded-lg 
     transition-all hover:bg-gray-200 ${lgNavLink} active:bg-gray-100`,
     isButton,
@@ -52,10 +61,11 @@ export default function ButtonNav(props: Props) {
   const [isHover, setIsHover] = useState(false);
 
   const pathname = useLocation().pathname;
-
   const isActive =
-    isActiveRoute(pathname, text.toLowerCase()) ||
-    (text === 'Home' && pathname === '/');
+    isActiveRoute(pathname, text?.toLowerCase()) ||
+    (text === 'Home' && pathname === '/') ||
+    (pathname === `/${profile?._id}` &&
+      text.toLowerCase() === profile?.username);
 
   if (isButton) {
     return (
@@ -66,19 +76,28 @@ export default function ButtonNav(props: Props) {
         onClick={onClick}
       >
         <div
-          className={`${isHover && 'scale-105'} ${
-            isOpen && 'scale-105'
-          } ${lgImg} flex h-6 w-6 items-center justify-center transition-all duration-150`}
+          className={classNames(
+            `${lgImg} relative  flex h-6 w-6 items-center justify-center transition-all duration-150`,
+            {
+              'scale-105': isHover || isOpen
+            }
+          )}
         >
           <img
             src={`${isOpen ? svgActive : svg}`}
-            className={`h-6 w-6 ${
-              isProfile ? 'rounded-full' : ''
-            } object-cover transition-all`}
+            className={classNames(`h-6 w-6 object-cover transition-all`, {
+              'rounded-full': isProfile
+            })}
             alt={`${text} logo`}
           />
+          {text === 'Notifications' && props.hasNotification && (
+            <span className='absolute -right-1 -top-1 flex h-3 w-3'>
+              <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75' />
+              <span className='relative inline-flex h-3 w-3 rounded-full bg-red-400' />
+            </span>
+          )}
         </div>
-        <p className={`hidden ${lgP}`}>{text}</p>
+        <p className={`hidden ${lgP} capitalize`}>{text}</p>
       </button>
     );
   }
@@ -90,6 +109,7 @@ export default function ButtonNav(props: Props) {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
+      {children}
       <div
         className={`${isHover && 'scale-105'} ${
           isActive && 'scale-105'
