@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { searchUsers } from 'src/apis/user.api';
 import { User } from 'src/types/user.type';
-import MessageUser from '../MessageUser';
+import MessageUser from '../../pages/Messages/MessageUser';
 import List from '../List';
 import ChatUser from '../ChatUser';
 import { useNavigate } from 'react-router-dom';

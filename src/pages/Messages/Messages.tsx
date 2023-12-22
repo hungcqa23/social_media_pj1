@@ -1,5 +1,5 @@
 import Button from 'src/components/Button';
-import MessageUser from 'src/components/MessageUser';
+import MessageUser from 'src/pages/Messages/MessageUser';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import List from 'src/components/List';
 import { retrieveConversations } from 'src/apis/conversation.api';

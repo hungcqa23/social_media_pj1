@@ -1,20 +1,20 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 export default function Search({
   query,
   onChange
 }: {
-  query: string;
+  query?: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
 }) {
+  const [filter, setFilter] = useState<string>('');
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        setFilter('');
         onChange('');
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
-
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
@@ -28,8 +28,13 @@ export default function Search({
           </span>
         )}
         <input
-          value={query}
-          onChange={e => onChange(e.target.value)}
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              onChange(filter);
+            }
+          }}
           placeholder='Search Instacloud'
           className='focus:text-black-500 grow bg-gray-100 text-black outline-none focus:outline-none'
           maxLength={100}

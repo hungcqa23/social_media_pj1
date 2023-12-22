@@ -12,9 +12,9 @@ import {
   sendMessage
 } from 'src/apis/conversation.api';
 import { AppContext } from 'src/contexts/app.contexts';
-import Message from '../Message';
+import Message from 'src/pages/Messages/Message';
 import { IMessageData, ISendMessageData } from 'src/types/conversation.type';
-import MessageInput from '../MessageInput';
+import MessageInput from 'src/pages/Messages/MessageInput';
 import { User } from 'src/types/user.type';
 import { getUserProfile } from 'src/apis/user.api';
 import useScrollToBottom from 'src/hooks/useScrollToBottom';
@@ -23,7 +23,6 @@ import { socketIOService } from 'src/socket/socket';
 import VideoCall from 'src/pages/VideoCall';
 import { checkIfCurrentUserBeingBannedOrBanThePartner } from 'src/utils/utils';
 import { Link } from 'react-router-dom';
-import { orderBy } from 'lodash';
 
 export default function Conversation() {
   const [messages, setMessages] = useState<IMessageData[]>([]);
@@ -120,9 +119,7 @@ export default function Conversation() {
         socketIOService.getSocket().off('message read');
       }
     };
-    },
-    [fetched, profile, receiverId.id, ChatSocket.receiveMessage]
-  );
+  }, [fetched, profile, receiverId.id, ChatSocket.receiveMessage]);
 
   const sendChatMessage = async (
     message: string,

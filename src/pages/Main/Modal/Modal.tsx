@@ -45,6 +45,7 @@ export default function Modal({
         profilePicture: profile?.profilePicture || ''
       })
   });
+
   useEffect(() => {
     return () => {
       setIncludesMedia(false);

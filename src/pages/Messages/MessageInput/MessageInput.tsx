@@ -1,7 +1,12 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
-import ImagePreview from '../ImagePreview';
-import { calculateTextWidth, checkFile, checkIfCurrentUserBeingBannedOrBanThePartner, readAsBase64 } from 'src/utils/utils';
+import ImagePreview from 'src/components/ImagePreview';
+import {
+  calculateTextWidth,
+  checkFile,
+  checkIfCurrentUserBeingBannedOrBanThePartner,
+  readAsBase64
+} from 'src/utils/utils';
 import { default_image_sent_message } from '../Message/Message';
 import { User } from 'src/types/user.type';
 

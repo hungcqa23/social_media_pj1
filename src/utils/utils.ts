@@ -66,7 +66,7 @@ function isToday(date: Date): boolean {
   );
 }
 
-function validateFile(file, type?: 'image' | 'video') {
+function validateFile(file: any, type?: 'image' | 'video') {
   if (type === 'image') {
     const validImageTypes = [
       'image/jpeg',
@@ -87,7 +87,7 @@ function validateFile(file, type?: 'image' | 'video') {
   }
 }
 
-function checkFileSize(file, type?: 'image' | 'video') {
+function checkFileSize(file: any, type?: 'image' | 'video') {
   let fileError = '';
   const isValid = validateFile(file, type);
   if (!isValid) {
@@ -100,7 +100,7 @@ function checkFileSize(file, type?: 'image' | 'video') {
   return fileError;
 }
 
-export function checkFile(file, type?: 'image' | 'video') {
+export function checkFile(file: any, type?: 'image' | 'video') {
   if (!validateFile(file, type)) {
     window.alert(`File ${file.name} is not accepted`);
     return false;
