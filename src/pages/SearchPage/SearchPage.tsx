@@ -360,6 +360,7 @@ export default function SearchPage() {
       // return postApi.getPosts(search, signal);
     }
   });
+  console.log(searchData);
   const users = searchData?.data.users || [];
   const posts = searchData?.data.posts || [];
   const handleChange = (selectedDate: Date) => {

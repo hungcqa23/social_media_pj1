@@ -1,8 +1,4 @@
-import {
-  calculateTimeAgo,
-  formatDate,
-  formatSocialNumber
-} from 'src/utils/helper';
+import { formatDate, formatSocialNumber } from 'src/utils/helper';
 import IconProfile from '../IconProfile';
 import { Post } from 'src/types/post.type';
 import { Link } from 'react-router-dom';
@@ -12,7 +8,7 @@ interface Props {
 }
 export default function FilterPost({ post }: Props) {
   const { username, createdAt, commentsCount } = post;
-  const like = post.reactions.like;
+  const like = post.reactions?.like || 0;
   return (
     <div className='mt-5 px-4 pb-4'>
       <div className='flex w-full flex-col items-center border-b pb-4 sm:flex-row sm:items-stretch'>

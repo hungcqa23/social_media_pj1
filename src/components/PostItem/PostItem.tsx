@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import Profile from '../IconProfile';
 import Comment from '../Comment';
 import List from '../List';
@@ -86,6 +86,7 @@ export default function PostItem({
   const [isEditing, setIsEditing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const contentRef = useRef<HTMLTextAreaElement | null>(null);
+  const [file, setFile] = useState<File>();
 
   // Form data for comment and submit comment
   const { register, handleSubmit, watch, reset, setValue } = useForm<{
@@ -224,6 +225,20 @@ export default function PostItem({
     deletePostMutation.mutate(`${post._id}/${post.pId}`);
     dispatch({ type: ACTION_TYPES.CLOSE });
   };
+
+  // Update Post
+  const updatePostMutation = useMutation({
+    mutationFn: (body: { content: string }) =>
+      postApi.updatePost({
+        postId: post._id || '',
+        content: body.content,
+        file: file || undefined
+      })
+  });
+
+  const previewFile = useMemo(() => {
+    return file ? URL.createObjectURL(file) : undefined;
+  }, [file]);
 
   const isOwner = post.username === profile?.username;
 
@@ -413,15 +428,43 @@ export default function PostItem({
       </div>
 
       {/* Image or video */}
-      {post.imgVersion !== '' && (
-        <div className='flex justify-center border-t py-2'>
+
+      <div
+        className={classNames('relative flex justify-center border-t py-2', {
+          hidden: post.imgVersion === '' && post.videoVersion === '',
+          flex: post.imgVersion !== '' || post.videoVersion !== ''
+        })}
+      >
+        {post.imgVersion !== '' && (
           <img
             src={`https://res.cloudinary.com/daszajz9a/image/upload/v${post.imgVersion}/${post.imgId}`}
             alt='Post'
             className='w-4/5 object-cover p-4'
           />
-        </div>
-      )}
+        )}
+        {post.videoVersion !== '' && (
+          // eslint-disable-next-line jsx-a11y/media-has-caption
+          <video controls className='w-4/5 object-cover p-4'>
+            <source
+              src={`https://res.cloudinary.com/daszajz9a/video/upload/v${post.videoVersion}/${post.videoId}`}
+              type='video/mp4'
+            />
+          </video>
+        )}
+
+        <button
+          className='absolute right-0 top-0 flex h-8 w-8 items-center justify-center rounded-full border bg-white hover:bg-gray-100'
+          onClick={() => setFile(undefined)}
+        >
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            viewBox='0 0 384 512'
+            className='h-5 fill-gray-500'
+          >
+            <path d='M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z' />
+          </svg>
+        </button>
+      </div>
 
       {/* Interaction */}
       <div className={`border-t border-gray-200 px-4`}>

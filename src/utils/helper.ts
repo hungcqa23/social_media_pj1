@@ -122,3 +122,7 @@ export const handleTextAreaChange = ({
     textAreaRef.current.style.height = textAreaRef.current.scrollHeight + 'px'; // Set the height to the scrollHeight
   }
 };
+
+export const fileNameExtension = (file?: File): string => {
+  return file?.name.split('.').pop() || '';
+};

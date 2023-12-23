@@ -4,6 +4,7 @@ import http from 'src/utils/http';
 
 const URL_GET_ALL_POSTS = 'post/all';
 const URL_CREATE_POST_WITH_MEDIA = 'post-with-image';
+const URL_CREATE_POST_WITH_VIDEO = 'post-with-video';
 const URL_POST = 'post';
 const URL_GET_ALL_SAVED_POSTS = 'saved-posts';
 const URL_SAVED_POST = 'post/save-post';
@@ -45,7 +46,15 @@ export const postApi = {
     });
   },
 
-  createPostWithMedia(body: Post) {
+  createPostWithMedia(
+    body: Post & {
+      image?: string;
+      video?: string;
+    }
+  ) {
+    if (body.video) {
+      return http.post<CreatePost>(URL_CREATE_POST_WITH_VIDEO, body);
+    }
     return http.post<CreatePost>(URL_CREATE_POST_WITH_MEDIA, body);
   },
   createPost(body: { content: string; profilePicture: string }) {
@@ -68,5 +77,31 @@ export const postApi = {
   },
   getPostById(id: string) {
     return http.get<GetPostById>(`${URL_POST}/${id}`);
+  },
+  updatePost({
+    postId,
+    content,
+    file
+  }: {
+    postId: string;
+    content: string;
+    file?: File;
+  }) {
+    if (file) {
+      const fileExtension = file.name.split('.').pop();
+      if (fileExtension === 'mp4') {
+        return http.put<CreatePost>(`${URL_POST}/${postId}`, {
+          post: content,
+          video: file
+        });
+      }
+      return http.put<CreatePost>(`${URL_POST}/${postId}`, {
+        post: content,
+        image: file
+      });
+    }
+    return http.put<CreatePost>(`${URL_POST}/${postId}`, {
+      post: content
+    });
   }
 };

@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import authApi from 'src/apis/auth.api';
 import Button from 'src/components/Button';
@@ -25,6 +25,7 @@ export default function Register() {
     getValues,
     formState: { errors }
   } = useForm<FormData>();
+  const navigate = useNavigate();
 
   const rules = getRules(getValues);
   const signUpMutation = useMutation({
@@ -52,6 +53,7 @@ export default function Register() {
               toast.success('Register successfully', {
                 position: toast.POSITION.TOP_RIGHT
               });
+            navigate(path.login);
           }
         }
       );

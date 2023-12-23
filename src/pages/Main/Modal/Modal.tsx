@@ -35,6 +35,7 @@ export default function Modal({
     mutationFn: (
       body: Post & {
         image?: string;
+        video?: string;
       }
     ) => postApi.createPostWithMedia(body)
   });
@@ -67,11 +68,13 @@ export default function Modal({
   const onSubmit = handleSubmit(async data => {
     const stringBase64 = file ? await convertFileToBase64(file) : '';
     if (file) {
+      console.log(stringBase64);
       createPostWithMediaMutation.mutate(
         {
           post: data.content,
           profilePicture: profile?.profilePicture,
-          image: stringBase64,
+          image: fileExtension !== 'mp4' ? stringBase64 : undefined,
+          video: fileExtension === 'mp4' ? stringBase64 : undefined,
           privacy: 'public'
         },
         {
@@ -113,7 +116,8 @@ export default function Modal({
       );
     }
   });
-  const onChangeFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const fileExtension = file?.name?.split('.')?.pop()?.toLowerCase() || '';
+  const onChangeFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setFile(event.target.files[0]);
     }
@@ -121,6 +125,11 @@ export default function Modal({
   const onCloseFile = () => {
     setFile(null);
     setIncludesMedia(false);
+
+    // Reset the file input value
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
   };
 
   return (
@@ -246,13 +255,25 @@ export default function Modal({
                           </button>
                         )}
 
-                        {file && (
+                        {file && fileExtension !== 'mp4' && (
                           <div className='p-2'>
                             <img
                               src={URL.createObjectURL(file)}
                               alt='User Upload'
                               className='h-full w-full rounded-md'
                             />
+                          </div>
+                        )}
+
+                        {file && fileExtension === 'mp4' && (
+                          <div className='p-2'>
+                            {/*eslint-disable-next-line jsx-a11y/media-has-caption*/}
+                            <video controls>
+                              <source
+                                src={URL.createObjectURL(file)}
+                                type='video/mp4'
+                              />
+                            </video>
                           </div>
                         )}
 

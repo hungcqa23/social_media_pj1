@@ -28,7 +28,7 @@ export default function NotificationItem({
 
   return (
     <Link
-      to={'#'}
+      to={`/posts/${notification.entityId}`}
       className='block w-full py-1 hover:bg-gray-200'
       onClick={() => {
         if (!isRead) {
@@ -42,6 +42,7 @@ export default function NotificationItem({
             className='mr-3 flex h-14 w-14'
             classNameImage='h-14 w-14'
             isImage
+            // src={notification.}
           />
           <div
             className={classNames(
