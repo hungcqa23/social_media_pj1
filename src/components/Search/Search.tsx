@@ -44,7 +44,10 @@ export default function Search({
       {query !== '' && (
         <button
           className='hover:pointer flex h-6 shrink-0 basis-6 cursor-pointer items-center justify-center rounded-full bg-gray-500'
-          onClick={() => onChange('')}
+          onClick={() => {
+            setFilter('');
+            onChange('');
+          }}
         >
           <span>
             <svg

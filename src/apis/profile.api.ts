@@ -97,6 +97,7 @@ export const profileApi = {
     signal?: AbortSignal,
     date?: Date
   ) => {
+    console.log('Type', type);
     if (!type) {
       return http.get<Search>(`search/post`, {
         params: {

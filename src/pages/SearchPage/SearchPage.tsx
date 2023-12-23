@@ -348,7 +348,7 @@ export default function SearchPage() {
   const { type } = useQueryString();
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
+  console.log(search);
   const { data: searchData, isLoading } = useQuery({
     queryKey: ['search', { search, type, selectedDate }],
     queryFn: ({ signal }) => {
