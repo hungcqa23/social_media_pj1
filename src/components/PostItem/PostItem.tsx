@@ -87,6 +87,7 @@ export default function PostItem({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const contentRef = useRef<HTMLTextAreaElement | null>(null);
   const [file, setFile] = useState<File>();
+  const [isShowMedia, setIsShowMedia] = useState(true);
 
   // Form data for comment and submit comment
   const { register, handleSubmit, watch, reset, setValue } = useForm<{
@@ -399,6 +400,7 @@ export default function PostItem({
               onKeyDown={event => {
                 if (event.key === 'Escape') {
                   setIsEditing(false);
+                  setIsShowMedia(true);
                 }
               }}
               name={name}
@@ -423,6 +425,29 @@ export default function PostItem({
               </button>{' '}
               to cancel
             </p>
+            <button
+              className='hover:pointer flex h-10 w-full items-center justify-center gap-2 rounded bg-gray-50 outline-none hover:bg-gray-100'
+              onClick={() => setIsShowMedia(true)}
+              type='button'
+            >
+              <div className='flex h-6 w-6 items-center justify-center rounded-full'>
+                <span>
+                  <svg
+                    className='h-6 w-6'
+                    viewBox='0 0 36 36'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M30.375 5.625H10.125C9.52826 5.625 8.95597 5.86205 8.53401 6.28401C8.11205 6.70597 7.875 7.27826 7.875 7.875V10.125H5.625C5.02826 10.125 4.45597 10.3621 4.03401 10.784C3.61205 11.206 3.375 11.7783 3.375 12.375V28.125C3.375 28.7217 3.61205 29.294 4.03401 29.716C4.45597 30.1379 5.02826 30.375 5.625 30.375H25.875C26.4717 30.375 27.044 30.1379 27.466 29.716C27.8879 29.294 28.125 28.7217 28.125 28.125V25.875H30.375C30.9717 25.875 31.544 25.6379 31.966 25.216C32.3879 24.794 32.625 24.2217 32.625 23.625V7.875C32.625 7.27826 32.3879 6.70597 31.966 6.28401C31.544 5.86205 30.9717 5.625 30.375 5.625ZM24.1875 10.125C24.5213 10.125 24.8475 10.224 25.125 10.4094C25.4025 10.5948 25.6188 10.8584 25.7465 11.1667C25.8743 11.4751 25.9077 11.8144 25.8426 12.1417C25.7775 12.4691 25.6167 12.7697 25.3807 13.0057C25.1447 13.2417 24.8441 13.4025 24.5167 13.4676C24.1894 13.5327 23.8501 13.4993 23.5417 13.3715C23.2334 13.2438 22.9698 13.0275 22.7844 12.75C22.599 12.4725 22.5 12.1463 22.5 11.8125C22.5 11.3649 22.6778 10.9357 22.9943 10.6193C23.3107 10.3028 23.7399 10.125 24.1875 10.125ZM25.875 28.125H5.625V12.375H7.875V23.625C7.875 24.2217 8.11205 24.794 8.53401 25.216C8.95597 25.6379 9.52826 25.875 10.125 25.875H25.875V28.125ZM30.375 23.625H10.125V18.5625L15.1875 13.5L22.1709 20.4834C22.3819 20.6943 22.6679 20.8127 22.9662 20.8127C23.2644 20.8127 23.5504 20.6943 23.7614 20.4834L27.3698 16.875L30.375 19.8816V23.625Z'
+                      fill='black'
+                    />
+                  </svg>
+                </span>
+              </div>
+              <span className='text-sm font-medium text-black'>
+                Add photos/videos
+              </span>
+            </button>
           </>
         )}
       </div>
@@ -431,39 +456,50 @@ export default function PostItem({
 
       <div
         className={classNames('relative flex justify-center border-t py-2', {
-          hidden: post.imgVersion === '' && post.videoVersion === '',
+          hidden:
+            (post.imgVersion === '' && post.videoVersion === '') ||
+            !isShowMedia,
           flex: post.imgVersion !== '' || post.videoVersion !== ''
         })}
       >
-        {post.imgVersion !== '' && (
-          <img
-            src={`https://res.cloudinary.com/daszajz9a/image/upload/v${post.imgVersion}/${post.imgId}`}
-            alt='Post'
-            className='w-4/5 object-cover p-4'
-          />
-        )}
-        {post.videoVersion !== '' && (
-          // eslint-disable-next-line jsx-a11y/media-has-caption
-          <video controls className='w-4/5 object-cover p-4'>
-            <source
-              src={`https://res.cloudinary.com/daszajz9a/video/upload/v${post.videoVersion}/${post.videoId}`}
-              type='video/mp4'
-            />
-          </video>
+        {isShowMedia && (
+          <>
+            {post.imgVersion !== '' && (
+              <img
+                src={`https://res.cloudinary.com/daszajz9a/image/upload/v${post.imgVersion}/${post.imgId}`}
+                alt='Post'
+                className='w-4/5 object-cover p-4'
+              />
+            )}
+            {post.videoVersion !== '' && (
+              // eslint-disable-next-line jsx-a11y/media-has-caption
+              <video controls className='w-4/5 object-cover p-4'>
+                <source
+                  src={`https://res.cloudinary.com/daszajz9a/video/upload/v${post.videoVersion}/${post.videoId}`}
+                  type='video/mp4'
+                />
+              </video>
+            )}
+          </>
         )}
 
-        <button
-          className='absolute right-0 top-0 flex h-8 w-8 items-center justify-center rounded-full border bg-white hover:bg-gray-100'
-          onClick={() => setFile(undefined)}
-        >
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 384 512'
-            className='h-5 fill-gray-500'
+        {isEditing && (isShowMedia || file) && (
+          <button
+            className='absolute right-0 top-0 flex h-8 w-8 items-center justify-center rounded-full border bg-white hover:bg-gray-100'
+            onClick={() => {
+              setFile(undefined);
+              setIsShowMedia(false);
+            }}
           >
-            <path d='M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z' />
-          </svg>
-        </button>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              viewBox='0 0 384 512'
+              className='h-5 fill-gray-500'
+            >
+              <path d='M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z' />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Interaction */}

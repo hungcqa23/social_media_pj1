@@ -6,7 +6,6 @@ import { AuthResponse } from 'src/types/auth.type';
 
 export const BASE_ENDPOINT = 'http://localhost:5000/api/v1';
 
-
 class Http {
   private accessToken: string;
   // private refreshToken: string;
@@ -47,8 +46,7 @@ class Http {
         const { url } = response.config;
         if (url === URL_LOGIN || url === URL_REGISTER) {
           const data = response.data as AuthResponse;
-          console.log(data);
-          // setProfileToLS(data.user);
+          setProfileToLS(data.user);
         } else if (url === URL_LOGOUT) {
           this.accessToken = '';
           // this.refreshToken = '';

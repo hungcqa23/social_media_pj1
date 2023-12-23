@@ -23,7 +23,7 @@ import Messages from './pages/Messages';
 import ResetPassword from './pages/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword';
 import Register from './pages/Register';
-// import Main from './pages/Main';
+import Main from './pages/Main';
 import EmailSetting from './pages/EmailSetting';
 import EditProfile from './pages/EditProfile';
 import Profile from './pages/Profile';
@@ -33,7 +33,7 @@ import PostPage from './pages/PostPage';
 
 // const Login = lazy(() => import('./pages/Login'));
 // const MainLayout = lazy(() => import('./layouts/MainLayout'));
-const Main = lazy(() => import('./pages/Main'));
+// const Main = lazy(() => import('./pages/Main'));
 // const Register = lazy(() => import('./pages/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 // const PostPage = lazy(() => import('./pages/PostPage'));
