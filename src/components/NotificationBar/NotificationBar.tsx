@@ -3,34 +3,35 @@ import IconProfile from '../IconProfile';
 import Button from '../Button';
 import classNames from 'classnames';
 import { useQueryString } from 'src/hooks/useQueryString';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { notificationApi } from 'src/apis/notification.api';
 import List from '../List';
 import NotificationItem from './NotificationItem';
+import { useContext, useEffect } from 'react';
+import { socketIOService } from 'src/socket/socket';
+import { AppContext } from 'src/contexts/app.contexts';
+import { Notification } from 'src/types/notification.type';
 
 interface Props {
   className?: string;
   children?: React.ReactNode;
+  notificationsData: Notification[];
+  isLoading: boolean;
 }
 export default function NotificationBar({
   className = 'ml-[4.5rem] flex lg:ml-56 bg-white',
+  notificationsData,
+  isLoading,
   children
 }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryStr = useQueryString();
   const { type } = queryStr;
-  const { data: notificationsData, isLoading } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: () => notificationApi.getAllNotifications()
-  });
 
   const notifications =
     (type === 'unread'
-      ? notificationsData?.data?.notification.filter(
-          notification => notification.read === false
-        )
-      : notificationsData?.data?.notification) || [];
-  console.log(notifications);
+      ? notificationsData.filter(notification => notification.read === false)
+      : notificationsData) || [];
 
   return (
     <div className={className}>

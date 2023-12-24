@@ -14,6 +14,7 @@ export default function Modal({
   type = 'default',
   classNameModal = 'flex min-h-[24rem] md:w-[26rem] w-96 flex-col justify-between rounded-xl bg-white shadow'
 }: Props) {
+ 
   if (type === 'option') {
     return (
       <div className='text-normal flex min-h-[2rem] w-80 flex-col  rounded-lg bg-white text-base font-normal text-black md:w-96'>

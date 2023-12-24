@@ -16,6 +16,7 @@ type Props = {
   senderId?: string;
   isVideoCall?: boolean;
   peer?: Peer;
+  call?: MediaConnection;
   setCallEnded?: (ended: boolean) => void;
   onClose: () => void;
 };
@@ -83,88 +84,78 @@ const VideoCall = (props: Props) => {
   }, []);
 
   useEffect(() => {
-    if (props.isReceiver && props.peer) {
-      props.peer.on('call', call => {
-        callRef = call;
-        navigator.mediaDevices
-          .getUserMedia({
-            video: props.isVideoCall ? true : false,
-            audio: true
-          })
-          .then((incomeStream: MediaStream) => {
-            receiverStream = incomeStream;
+    if (props.isReceiver && props.call) {
+      callRef = props.call;
+      navigator.mediaDevices
+        .getUserMedia({
+          video: props.isVideoCall ? true : false,
+          audio: true
+        })
+        .then((incomeStream: MediaStream) => {
+          receiverStream = incomeStream;
+          if (props.isVideoCall) {
+            if (currentUserVideoRef.current) {
+              currentUserVideoRef.current.srcObject = incomeStream;
+              currentUserVideoRef.current.play();
+            }
+          } else {
+            if (currentAudioRef.current) {
+              currentAudioRef.current.srcObject = incomeStream;
+              currentAudioRef.current.play();
+            }
+          }
+          if (!props.call) return;
+          props.call.answer(incomeStream);
+          props.call.on('stream', (remoteStream: MediaStream) => {
             if (props.isVideoCall) {
-              if (currentUserVideoRef.current) {
-                currentUserVideoRef.current.srcObject = incomeStream;
-                currentUserVideoRef.current.play();
+              if (remoteUserVideoRef.current) {
+                remoteUserVideoRef.current.srcObject = remoteStream;
+                remoteUserVideoRef.current.play();
               }
             } else {
+              if (remoteAudioRef.current) {
+                remoteAudioRef.current.srcObject = remoteStream;
+                remoteAudioRef.current.play();
+              }
+            }
+          });
+          props.call.on('close', () => {
+            props.onClose();
+          });
+        })
+        .catch(error => {
+          navigator.mediaDevices
+            .getUserMedia({
+              video: false,
+              audio: true
+            })
+            .then((incomeStream: MediaStream) => {
+              receiverStream = incomeStream;
               if (currentAudioRef.current) {
                 currentAudioRef.current.srcObject = incomeStream;
                 currentAudioRef.current.play();
               }
-            }
-            call.answer(incomeStream);
-            call.on('stream', (remoteStream: MediaStream) => {
-              if (props.isVideoCall) {
-                if (remoteUserVideoRef.current) {
-                  remoteUserVideoRef.current.srcObject = remoteStream;
-                  remoteUserVideoRef.current.play();
-                }
-              } else {
-                if (remoteAudioRef.current) {
-                  remoteAudioRef.current.srcObject = remoteStream;
-                  remoteAudioRef.current.play();
-                }
-              }
-            });
-            call.on('close', () => {
-              props.onClose();
-            });
-          })
-          .catch(error => {
-            navigator.mediaDevices
-              .getUserMedia({
-                video: false,
-                audio: true
-              })
-              .then((incomeStream: MediaStream) => {
-                receiverStream = incomeStream;
-                if (currentAudioRef.current) {
-                  currentAudioRef.current.srcObject = incomeStream;
-                  currentAudioRef.current.play();
-                }
-                call.answer(incomeStream);
-                call.on('stream', (remoteStream: MediaStream) => {
-                  if (props.isVideoCall) {
-                    if (remoteUserVideoRef.current) {
-                      remoteUserVideoRef.current.srcObject = remoteStream;
-                      remoteUserVideoRef.current.play();
-                    }
-                  } else {
-                    if (remoteAudioRef.current) {
-                      remoteAudioRef.current.srcObject = remoteStream;
-                      remoteAudioRef.current.play();
-                    }
+              if (!props.call) return;
+              props.call.answer(incomeStream);
+              props.call.on('stream', (remoteStream: MediaStream) => {
+                if (props.isVideoCall) {
+                  if (remoteUserVideoRef.current) {
+                    remoteUserVideoRef.current.srcObject = remoteStream;
+                    remoteUserVideoRef.current.play();
                   }
-                  console.log('local', currentUserVideoRef.current?.srcObject);
-                  console.log('remote', remoteUserVideoRef.current?.srcObject);
-                  console.log(
-                    'local audio',
-                    currentAudioRef.current?.srcObject
-                  );
-                  console.log(
-                    'remote audio',
-                    remoteAudioRef.current?.srcObject
-                  );
-                });
-                call.on('close', () => {
-                  props.onClose();
-                });
-                console.log(error);
+                } else {
+                  if (remoteAudioRef.current) {
+                    remoteAudioRef.current.srcObject = remoteStream;
+                    remoteAudioRef.current.play();
+                  }
+                }
               });
-          });
-      });
+              props.call.on('close', () => {
+                props.onClose();
+              });
+              console.log(error);
+            });
+        });
     }
   }, []);
 
@@ -197,23 +188,18 @@ const VideoCall = (props: Props) => {
   };
 
   return (
-    <NewWindow
-      title={props.username}
-      center='screen'
-      copyStyles
-      onUnload={handleTurnOff}
-    >
+    <NewWindow title={props.username} center='screen' onUnload={handleTurnOff}>
       <div className='flex h-full w-full flex-col gap-1 bg-slate-800'>
         <div className='flex h-[80%] w-full flex-row justify-between'>
           <div className='flex h-full w-[48%] items-center justify-center'>
             {props.isVideoCall ? (
               <video ref={currentUserVideoRef} muted playsInline />
             ) : (
-              <div className='max-w-full rounded-full'>
+              <div className='flex max-h-[9rem] max-w-[9rem] items-center justify-center rounded-full'>
                 <img
                   src={props.senderProfilePicture}
                   alt='profile'
-                  className='max-w-full'
+                  className='h-44 w-44 object-cover rounded-full'
                 />
                 <audio ref={currentAudioRef} hidden={true} />
               </div>
@@ -223,11 +209,11 @@ const VideoCall = (props: Props) => {
             {props.isVideoCall ? (
               <video ref={remoteUserVideoRef} muted playsInline />
             ) : (
-              <div className='max-w-full rounded-full'>
+              <div className='flex max-h-[9rem] max-w-[9rem] items-center justify-center rounded-full'>
                 <img
                   src={props.receiverProfilePicture}
                   alt='profile'
-                  className='max-w-full'
+                  className='h-44 w-44 object-cover rounded-full'
                 />
                 <audio ref={remoteAudioRef} hidden={true} />
               </div>

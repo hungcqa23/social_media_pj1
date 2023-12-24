@@ -2,6 +2,7 @@ export interface Notification {
   _id: string;
   userTo: string;
   userFrom: string;
+  userFromProfilePicture: string;
   read: boolean;
   message: string;
   notificationType: string;

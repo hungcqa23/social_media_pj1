@@ -16,12 +16,10 @@ export default function NotificationItem({
   const markAsReadMutation = useMutation({
     mutationFn: () => notificationApi.markAsRead(notification._id),
     onSuccess: () => {
-      setTimeout(() => {
-        queryClient.invalidateQueries({
-          predicate: query => {
-            return query.queryKey[0] === 'notifications';
-          }
-        });
+      queryClient.invalidateQueries({
+        predicate: query => {
+          return query.queryKey[0] === 'notifications';
+        }
       });
     }
   });
