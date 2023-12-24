@@ -3,47 +3,17 @@ import Profile from '../../../components/IconProfile';
 import List from '../../../components/List';
 import SuggestedFriend from '../SuggestedFriend';
 import { useAppContext } from 'src/contexts/app.contexts';
-
-interface SuggestedFriends {
-  id: number;
-  username: string;
-  fullName: string;
-  srcImg?: string;
-}
-
-const suggestedFriends: SuggestedFriends[] = [
-  {
-    id: 1,
-    username: 'anhungwindyy',
-    fullName: 'An Hưng',
-    srcImg:
-      'https://images.unsplash.com/photo-1477118476589-bff2c5c4cfbb?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-  },
-  {
-    id: 2,
-    username: 'anhungwindyy',
-    fullName: 'An Hưng'
-  },
-  {
-    id: 3,
-    username: 'anhungwindyy',
-    fullName: 'An Hưng'
-  },
-  {
-    id: 4,
-    username: 'anhungwindyy',
-    fullName: 'An Hưng'
-  },
-  {
-    id: 5,
-    username: 'anhungwindyy',
-    fullName: 'An Hưng'
-  }
-];
+import { User } from 'src/types/user.type';
+import { useQuery } from '@tanstack/react-query';
+import { getRecommendedUsers } from 'src/apis/user.api';
 
 export default function SuggestedBar() {
   const { profile } = useAppContext();
 
+  const { data: recommendationData, isLoading } = useQuery({
+    queryKey: ['user-recommendations'],
+    queryFn: () => getRecommendedUsers()
+  });
   return (
     <div className='hidden w-96 flex-col pl-16 xl:flex'>
       <div className='mt-9 flex flex-col gap-6'>
@@ -72,12 +42,13 @@ export default function SuggestedBar() {
             </span>
           </div>
 
-          {List<SuggestedFriends>({
-            listItems: suggestedFriends,
-            mapFn: ({ id, username, srcImg }: SuggestedFriends) => (
-              <SuggestedFriend key={id} username={username} srcImg={srcImg} />
-            )
-          })}
+          {!isLoading &&
+            List<User>({
+              listItems: recommendationData?.data.users || [],
+              mapFn: (user: User) => (
+                <SuggestedFriend key={user._id} user={user} />
+              )
+            })}
         </div>
       </div>
     </div>

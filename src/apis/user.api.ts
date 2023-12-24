@@ -33,3 +33,9 @@ export const searchUsers = async (query: string) => {
     console.log('query null');
   }
 };
+
+export function getRecommendedUsers() {
+  return http.get<TSearchUser>(`user-recommendation`, {
+    withCredentials: true
+  });
+};

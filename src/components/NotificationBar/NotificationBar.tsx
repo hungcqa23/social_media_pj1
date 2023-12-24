@@ -35,7 +35,7 @@ export default function NotificationBar({
 
   return (
     <div className={className}>
-      <nav className='flex h-screen min-w-fit flex-col border-r'>
+      <nav className='relative z-50 flex h-screen min-w-fit flex-col border-r bg-white'>
         {children}
         <p className='mb-2 ml-9 mr-12 mt-12 text-2xl font-bold text-black'>
           Notifications
@@ -112,7 +112,7 @@ export default function NotificationBar({
               />
             ),
             as: 'ul',
-            className: classNames('', {
+            className: classNames('bg-white', {
               'mt-2': notifications.length > 0
             })
           })}

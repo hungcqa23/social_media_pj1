@@ -196,7 +196,7 @@ export default function Profile() {
                   className='h-32 w-32 md:h-40 md:w-40'
                   classNameImage='md:h-40 md:w-40 w-32 h-32'
                   isImage
-                  src={profile?.profilePicture}
+                  src={userProfile?.profilePicture}
                 />
               </div>
 
