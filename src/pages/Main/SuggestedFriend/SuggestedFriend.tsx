@@ -1,40 +1,24 @@
 import { Link } from 'react-router-dom';
 import Profile from '../../../components/IconProfile';
 import { useState } from 'react';
+import { User } from 'src/types/user.type';
 
 interface Props {
-  username: string;
-  to?: string;
-  followers?: string[];
-  srcImg?: string;
+  user: User;
 }
 export default function SuggestedFriend(props: Props) {
   const [isFollowed, setIsFollowed] = useState(false);
-
-  const {
-    username,
-    followers = ['anhung1', 'anhung2', 'anhung3'],
-    srcImg = '/src/assets/images/user.jpg',
-    to = '/profile'
-  } = props;
-
-  let userFollowStr = `Followed by ${followers[0]} + ${
-    followers.length - 1
-  } more`;
-  if (userFollowStr.length > 28) {
-    userFollowStr = userFollowStr.slice(0, 27) + '...';
-  }
-
+  
   return (
     <div className='flex items-center px-4 py-2'>
       <div className='mr-2'>
-        <Profile src={srcImg} to={to} />
+        <Profile src={props.user.profilePicture} to={`/${props.user._id}`} />
       </div>
       <div className='flex flex-col'>
-        <Link to={to} className='text-sm font-semibold'>
-          {username}
+        <Link to={`${props.user._id}`} className='text-sm font-semibold'>
+          {props.user.username}
         </Link>
-        <p className='text-xs text-gray-400'>{userFollowStr}</p>
+        <p className='text-xs text-gray-400'>We recommend you this user</p>
       </div>
       <div className='ml-auto'>
         <button onClick={() => setIsFollowed(!isFollowed)}>

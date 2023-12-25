@@ -67,8 +67,7 @@ const Message = ({ item, isReceived }: Props) => {
             isReceived ? 'justify-start' : 'justify-end'
           }`}
         >
-          {formatMessageDateTime(new Date(item.createdAt))}{' '}
-          {item.isRead ? 'read' : 'unread'}
+          {formatMessageDateTime(new Date(item.createdAt))}
         </div>
       </div>
     </div>

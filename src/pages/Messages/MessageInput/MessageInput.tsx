@@ -1,14 +1,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
 import ImagePreview from 'src/components/ImagePreview';
-import {
-  calculateTextWidth,
-  checkFile,
-  checkIfCurrentUserBeingBannedOrBanThePartner,
-  readAsBase64
-} from 'src/utils/utils';
+import { calculateTextWidth, checkFile, readAsBase64 } from 'src/utils/utils';
 import { default_image_sent_message } from '../Message/Message';
-import { User } from 'src/types/user.type';
 
 const maxTextAreaHeight = 48;
 const originalHeight = 24;
@@ -50,12 +44,17 @@ const MessageInput = ({ setChatMessage, isBlocked }: Props) => {
       if (message) {
         setChatMessage(message.replace(/ +(?= )/g, ''), base64file!);
         return message;
+      } else {
+        if (!base64file) {
+          return;
+        } else {
+          setChatMessage(
+            default_image_sent_message.replace(/ +(?= )/g, ''),
+            base64file!
+          );
+          return default_image_sent_message;
+        }
       }
-      setChatMessage(
-        default_image_sent_message.replace(/ +(?= )/g, ''),
-        base64file!
-      );
-      return default_image_sent_message;
     });
     reset();
   };

@@ -1,4 +1,4 @@
-import { Reaction } from 'src/types/reaction.type';
+import { IReactionDocument, Reaction } from 'src/types/reaction.type';
 import { SuccessResponse } from 'src/types/utils.type';
 import http from 'src/utils/http';
 
@@ -6,7 +6,7 @@ const URL_LIKE_POST = 'post/reaction';
 const URL_GET_REACTION = 'post/reactions';
 
 export interface GetReactions extends SuccessResponse {
-  reactions: Reaction[];
+  reactions: IReactionDocument[];
 }
 export const reactionApi = {
   likePost(body: { postId: string; userTo: string; profilePicture: string }) {

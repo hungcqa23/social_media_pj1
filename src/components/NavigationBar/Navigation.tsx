@@ -3,13 +3,13 @@ import { iconsSvg } from 'src/constants/icons';
 import ButtonNav from '../ButtonNav/ButtonNav';
 import { isActiveRoute } from 'src/utils/utils';
 import Popover from '../Popover';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import authApi from 'src/apis/auth.api';
 import { useAppContext } from 'src/contexts/app.contexts';
 import { clearLS } from 'src/utils/auth';
 import NotificationBar from '../NotificationBar';
 
-import { useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import {
   FloatingOverlay,
   FloatingPortal,
@@ -22,6 +22,7 @@ import {
   useInteractions
 } from '@floating-ui/react';
 import { notificationApi } from 'src/apis/notification.api';
+import { socketIOService } from 'src/socket/socket';
 
 interface Props {
   classNameNav?: string;
@@ -40,6 +41,8 @@ interface LinkProps {
 }
 export default function Navigation(props: Props) {
   const [isNotificationBarOpen, setIsNotificationBarOpen] = useState(false);
+  const queryClient: QueryClient = useQueryClient();
+  const [hasNotification, setHasNotification] = useState(false);
   const location = useLocation();
   const id = useId();
   const { profile, setIsAuthenticated, setProfile } = useAppContext();
@@ -112,14 +115,48 @@ export default function Navigation(props: Props) {
     whileElementsMounted: autoUpdate,
     middleware: [shift(), flip(), offset(13)]
   });
+
   const dismiss = useDismiss(context);
   const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);
-  const { data } = useQuery({
+
+  const {
+    data: notificationsData,
+    isLoading,
+    refetch
+  } = useQuery({
     queryKey: ['notifications'],
     queryFn: () => notificationApi.getAllNotifications()
   });
-  const hasNotifications =
-    data?.data.notification.some(notification => !notification.read) || false;
+  const checkIfNotSeen = useCallback(() => {
+    if (notificationsData?.data.notification && !isLoading) {
+      notificationsData?.data.notification.some(value => {
+        if (!value.read) {
+          setHasNotification(true);
+          return;
+        }
+      });
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (isNotificationBarOpen) {
+      setHasNotification(false);
+    }
+  }, [isNotificationBarOpen]);
+
+  useEffect(() => {
+    checkIfNotSeen();
+    if (socketIOService.getSocket()) {
+      socketIOService
+        .getSocket()
+        .on('insert notification', (data: Notification[], { userTo }) => {
+          if (profile?._id === userTo) {
+            refetch();
+            setHasNotification(true);
+          }
+        });
+    }
+  }, [checkIfNotSeen, profile?._id, queryClient]);
 
   return (
     <nav className={classNameNav}>
@@ -158,7 +195,7 @@ export default function Navigation(props: Props) {
                     onClick={() => {
                       setIsNotificationBarOpen(prev => !prev);
                     }}
-                    hasNotification={hasNotifications}
+                    hasNotification={hasNotification}
                   />
 
                   {isNotificationBarOpen && (
@@ -168,7 +205,15 @@ export default function Navigation(props: Props) {
                         ref={refs.setFloating}
                         {...getFloatingProps()}
                       >
-                        <NotificationBar className='min-h-[20rem] overflow-y-auto bg-white shadow-[5px_0px_11px_-1px_rgba(0,0,0,0.2)] md:min-w-[24rem]' />
+                        {!isLoading && (
+                          <NotificationBar
+                            notificationsData={
+                              notificationsData!.data.notification
+                            }
+                            isLoading={isLoading}
+                            className='min-h-[20rem] overflow-y-auto bg-white shadow-[5px_0px_11px_-1px_rgba(0,0,0,0.2)] md:min-w-[24rem]'
+                          />
+                        )}
                       </div>
                     </FloatingPortal>
                   )}

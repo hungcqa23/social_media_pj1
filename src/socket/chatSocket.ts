@@ -1,11 +1,11 @@
 import { User } from 'src/types/user.type';
 import { socketIOService } from './socket';
 import { IMessageData, ISenderReceiver } from 'src/types/conversation.type';
-import { cloneDeep, findIndex, remove } from 'lodash';
+import { cloneDeep, findIndex, orderBy, remove } from 'lodash';
 
 export class ChatSocket {
   static chatMessages: IMessageData[] = [];
-  static conversations: IMessageData[] = [];
+  static chatConversations: IMessageData[] = [];
 
   static joinRoom(user: User, profile: User) {
     const users: ISenderReceiver = {
@@ -18,7 +18,11 @@ export class ChatSocket {
     socketIOService.getSocket().emit('join room', users);
   }
 
-  static conversation(profile: User, conversations: IMessageData[]) {
+  static conversation(
+    profile: User,
+    conversations: IMessageData[],
+    setConversations: (conversations: IMessageData[]) => void
+  ) {
     if (!socketIOService.getSocket()) return;
     socketIOService
       .getSocket()
@@ -41,26 +45,16 @@ export class ChatSocket {
             );
             conversations = [data, ...conversations];
           } else {
-            conversations.push(data);
+            remove(
+              conversations,
+              conversation =>
+                conversation.receiverUsername === data.receiverUsername
+            );
+            conversations = [data, ...conversations];
           }
-          // setConversations(conversations);
+          setConversations(orderBy(conversations, 'createdAt', 'desc'));
         }
       });
-    socketIOService.getSocket().on('message read', (data: IMessageData) => {
-      if (
-        data.senderUsername.toLowerCase() === profile.username ||
-        data.receiverUsername.toLowerCase() === profile.username
-      ) {
-        const messageIndex: number = findIndex(this.chatMessages, [
-          '_id',
-          data._id
-        ]);
-        if (messageIndex > -1) {
-          this.chatMessages.splice(messageIndex, 1, data);
-          conversations = [...this.chatMessages];
-        }
-      }
-    });
   }
 
   static receiveMessage(
@@ -80,7 +74,24 @@ export class ChatSocket {
           data.conversationId === ChatSocket.chatMessages[0].conversationId
         ) {
           ChatSocket.chatMessages.push(data);
-          messages = [...this.chatMessages];
+          messages = [...ChatSocket.chatMessages];
+          setMessages(messages);
+        }
+      }
+    });
+    socketIOService.getSocket().on('message read', (data: IMessageData) => {
+      if (
+        data.senderUsername.toLowerCase() === username ||
+        data.receiverUsername.toLowerCase() === username
+      ) {
+        const messageIndex: number = findIndex(this.chatMessages, [
+          '_id',
+          data._id
+        ]);
+        if (messageIndex > -1) {
+          console.log('hella');
+          ChatSocket.chatMessages.splice(messageIndex, 1, data);
+          messages = [...ChatSocket.chatMessages];
           setMessages(messages);
         }
       }

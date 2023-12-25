@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import IconProfile from '../IconProfile';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {
   callAudio,
   callAudioReq,
@@ -22,7 +22,6 @@ import { ChatSocket } from 'src/socket/chatSocket';
 import { socketIOService } from 'src/socket/socket';
 import VideoCall from 'src/pages/VideoCall';
 import { checkIfCurrentUserBeingBannedOrBanThePartner } from 'src/utils/utils';
-import { Link } from 'react-router-dom';
 
 export default function Conversation() {
   const [messages, setMessages] = useState<IMessageData[]>([]);
@@ -108,7 +107,6 @@ export default function Conversation() {
       if (messages.length > 0) {
         markMessagesAsSeen(receiverId.id as string);
       }
-      setIsLoading(false);
     }
     if (!fetched) {
       setFetched(true);
@@ -119,7 +117,7 @@ export default function Conversation() {
         socketIOService.getSocket().off('message read');
       }
     };
-  }, [fetched, profile, receiverId.id, ChatSocket.receiveMessage]);
+  }, [fetched, profile, messages.length]);
 
   const sendChatMessage = async (
     message: string,
@@ -197,9 +195,9 @@ export default function Conversation() {
       <div className='flex h-full w-full flex-col justify-between'>
         <header className='space-between flex justify-between border-b px-4 py-4'>
           <div className='flex items-center'>
-            <IconProfile src={profile?.profilePicture} />
+            <IconProfile src={receiver?.profilePicture} />
             <span className='ml-2 text-sm font-medium text-gray-950'>
-              {profile?.username}
+              {receiver?.username}
             </span>
           </div>
           <div className='flex gap-2'>

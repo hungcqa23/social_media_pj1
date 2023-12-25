@@ -196,7 +196,7 @@ export default function Profile() {
                   className='h-32 w-32 md:h-40 md:w-40'
                   classNameImage='md:h-40 md:w-40 w-32 h-32'
                   isImage
-                  src={profile?.profilePicture}
+                  src={userProfile?.profilePicture}
                 />
               </div>
 
@@ -436,7 +436,7 @@ export default function Profile() {
                                         {follower.username}
                                       </span>
                                       <span className='text-[0.8125rem]'>
-                                        {follower.userProfile.fullname}
+                                        {follower.fullname}
                                       </span>
                                     </div>
                                   </div>
@@ -480,9 +480,7 @@ export default function Profile() {
                                         <span className='text-sm font-medium text-black'>
                                           {follower.username}
                                         </span>
-                                        <span>
-                                          {follower.userProfile.fullname}
-                                        </span>
+                                        <span>{follower.fullname}</span>
                                       </div>
                                     </div>
                                   </div>

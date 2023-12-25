@@ -8,3 +8,15 @@ export interface Reaction {
   userTo: string;
   createdAt: string;
 }
+
+export interface IReactionDocument {
+  _id?: string;
+  username: string;
+  userId: string;
+  postId: string;
+  commentId?: string;
+  profilePicture: string;
+  createdAt?: Date;
+  userTo?: string;
+  comment?: string;
+}

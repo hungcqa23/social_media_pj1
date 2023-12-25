@@ -19,6 +19,7 @@ interface Props {
   isOpen: boolean;
   className?: string;
   classNameOverlay?: string;
+  disableUseDismiss?: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export default function Dialog({
@@ -26,6 +27,7 @@ export default function Dialog({
   renderDialog,
   className,
   as: Element = 'div',
+  disableUseDismiss = false,
   isOpen,
   setIsOpen,
   classNameOverlay = 'flex items-center justify-center bg-black/70'
@@ -37,7 +39,9 @@ export default function Dialog({
   });
 
   const click = useClick(context);
+
   const dismiss = useDismiss(context, {
+    enabled: !disableUseDismiss,
     outsidePressEvent: 'mousedown'
   });
   const role = useRole(context);

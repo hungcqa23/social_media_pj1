@@ -6,14 +6,25 @@ import { socketIOService } from './socket/socket';
 import { AppContext } from './contexts/app.contexts';
 import { IMessageData } from './types/conversation.type';
 import VideoCall from './pages/VideoCall';
+import Dialog from './components/Dialog';
+import CallDialog from './components/CallDialog/CallDialog';
+import { MediaConnection } from 'peerjs';
+
+export type ISender = {
+  username: string;
+  userProfilePicture: string;
+};
 
 function App() {
   const routeElement = useRouteElement();
   const { peer, setPeerId, profile } = useContext(AppContext);
+  const [isReceivingCall, setIsReceivingCall] = useState<boolean>(false);
   const [callAccepted, SetCallAccepted] = useState<boolean>(false);
   const [isWindowOpen, setIsWindowOpen] = useState<boolean>(false);
   const [callEnded, setCallEnded] = useState<boolean>(false);
   const [message, setMessage] = useState<IMessageData>();
+  const [sender, setSender] = useState<ISender>();
+  const [call, setCall] = useState<MediaConnection>();
   useEffect(() => {
     socketIOService.setUpConnection();
 
@@ -42,9 +53,19 @@ function App() {
           profile?.username.toLowerCase()
         ) {
           console.log(`You have a call from ${data.senderUsername}`);
-          SetCallAccepted(true);
           setMessage(data);
-          setIsWindowOpen(true);
+          peer.on('call', call => {
+            setIsReceivingCall(true);
+            setSender({
+              username: data.senderUsername,
+              userProfilePicture: data.senderProfilePicture
+            });
+            call.on('close', () => {
+              console.log('it works');
+              setIsReceivingCall(false);
+            });
+            setCall(call);
+          });
         }
       });
     }
@@ -53,14 +74,36 @@ function App() {
   const handleOnClose = () => {
     SetCallAccepted(!callAccepted);
     setCallEnded(!callEnded);
-  }
+  };
+
+  const handleAccept = () => {
+    SetCallAccepted(true);
+    setIsWindowOpen(true);
+    setIsReceivingCall(false);
+  };
 
   return (
     <div className='overflow-x-hidden overflow-y-hidden'>
       {routeElement}
+      <Dialog
+        isOpen={isReceivingCall}
+        setIsOpen={setIsReceivingCall}
+        className='hidden'
+        disableUseDismiss={true}
+        renderDialog={
+          <CallDialog
+            sender={sender!}
+            onAccept={handleAccept}
+            onReject={() => setIsReceivingCall(false)}
+          />
+        }
+      >
+        <></>
+      </Dialog>
       {callAccepted && isWindowOpen && (
         <VideoCall
           peer={peer}
+          call={call}
           isReceiver={true}
           callAccepted={callAccepted}
           senderProfilePicture={message?.senderProfilePicture}
