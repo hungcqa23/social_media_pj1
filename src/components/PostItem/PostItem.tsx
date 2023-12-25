@@ -309,6 +309,7 @@ export default function PostItem({
       },
       {
         onSuccess: () => {
+          console.log('Update post!');
           setContentTextarea('');
           setFile(undefined);
           setIsEditing(false);
