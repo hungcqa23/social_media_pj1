@@ -153,7 +153,13 @@ export default function SearchPage() {
       const selectDate = selectedDate ? new Date(selectedDate) : undefined;
       selectDate?.setDate(selectDate.getDate() + 1);
       // if (type === 'users') {
-      return profileApi.searchUsers(search, type, signal, selectDate);
+      return profileApi.searchUsers(
+        search,
+        type,
+        signal,
+        selectDate,
+        selectedCountry || undefined
+      );
       // }
       // return postApi.getPosts(search, signal);
     }
@@ -240,6 +246,7 @@ export default function SearchPage() {
                     isOpen={showCities}
                     setIsOpen={setShowCities}
                     className='flex py-2 text-sm font-medium text-black focus:outline-none'
+                    label={null}
                   >
                     <ul className='mt-2 flex max-h-52 w-80 flex-col overflow-y-auto rounded bg-white shadow'>
                       {countries.map(country => (

@@ -258,7 +258,7 @@ export default function EditProfile() {
                   isOpen={showCities}
                   setIsOpen={setShowCities}
                   className='flex w-full justify-center text-sm font-medium text-black'
-                  label={selectedCountry}
+                  label={selectedCountry || 'Select...'}
                 >
                   <ul className='mt-2 flex max-h-52 w-80 flex-col overflow-y-auto rounded bg-white shadow'>
                     {countries.map(country => {

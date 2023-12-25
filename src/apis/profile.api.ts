@@ -100,9 +100,9 @@ export const profileApi = {
     keyword: string,
     type?: string,
     signal?: AbortSignal,
-    date?: Date
+    date?: Date,
+    selectedCountry?: string
   ) => {
-    console.log('Type', type);
     if (!type) {
       return http.get<Search>(`search/post`, {
         params: {
@@ -114,7 +114,8 @@ export const profileApi = {
     }
     return http.get<Search>(`user/search`, {
       params: {
-        q: keyword
+        q: keyword,
+        location: selectedCountry
       },
       signal
     });
