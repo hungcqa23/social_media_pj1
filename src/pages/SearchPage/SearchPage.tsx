@@ -148,11 +148,11 @@ export default function SearchPage() {
   const [showCities, setShowCities] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const { data: searchData, isLoading } = useQuery({
-    queryKey: ['search', { search, type, selectedDate }],
+    queryKey: ['search', { search, type, selectedDate, selectedCountry }],
     queryFn: ({ signal }) => {
       const selectDate = selectedDate ? new Date(selectedDate) : undefined;
       selectDate?.setDate(selectDate.getDate() + 1);
-      // if (type === 'users') {
+      console.log(selectedCountry);
       return profileApi.searchUsers(
         search,
         type,
@@ -160,8 +160,6 @@ export default function SearchPage() {
         selectDate,
         selectedCountry || undefined
       );
-      // }
-      // return postApi.getPosts(search, signal);
     }
   });
 
