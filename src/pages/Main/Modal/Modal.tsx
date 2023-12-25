@@ -101,7 +101,9 @@ export default function Modal({
               position: toast.POSITION.TOP_RIGHT
             });
             closeModal();
-            queryClient.invalidateQueries({ queryKey: ['posts'] });
+            setTimeout(() => {
+              queryClient.invalidateQueries({ queryKey: ['posts'] });
+            }, 1000);
           },
           onError: () => {
             toast.error('Create post failed!', {

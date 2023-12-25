@@ -309,7 +309,6 @@ export default function PostItem({
       },
       {
         onSuccess: () => {
-          console.log('Update post!');
           setContentTextarea('');
           setFile(undefined);
           setIsEditing(false);
@@ -319,7 +318,8 @@ export default function PostItem({
               (query.queryKey[0] === 'posts' &&
                 query.queryKey[1] === post._id) ||
               (query.queryKey[0] === 'profile-materials' &&
-                query.queryKey[1] === post.userId)
+                query.queryKey[1] === post.userId) ||
+              query.queryKey[0] === 'posts'
           });
         }
       }
