@@ -126,7 +126,7 @@ export function Select({
         className={className}
         type='button'
       >
-        {selectedLabel ?? 'Hello World!...'}
+        {selectedLabel ?? 'Selected...'}
       </button>
 
       <SelectContext.Provider value={selectContext}>
