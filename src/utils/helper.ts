@@ -106,7 +106,6 @@ export const handleTextAreaChange = ({
   if (textAreaRef.current) {
     // Check if it's only 1 line
     const lineOfText = calculateNumLines(textAreaRef);
-    console.log(lineOfText);
     if (lineOfText <= 1) {
       return (textAreaRef.current.style.height = `${originalHeight}px`);
     }

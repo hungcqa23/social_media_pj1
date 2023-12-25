@@ -19,9 +19,9 @@ export default function FilterPost({ post }: Props) {
             <span className='text-xs font-normal text-gray-300'>
               {formatDate(createdAt as string)}
             </span>
-            <button className='text-xs font-semibold text-blue-500'>
+            {/* <button className='text-xs font-semibold text-blue-500'>
               Follow
-            </button>
+            </button> */}
           </div>
           <p className='mt-2 text-sm'>{post.post}</p>
           <div className='mt-4 flex gap-4'>
@@ -48,6 +48,19 @@ export default function FilterPost({ post }: Props) {
             />
           </Link>
         )}
+
+        {post.videoId !== '' && (
+          <Link to={`/posts/${post._id}`} className='p-2'>
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+            <video className='rounded-md' controls width={240}>
+              <source
+                src={`https://res.cloudinary.com/daszajz9a/video/upload/v${post.videoVersion}/${post.videoId}`}
+                type='video/mp4'
+              />
+            </video>
+          </Link>
+        )}
+
         {/* Images */}
         {/* {image && (
           <div className='flex flex-grow justify-end'>

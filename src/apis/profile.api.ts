@@ -82,9 +82,13 @@ export const profileApi = {
     quote?: string | undefined;
     work?: string | undefined;
     school?: string | undefined;
-    location?: string | undefined;
+    country?: string | undefined;
   }) => {
-    return http.put<GetProfile>(`user/update-background-info`, body);
+    return http.put<GetProfile>(`user/update-background-info`, {
+      ...body,
+      country: undefined,
+      location: body.country
+    });
   },
   uploadImageProfile: (body: { image: string }) => {
     return http.post<SuccessResponse>(`image/upload`, {
@@ -112,6 +116,17 @@ export const profileApi = {
         q: keyword
       },
       signal
+    });
+  },
+  updatePassword: (body: {
+    currentPassword: string;
+    password: string;
+    confirmPassword: string;
+  }) => {
+    return http.put<SuccessResponse>(`user/update-password`, {
+      currentPassword: body.currentPassword,
+      newPassword: body.password,
+      confirmPassword: body.confirmPassword
     });
   }
 };

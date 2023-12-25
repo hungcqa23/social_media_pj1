@@ -1,5 +1,6 @@
 import { Post } from 'src/types/post.type';
 import { SuccessResponse } from 'src/types/utils.type';
+import { convertFileToBase64 } from 'src/utils/file';
 import http from 'src/utils/http';
 
 const URL_GET_ALL_POSTS = 'post/all';
@@ -78,30 +79,39 @@ export const postApi = {
   getPostById(id: string) {
     return http.get<GetPostById>(`${URL_POST}/${id}`);
   },
-  updatePost({
-    postId,
+  async updatePost({
+    post,
     content,
     file
   }: {
-    postId: string;
+    post: Post;
     content: string;
     file?: File;
   }) {
     if (file) {
+      const stringBase64 = await convertFileToBase64(file);
       const fileExtension = file.name.split('.').pop();
       if (fileExtension === 'mp4') {
-        return http.put<CreatePost>(`${URL_POST}/${postId}`, {
+        return http.put<CreatePost>(`post-with-image/${post._id}`, {
           post: content,
-          video: file
+          video: stringBase64,
+          profilePicture: post.profilePicture
         });
       }
-      return http.put<CreatePost>(`${URL_POST}/${postId}`, {
+      return http.put<CreatePost>(`post-with-image/${post._id}`, {
         post: content,
-        image: file
+        image: stringBase64,
+        profilePicture: post.profilePicture
       });
     }
-    return http.put<CreatePost>(`${URL_POST}/${postId}`, {
-      post: content
+
+    return http.put<CreatePost>(`${URL_POST}/${post._id}`, {
+      post: content,
+      profilePicture: post.profilePicture,
+      videoId: post.videoId,
+      videoVersion: post.videoVersion,
+      imgVersion: post.imgVersion,
+      imgId: post.imgId
     });
   }
 };

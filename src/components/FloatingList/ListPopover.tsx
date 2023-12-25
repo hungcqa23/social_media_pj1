@@ -19,6 +19,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState
@@ -40,11 +41,18 @@ interface Props {
   className?: string;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  label: string | null;
 }
-export function Select({ children, className, isOpen, setIsOpen }: Props) {
+export function Select({
+  children,
+  className,
+  isOpen,
+  setIsOpen,
+  label
+}: Props) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
+  const [selectedLabel, setSelectedLabel] = useState<string | null>(label);
 
   const { refs, floatingStyles, context } = useFloating({
     placement: 'bottom-start',
@@ -106,6 +114,9 @@ export function Select({ children, className, isOpen, setIsOpen }: Props) {
     [activeIndex, selectedIndex, getItemProps, handleSelect]
   );
 
+  useEffect(() => {
+    setSelectedLabel(label);
+  }, [label]);
   return (
     <>
       <button
@@ -113,8 +124,9 @@ export function Select({ children, className, isOpen, setIsOpen }: Props) {
         tabIndex={0}
         {...getReferenceProps()}
         className={className}
+        type='button'
       >
-        {selectedLabel ?? 'Select...'}
+        {selectedLabel ?? 'Hello World!...'}
       </button>
 
       <SelectContext.Provider value={selectContext}>
@@ -141,25 +153,28 @@ export function Select({ children, className, isOpen, setIsOpen }: Props) {
 export function Option({
   label,
   className = 'p-2 text-sm font-medium',
-  onClick
+  onClick,
+  isSelectedOption
 }: {
   label: string;
   className?: string;
   onClick: () => void;
+  isSelectedOption?: boolean;
 }) {
   const { activeIndex, selectedIndex, getItemProps, handleSelect } =
     useContext(SelectContext);
 
   const { ref, index } = useListItem({ label });
 
-  const isActive = activeIndex === index;
+  const isActive = isSelectedOption || activeIndex === index;
   const isSelected = selectedIndex === index;
-
+  // Kiểm tra prop isSelectedOption để xác định liệu option có được chọn hay không
+  const finalIsSelected = isSelectedOption || isSelected;
   return (
     <button
       ref={ref}
       role='option'
-      aria-selected={isActive && isSelected}
+      aria-selected={isActive && finalIsSelected}
       tabIndex={isActive ? 0 : -1}
       {...getItemProps({
         onClick: () => {
@@ -171,6 +186,7 @@ export function Option({
         'bg-gray-200': isActive,
         'font-bold': isSelected
       })}
+      type='button'
     >
       {label}
     </button>

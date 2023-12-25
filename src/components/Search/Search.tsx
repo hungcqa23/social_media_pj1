@@ -35,7 +35,7 @@ export default function Search({
               onChange(filter);
             }
           }}
-          placeholder='Search Instacloud'
+          placeholder='Search Instacloud...'
           className='focus:text-black-500 grow bg-gray-100 text-black outline-none focus:outline-none'
           maxLength={100}
         />

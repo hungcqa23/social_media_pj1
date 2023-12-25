@@ -29,6 +29,7 @@ import EditProfile from './pages/EditProfile';
 import Profile from './pages/Profile';
 import YourContent from './pages/YourContent';
 import PostPage from './pages/PostPage';
+import AccountPassword from './pages/EditProfile/AccountPassword';
 // import NotFound from './pages/NotFound';
 
 // const Login = lazy(() => import('./pages/Login'));
@@ -138,6 +139,10 @@ export default function useRouteElement() {
                 {
                   path: path.blocked_accounts,
                   element: <BlockedAccount />
+                },
+                {
+                  path: path.account_password,
+                  element: <AccountPassword />
                 }
               ]
             },

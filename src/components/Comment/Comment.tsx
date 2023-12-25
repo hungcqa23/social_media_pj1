@@ -144,7 +144,7 @@ export default function Comment({ comment }: Props) {
           className='h-8 w-8 flex-shrink-0'
           classNameImage='h-8 w-8'
           src={comment.profilePicture}
-          to={`${comment.userId}`}
+          to={`/${comment.userId}`}
         />
 
         <div
@@ -357,7 +357,7 @@ export default function Comment({ comment }: Props) {
 
             {/* Content Editing*/}
             {isEditing && (
-              <form onSubmit={updateComment}>
+              <form onSubmit={updateComment} className='w-full'>
                 <div className='flex gap-2'>
                   {/* Input */}
                   <div className='grow rounded-3xl bg-gray-100'>

@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 import Button from 'src/components/Button';
 import Input from 'src/components/Input';
 import authApi from 'src/apis/auth.api';
-import { setAccessTokenToLS, setProfileToLS } from 'src/utils/auth';
 import { ErrorResponse } from 'src/types/utils.type';
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils';
 import { schema } from 'src/utils/rules';

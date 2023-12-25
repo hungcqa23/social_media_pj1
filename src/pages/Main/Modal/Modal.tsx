@@ -61,14 +61,10 @@ export default function Modal({
       // Set the height to the scrollHeight
     }
   };
-  const handleOpenFile = () => {
-    inputRef?.current?.click();
-  };
 
   const onSubmit = handleSubmit(async data => {
     const stringBase64 = file ? await convertFileToBase64(file) : '';
     if (file) {
-      console.log(stringBase64);
       createPostWithMediaMutation.mutate(
         {
           post: data.content,
@@ -88,7 +84,7 @@ export default function Modal({
             closeModal();
           },
           onError: () => {
-            toast.error('Create post failed!', {
+            toast.error('Create post failed! Size must be less than 5MB', {
               position: toast.POSITION.TOP_RIGHT
             });
           }
@@ -132,6 +128,9 @@ export default function Modal({
     }
   };
 
+  const handleOpenFile = () => {
+    inputRef?.current?.click();
+  };
   return (
     <form
       className={`flex min-h-[30rem] w-[28rem] flex-col justify-between rounded-lg bg-white shadow md:w-[33rem]`}
@@ -325,8 +324,8 @@ export default function Modal({
                 <input
                   type='file'
                   className='hidden'
+                  accept='image/*,.mp4'
                   ref={inputRef}
-                  accept='image/*'
                   onChange={onChangeFile}
                 />
               </button>

@@ -16,6 +16,7 @@ const path = {
   accounts: 'accounts',
   emails: 'emails',
   blocked_accounts: 'blocked_accounts',
+  account_password: 'account_password',
   all: '*',
   id: ':id'
 } as const;

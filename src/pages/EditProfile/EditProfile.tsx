@@ -7,12 +7,13 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Input from 'src/components/Input';
 import { ProfileSchema, profile } from 'src/utils/rules';
-import { isAxiosUnprocessableEntityError } from 'src/utils/utils';
+import { Select, Option } from 'src/components/FloatingList/ListPopover';
 import { toast } from 'react-toastify';
 import { convertFileToBase64 } from 'src/utils/file';
 import InputFile from 'src/components/InputFile/InputFile';
 import { useAppContext } from 'src/contexts/app.contexts';
 import { setProfileToLS } from 'src/utils/auth';
+import countries from 'src/assets/data/country';
 
 type FormData = Pick<
   ProfileSchema,
@@ -37,7 +38,11 @@ export default function EditProfile() {
   const profile = profileData?.data.user;
   const [file, setFile] = useState<File>();
   const updateProfileMutation = useMutation({
-    mutationFn: (data: FormData) => profileApi.updateProfile(data)
+    mutationFn: (
+      data: FormData & {
+        country?: string;
+      }
+    ) => profileApi.updateProfile(data)
   });
   const uploadProfileMutation = useMutation({
     mutationFn: (data: { image: string }) => profileApi.uploadImageProfile(data)
@@ -51,6 +56,8 @@ export default function EditProfile() {
     defaultValues: {},
     resolver: yupResolver<FormData>(profileSchema)
   });
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [showCities, setShowCities] = useState<boolean>(false);
 
   const {
     register,
@@ -79,6 +86,7 @@ export default function EditProfile() {
       setValue('quote', profile?.quote);
       setValue('work', profile?.work);
       setValue('school', profile?.school);
+      setSelectedCountry(profile?.location);
       setValueText(profile?.quote || '');
     }
   }, [profile, setValue]);
@@ -94,12 +102,13 @@ export default function EditProfile() {
         facebook: undefined,
         twitter: undefined,
         youtube: undefined,
-        quote: valueText
+        quote: valueText,
+        country: selectedCountry || undefined
       });
       setProfile(res.data.user);
       setProfileToLS(res.data.user);
       setTimeout(() => {
-        location.reload();
+        // location.reload();
       }, 1000);
 
       toast.success('Update profile successfully!');
@@ -244,13 +253,27 @@ export default function EditProfile() {
                 Location
               </span>
 
-              <Input
-                className='flex-grow'
-                type='text'
-                classNameInput='p-2 h-9 w-full max-w-sm rounded border outline-none'
-                register={register}
-                name='location'
-              />
+              <div className='h-9 w-full max-w-sm rounded border p-2'>
+                <Select
+                  isOpen={showCities}
+                  setIsOpen={setShowCities}
+                  className='flex w-full justify-center text-sm font-medium text-black'
+                  label={selectedCountry}
+                >
+                  <ul className='mt-2 flex max-h-52 w-80 flex-col overflow-y-auto rounded bg-white shadow'>
+                    {countries.map(country => {
+                      return (
+                        <Option
+                          key={country.code}
+                          label={country.name}
+                          onClick={() => setSelectedCountry(country.name)}
+                          isSelectedOption={selectedCountry === country.name}
+                        />
+                      );
+                    })}
+                  </ul>
+                </Select>
+              </div>
             </div>
           </div>
 
