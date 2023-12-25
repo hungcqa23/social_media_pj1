@@ -35,6 +35,7 @@ export default function Modal({
     mutationFn: (
       body: Post & {
         image?: string;
+        video?: string;
       }
     ) => postApi.createPostWithMedia(body)
   });
@@ -60,9 +61,6 @@ export default function Modal({
       // Set the height to the scrollHeight
     }
   };
-  const handleOpenFile = () => {
-    inputRef?.current?.click();
-  };
 
   const onSubmit = handleSubmit(async data => {
     const stringBase64 = file ? await convertFileToBase64(file) : '';
@@ -71,7 +69,8 @@ export default function Modal({
         {
           post: data.content,
           profilePicture: profile?.profilePicture,
-          image: stringBase64,
+          image: fileExtension !== 'mp4' ? stringBase64 : undefined,
+          video: fileExtension === 'mp4' ? stringBase64 : undefined,
           privacy: 'public'
         },
         {
@@ -85,7 +84,7 @@ export default function Modal({
             closeModal();
           },
           onError: () => {
-            toast.error('Create post failed!', {
+            toast.error('Create post failed! Size must be less than 5MB', {
               position: toast.POSITION.TOP_RIGHT
             });
           }
@@ -113,7 +112,8 @@ export default function Modal({
       );
     }
   });
-  const onChangeFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const fileExtension = file?.name?.split('.')?.pop()?.toLowerCase() || '';
+  const onChangeFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setFile(event.target.files[0]);
     }
@@ -121,8 +121,16 @@ export default function Modal({
   const onCloseFile = () => {
     setFile(null);
     setIncludesMedia(false);
+
+    // Reset the file input value
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
   };
 
+  const handleOpenFile = () => {
+    inputRef?.current?.click();
+  };
   return (
     <form
       className={`flex min-h-[30rem] w-[28rem] flex-col justify-between rounded-lg bg-white shadow md:w-[33rem]`}
@@ -246,13 +254,25 @@ export default function Modal({
                           </button>
                         )}
 
-                        {file && (
+                        {file && fileExtension !== 'mp4' && (
                           <div className='p-2'>
                             <img
                               src={URL.createObjectURL(file)}
                               alt='User Upload'
                               className='h-full w-full rounded-md'
                             />
+                          </div>
+                        )}
+
+                        {file && fileExtension === 'mp4' && (
+                          <div className='p-2'>
+                            {/*eslint-disable-next-line jsx-a11y/media-has-caption*/}
+                            <video controls>
+                              <source
+                                src={URL.createObjectURL(file)}
+                                type='video/mp4'
+                              />
+                            </video>
                           </div>
                         )}
 
@@ -304,8 +324,8 @@ export default function Modal({
                 <input
                   type='file'
                   className='hidden'
+                  accept='image/*,.mp4'
                   ref={inputRef}
-                  accept='image/*'
                   onChange={onChangeFile}
                 />
               </button>

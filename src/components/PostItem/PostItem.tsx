@@ -1,10 +1,11 @@
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import Profile from '../IconProfile';
 import Comment from '../Comment';
 import List from '../List';
 import Dialog from '../Dialog';
 import { Post } from 'src/types/post.type';
 import {
+  fileNameExtension,
   formatDate,
   formatSocialNumber,
   handleTextAreaChange
@@ -22,6 +23,7 @@ import CopyButton from './CopyButton';
 import Modal from '../Modal';
 import { useForm } from 'react-hook-form';
 import IconProfile from '../IconProfile';
+import Spinner from '../Spinner';
 
 interface States {
   openOptions: boolean;
@@ -103,16 +105,28 @@ interface PostProps {
 export default function PostItem({
   post,
   innerRef,
-  className = 'max-w-xl w-full rounded-lg border shadow'
+  className = 'max-w-xl w-full rounded-lg border shadow relative'
 }: PostProps) {
   const { profile } = useAppContext();
   const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [contentTextarea, setContentTextarea] = useState('');
+  const [commentTextarea, setCommentTextarea] = useState('');
+  const [contentTextarea, setContentTextarea] = useState(() => {
+    if (post.post) {
+      return post.post;
+    }
+    return '';
+  });
   const [isEditing, setIsEditing] = useState(false);
+  const [file, setFile] = useState<File>();
+  const [isShowMedia, setIsShowMedia] = useState(
+    () => post.imgVersion !== '' || post.videoVersion !== '' || false
+  );
+
+  const inputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const contentRef = useRef<HTMLTextAreaElement | null>(null);
-
+  const isOwner = post.username === profile?.username;
   // Form data for comment and submit comment
   const { register, handleSubmit, watch, reset, setValue } = useForm<{
     content: string;
@@ -120,10 +134,10 @@ export default function PostItem({
 
   useEffect(() => {
     if (isEditing) {
-      setValue('content', post.post || '');
+      setContentTextarea(post.post ?? '');
       contentRef.current?.focus();
     }
-  }, [isEditing, post.post, setValue]);
+  }, [isEditing, post.post]);
 
   const { ref, onChange, name } = register('content');
 
@@ -142,7 +156,7 @@ export default function PostItem({
         profilePicture: profile?.profilePicture || ''
       }),
     onSuccess: () => {
-      // queryClient.invalidateQueries({ queryKey: ['comments', post._id] });
+      setCommentTextarea('');
       setTimeout(() => {
         queryClient.invalidateQueries({
           predicate: query =>
@@ -154,10 +168,15 @@ export default function PostItem({
       }, 200);
     }
   });
+  const [moreComments, setMoreComments] = useState(() => {
+    if (comments.length > 3) {
+      return true;
+    }
+    return false;
+  });
   const onPostComment = (e: React.FormEvent) => {
     e.preventDefault();
-    addCommentMutation.mutate({ comment: contentTextarea });
-    setContentTextarea('');
+    addCommentMutation.mutate({ comment: commentTextarea });
   };
 
   // Saved Posts
@@ -252,12 +271,65 @@ export default function PostItem({
     dispatch({ type: ACTION_TYPES.CLOSE });
   };
 
-  const isOwner = post.username === profile?.username;
+  // Update Post
+  const updatePostMutation = useMutation({
+    mutationFn: (body: { content: string; file?: File }) =>
+      postApi.updatePost({
+        post: {
+          ...post,
+          imgId: isShowMedia ? post.imgId : '',
+          imgVersion: isShowMedia ? post.imgVersion : '',
+          videoId: isShowMedia ? post.videoId : '',
+          videoVersion: isShowMedia ? post.videoVersion : ''
+        },
+        content: body.content,
+        file
+      })
+  });
+  const onChangeFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setFile(event.target.files[0]);
+    }
+  };
+  const previewFile = useMemo(() => {
+    return file ? URL.createObjectURL(file) : undefined;
+  }, [file]);
+  const handleOpenFile = () => {
+    inputRef?.current?.click();
+  };
+  const onCloseFile = () => {
+    setFile(undefined);
+    setIsShowMedia(false);
+  };
+  const onUpdatePost = () => {
+    updatePostMutation.mutate(
+      {
+        content: contentTextarea,
+        file: isShowMedia ? undefined : file
+      },
+      {
+        onSuccess: () => {
+          setContentTextarea('');
+          setFile(undefined);
+          setIsEditing(false);
+          setIsShowMedia(true);
+          queryClient.invalidateQueries({
+            predicate: query =>
+              (query.queryKey[0] === 'posts' &&
+                query.queryKey[1] === post._id) ||
+              (query.queryKey[0] === 'profile-materials' &&
+                query.queryKey[1] === post.userId)
+          });
+        }
+      }
+    );
+  };
 
   return (
     <div className={classNames(className)} ref={innerRef}>
       {/* Header */}
       <div className='flex h-16 items-center justify-between p-4'>
+        {/* Information about post */}
         <div className='flex items-center md:items-start'>
           <div className='mr-2'>
             <Profile src={post.profilePicture} to={`/${post.userId}`} />
@@ -274,6 +346,7 @@ export default function PostItem({
           </div>
         </div>
 
+        {/* Save and edit */}
         <div className='flex'>
           {/* Saved button */}
           <Button
@@ -313,7 +386,7 @@ export default function PostItem({
               ))}
           </Button>
 
-          {/* Edit post */}
+          {/* Option interaction post */}
           {isOwner && (
             <Dialog
               isOpen={state.openMenu}
@@ -341,6 +414,7 @@ export default function PostItem({
                         className='justify-center border-t border-gray-300 p-3 font-semibold text-red-500'
                         onClick={() => {
                           setIsEditing(true);
+                          contentRef.current?.focus();
                           dispatch({ type: ACTION_TYPES.CLOSE });
                         }}
                       >
@@ -441,62 +515,163 @@ export default function PostItem({
         {!isEditing && (
           <p className='text-sm font-normal text-gray-950'>{post.post}</p>
         )}
+
         {isEditing && (
           <>
             <textarea
-              className='h-12 max-h-20 w-full resize-none overflow-y-hidden whitespace-pre-wrap text-base font-normal text-black placeholder:text-gray-600 focus:outline-none'
+              className='h-10 max-h-20 w-full resize-none overflow-y-hidden whitespace-pre-wrap text-base font-normal text-black placeholder:text-gray-600 focus:outline-none'
               onChange={event => {
                 handleTextAreaChange({
                   textAreaRef: contentRef,
-                  originalHeight: 48
+                  originalHeight: 40
                 });
-                onChange(event);
+                setContentTextarea(event.target.value);
               }}
               ref={e => {
-                ref(e);
+                // ref(e);
                 contentRef.current = e;
               }}
               onKeyDown={event => {
                 if (event.key === 'Escape') {
+                  setFile(undefined);
+                  setIsShowMedia(true);
                   setIsEditing(false);
                 }
+
+                if (event.key === 'Enter') {
+                  onUpdatePost();
+                }
               }}
+              value={contentTextarea}
               name={name}
             />
             <p className='text-xs text-black'>
               Press{' '}
               <button
-                className='text-blue-500 hover:underline'
-                onClick={() => setIsEditing(false)}
+                className='font-medium text-blue-600 hover:underline'
+                onClick={() => {
+                  onUpdatePost();
+                }}
               >
                 Enter
               </button>{' '}
               to save or{' '}
               <button
-                className='text-blue-500 hover:underline'
+                className='font-medium text-blue-600 hover:underline'
                 onClick={() => {
+                  setFile(undefined);
+                  setIsShowMedia(true);
                   setIsEditing(false);
-                  contentRef.current?.blur();
                 }}
               >
                 Esc
               </button>{' '}
               to cancel
             </p>
+
+            {!isShowMedia && !file && (
+              <>
+                <button
+                  className='hover:pointer flex h-9 w-full items-center justify-center gap-2 rounded bg-gray-50 outline-none hover:bg-gray-100'
+                  onClick={handleOpenFile}
+                  type='button'
+                >
+                  <span>
+                    <svg
+                      className='h-6 w-6'
+                      viewBox='0 0 36 36'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path
+                        d='M30.375 5.625H10.125C9.52826 5.625 8.95597 5.86205 8.53401 6.28401C8.11205 6.70597 7.875 7.27826 7.875 7.875V10.125H5.625C5.02826 10.125 4.45597 10.3621 4.03401 10.784C3.61205 11.206 3.375 11.7783 3.375 12.375V28.125C3.375 28.7217 3.61205 29.294 4.03401 29.716C4.45597 30.1379 5.02826 30.375 5.625 30.375H25.875C26.4717 30.375 27.044 30.1379 27.466 29.716C27.8879 29.294 28.125 28.7217 28.125 28.125V25.875H30.375C30.9717 25.875 31.544 25.6379 31.966 25.216C32.3879 24.794 32.625 24.2217 32.625 23.625V7.875C32.625 7.27826 32.3879 6.70597 31.966 6.28401C31.544 5.86205 30.9717 5.625 30.375 5.625ZM24.1875 10.125C24.5213 10.125 24.8475 10.224 25.125 10.4094C25.4025 10.5948 25.6188 10.8584 25.7465 11.1667C25.8743 11.4751 25.9077 11.8144 25.8426 12.1417C25.7775 12.4691 25.6167 12.7697 25.3807 13.0057C25.1447 13.2417 24.8441 13.4025 24.5167 13.4676C24.1894 13.5327 23.8501 13.4993 23.5417 13.3715C23.2334 13.2438 22.9698 13.0275 22.7844 12.75C22.599 12.4725 22.5 12.1463 22.5 11.8125C22.5 11.3649 22.6778 10.9357 22.9943 10.6193C23.3107 10.3028 23.7399 10.125 24.1875 10.125ZM25.875 28.125H5.625V12.375H7.875V23.625C7.875 24.2217 8.11205 24.794 8.53401 25.216C8.95597 25.6379 9.52826 25.875 10.125 25.875H25.875V28.125ZM30.375 23.625H10.125V18.5625L15.1875 13.5L22.1709 20.4834C22.3819 20.6943 22.6679 20.8127 22.9662 20.8127C23.2644 20.8127 23.5504 20.6943 23.7614 20.4834L27.3698 16.875L30.375 19.8816V23.625Z'
+                        fill='black'
+                      />
+                    </svg>
+                  </span>
+
+                  <span className='text-sm font-medium text-black'>
+                    Add photos/videos
+                  </span>
+                </button>
+
+                <input
+                  type='file'
+                  className='hidden'
+                  accept='image/*,.mp4'
+                  ref={inputRef}
+                  onChange={onChangeFile}
+                />
+              </>
+            )}
           </>
         )}
       </div>
 
       {/* Image or video */}
-      {post.imgVersion !== '' && (
-        <div className='flex justify-center border-t py-2'>
+      <div
+        className={classNames('relative justify-center border-t py-2', {
+          hidden:
+            ((post.imgVersion === '' && post.videoVersion === '') ||
+              !isShowMedia) &&
+            !file,
+          flex: post.imgVersion !== '' || post.videoVersion !== '' || file
+        })}
+      >
+        {isShowMedia && (
+          <>
+            {post.imgVersion !== '' && (
+              <img
+                src={`https://res.cloudinary.com/daszajz9a/image/upload/v${post.imgVersion}/${post.imgId}`}
+                alt='Post'
+                className='w-4/5 object-cover p-4'
+              />
+            )}
+
+            {post.videoVersion !== '' && (
+              // eslint-disable-next-line jsx-a11y/media-has-caption
+              <video controls className='w-4/5 object-cover p-4'>
+                <source
+                  src={`https://res.cloudinary.com/daszajz9a/video/upload/v${post.videoVersion}/${post.videoId}`}
+                  type='video/mp4'
+                />
+              </video>
+            )}
+          </>
+        )}
+
+        {file && fileNameExtension(file) !== 'mp4' && (
           <img
-            src={`https://res.cloudinary.com/daszajz9a/image/upload/v${post.imgVersion}/${post.imgId}`}
+            src={previewFile as string}
             alt='Post'
             className='w-4/5 object-cover p-4'
           />
-        </div>
-      )}
+        )}
+
+        {file && fileNameExtension(file) === 'mp4' && (
+          // eslint-disable-next-line jsx-a11y/media-has-caption
+          <video controls className='w-4/5 object-cover p-4'>
+            <source src={previewFile as string} type='video/mp4' />
+          </video>
+        )}
+
+        {isEditing && (isShowMedia || file) && (
+          <button
+            className='absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full border bg-white hover:bg-gray-100'
+            onClick={() => {
+              onCloseFile();
+            }}
+            type='button'
+          >
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              viewBox='0 0 384 512'
+              className='h-5 fill-gray-500'
+            >
+              <path d='M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z' />
+            </svg>
+          </button>
+        )}
+      </div>
 
       {/* Interaction */}
       <div className={`flex flex-col border-t border-gray-200 px-4 `}>
@@ -607,9 +782,17 @@ export default function PostItem({
       </div>
 
       {/* Comments */}
+      {moreComments && (
+        <button
+          className='pl-2 text-sm font-medium text-gray-500 hover:underline'
+          onClick={() => setMoreComments(false)}
+        >
+          View all {comments.length} comments
+        </button>
+      )}
       {!isLoadingComment &&
         List<IComment>({
-          listItems: comments,
+          listItems: moreComments ? comments.slice(0, 3) : comments,
           as: 'ul',
           mapFn: (comment: IComment) => (
             <Comment key={comment._id} comment={comment} />
@@ -653,7 +836,7 @@ export default function PostItem({
                 className='h-9 w-full flex-grow resize-none overflow-y-hidden bg-transparent p-2 text-sm font-normal text-gray-700 outline-none transition-all'
                 placeholder='Write a comment...'
                 onChange={event => {
-                  setContentTextarea(event.target.value);
+                  setCommentTextarea(event.target.value);
                   handleTextAreaChange({
                     textAreaRef: textareaRef
                   });
@@ -661,17 +844,16 @@ export default function PostItem({
                 ref={e => {
                   textareaRef.current = e;
                 }}
-                // name={commentRegister.name}
                 onKeyDown={event => {
                   if (event.key === 'Enter' && !event.shiftKey) {
                     event.preventDefault();
                     onPostComment(event);
                   }
                 }}
-                value={contentTextarea}
+                value={commentTextarea}
               />
 
-              {contentTextarea !== '' && (
+              {commentTextarea !== '' && (
                 <button
                   className='mb-1 mr-3 flex h-8 w-8 items-center justify-center self-end rounded-full hover:bg-gray-200'
                   type='submit'
@@ -696,6 +878,12 @@ export default function PostItem({
           </div>
         </div>
       </form>
+
+      {updatePostMutation.isPending && (
+        <div className='absolute inset-0 flex items-center justify-center bg-white opacity-80'>
+          <Spinner />
+        </div>
+      )}
     </div>
   );
 }

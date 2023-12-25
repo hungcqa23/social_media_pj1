@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation } from '@tanstack/react-query';
@@ -7,11 +7,6 @@ import { toast } from 'react-toastify';
 import Button from 'src/components/Button';
 import Input from 'src/components/Input';
 import authApi from 'src/apis/auth.api';
-import {
-  getProfileFromLS,
-  setAccessTokenToLS,
-  setProfileToLS
-} from 'src/utils/auth';
 import { ErrorResponse } from 'src/types/utils.type';
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils';
 import { schema } from 'src/utils/rules';
@@ -27,7 +22,7 @@ const loginSchema = schema.pick(['username', 'password']);
 
 export default function Login() {
   const { setIsAuthenticated, setProfile } = useAppContext();
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -44,15 +39,14 @@ export default function Login() {
   const onSubmit = handleSubmit(data => {
     loginMutation.mutate(data, {
       onSuccess: data => {
-        setAccessTokenToLS(data.data.token as string);
         toast.success('Login successfully', {
           position: toast.POSITION.TOP_RIGHT
         });
         setProfile(data.data.user);
-        setProfileToLS(data.data.user);
         setTimeout(() => {
           setIsAuthenticated(true);
-        }, 1000);
+          navigate('/login');
+        }, 2000);
       },
 
       onError: (error: unknown) => {

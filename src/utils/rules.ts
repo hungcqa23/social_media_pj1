@@ -84,6 +84,7 @@ export const schema = object({
     .email('Invalid email')
     .min(5, 'The length of email should be 5 - 255 characters')
     .max(255, 'The length of email should be 5 - 255 characters'),
+  currentPassword: yup.string().required('Current password is required'),
   username: yup
     .string()
     .required('Username is required')

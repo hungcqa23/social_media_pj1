@@ -23,10 +23,13 @@ export default function NotificationItem({
       });
     }
   });
-
+  const url =
+    notification.notificationType !== 'follows'
+      ? `/posts/${notification.entityId}`
+      : `/${notification.userFrom}`;
   return (
     <Link
-      to={'#'}
+      to={url}
       className='block w-full py-1 hover:bg-gray-200'
       onClick={() => {
         if (!isRead) {
@@ -40,6 +43,7 @@ export default function NotificationItem({
             className='mr-3 flex h-14 w-14'
             classNameImage='h-14 w-14'
             isImage
+            src={notification?.userFromProfilePicture}
           />
           <div
             className={classNames(

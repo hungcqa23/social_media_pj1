@@ -69,23 +69,23 @@ export default function Profile() {
         </svg>
       )
     },
-    {
-      value: 'videos',
-      isMatch: false,
-      svg: ({ isMatch }: { isMatch: boolean }) => (
-        <svg
-          className='h-6 w-6'
-          viewBox='0 0 24 24'
-          fill='none'
-          xmlns='http://www.w3.org/2000/svg'
-        >
-          <path
-            d='M2 2H22V22H2V2ZM4 4V20H20V4H4ZM8 6.37L17.75 12L8 17.63V6.37ZM10 9.835V14.165L13.75 12L10 9.835Z'
-            className={classNamePath({ isMatch })}
-          />
-        </svg>
-      )
-    },
+    // {
+    //   value: 'videos',
+    //   isMatch: false,
+    //   svg: ({ isMatch }: { isMatch: boolean }) => (
+    //     <svg
+    //       className='h-6 w-6'
+    //       viewBox='0 0 24 24'
+    //       fill='none'
+    //       xmlns='http://www.w3.org/2000/svg'
+    //     >
+    //       <path
+    //         d='M2 2H22V22H2V2ZM4 4V20H20V4H4ZM8 6.37L17.75 12L8 17.63V6.37ZM10 9.835V14.165L13.75 12L10 9.835Z'
+    //         className={classNamePath({ isMatch })}
+    //       />
+    //     </svg>
+    //   )
+    // },
     {
       value: 'saved',
       isMatch: false,

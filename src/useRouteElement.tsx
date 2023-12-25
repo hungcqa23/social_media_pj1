@@ -22,19 +22,20 @@ import NotificationBar from './components/NotificationBar';
 import Messages from './pages/Messages';
 import ResetPassword from './pages/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword';
-// import Register from './pages/Register';
+import Register from './pages/Register';
 import Main from './pages/Main';
 import EmailSetting from './pages/EmailSetting';
 import EditProfile from './pages/EditProfile';
 import Profile from './pages/Profile';
 import YourContent from './pages/YourContent';
 import PostPage from './pages/PostPage';
+import AccountPassword from './pages/EditProfile/AccountPassword';
 // import NotFound from './pages/NotFound';
 
 // const Login = lazy(() => import('./pages/Login'));
 // const MainLayout = lazy(() => import('./layouts/MainLayout'));
 // const Main = lazy(() => import('./pages/Main'));
-const Register = lazy(() => import('./pages/Register'));
+// const Register = lazy(() => import('./pages/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 // const PostPage = lazy(() => import('./pages/PostPage'));
 
@@ -138,6 +139,10 @@ export default function useRouteElement() {
                 {
                   path: path.blocked_accounts,
                   element: <BlockedAccount />
+                },
+                {
+                  path: path.account_password,
+                  element: <AccountPassword />
                 }
               ]
             },

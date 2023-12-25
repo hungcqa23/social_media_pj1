@@ -1,8 +1,4 @@
-import {
-  calculateTimeAgo,
-  formatDate,
-  formatSocialNumber
-} from 'src/utils/helper';
+import { formatDate, formatSocialNumber } from 'src/utils/helper';
 import IconProfile from '../IconProfile';
 import { Post } from 'src/types/post.type';
 import { Link } from 'react-router-dom';
@@ -12,7 +8,7 @@ interface Props {
 }
 export default function FilterPost({ post }: Props) {
   const { username, createdAt, commentsCount } = post;
-  const like = post.reactions.like;
+  const like = post.reactions?.like || 0;
   return (
     <div className='mt-5 px-4 pb-4'>
       <div className='flex w-full flex-col items-center border-b pb-4 sm:flex-row sm:items-stretch'>
@@ -23,9 +19,9 @@ export default function FilterPost({ post }: Props) {
             <span className='text-xs font-normal text-gray-300'>
               {formatDate(createdAt as string)}
             </span>
-            <button className='text-xs font-semibold text-blue-500'>
+            {/* <button className='text-xs font-semibold text-blue-500'>
               Follow
-            </button>
+            </button> */}
           </div>
           <p className='mt-2 text-sm'>{post.post}</p>
           <div className='mt-4 flex gap-4'>
@@ -52,6 +48,19 @@ export default function FilterPost({ post }: Props) {
             />
           </Link>
         )}
+
+        {post.videoId !== '' && (
+          <Link to={`/posts/${post._id}`} className='p-2'>
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+            <video className='rounded-md' controls width={240}>
+              <source
+                src={`https://res.cloudinary.com/daszajz9a/video/upload/v${post.videoVersion}/${post.videoId}`}
+                type='video/mp4'
+              />
+            </video>
+          </Link>
+        )}
+
         {/* Images */}
         {/* {image && (
           <div className='flex flex-grow justify-end'>

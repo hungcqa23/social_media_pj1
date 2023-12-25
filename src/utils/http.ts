@@ -1,11 +1,15 @@
 import axios, { AxiosError, HttpStatusCode, type AxiosInstance } from 'axios';
-import { clearLS, getAccessTokenFromLS, setProfileToLS } from './auth';
+import {
+  clearLS,
+  getAccessTokenFromLS,
+  setAccessTokenToLS,
+  setProfileToLS
+} from './auth';
 import { toast } from 'react-toastify';
 import { URL_LOGIN, URL_LOGOUT, URL_REGISTER } from 'src/apis/auth.api';
 import { AuthResponse } from 'src/types/auth.type';
 
 export const BASE_ENDPOINT = 'http://localhost:5000/api/v1';
-
 
 class Http {
   private accessToken: string;
@@ -20,7 +24,7 @@ class Http {
 
     this.instance = axios.create({
       baseURL: BASE_ENDPOINT,
-      timeout: 10000,
+      timeout: 15000,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -47,8 +51,8 @@ class Http {
         const { url } = response.config;
         if (url === URL_LOGIN || url === URL_REGISTER) {
           const data = response.data as AuthResponse;
-          console.log(data);
-          // setProfileToLS(data.user);
+          setProfileToLS(data.user);
+          setAccessTokenToLS(data.token);
         } else if (url === URL_LOGOUT) {
           this.accessToken = '';
           // this.refreshToken = '';

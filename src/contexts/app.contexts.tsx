@@ -11,6 +11,7 @@ interface AppContextInterface {
   peer: Peer;
   peerId: string | null;
   setPeerId: React.Dispatch<React.SetStateAction<string | null>>;
+  reset: () => void;
 }
 
 export const getInitialAppContext = (): AppContextInterface => ({
@@ -20,7 +21,8 @@ export const getInitialAppContext = (): AppContextInterface => ({
   setProfile: () => null,
   peer: new Peer(),
   peerId: null,
-  setPeerId: () => null
+  setPeerId: () => null,
+  reset: () => null
 });
 
 const initialContext = getInitialAppContext();
@@ -38,17 +40,21 @@ export const AppProvider = ({
     defaultValue.isAuthenticated
   );
   const [profile, setProfile] = useState<User | null>(defaultValue.profile);
-
+  const reset = () => {
+    setIsAuthenticated(false);
+    setProfile(null);
+  };
   return (
     <AppContext.Provider
       value={{
         isAuthenticated,
         setIsAuthenticated,
-        profile: defaultValue.profile,
-        setProfile: defaultValue.setProfile,
+        profile,
+        setProfile,
         peer: defaultValue.peer,
         peerId: defaultValue.peerId,
-        setPeerId: defaultValue.setPeerId
+        setPeerId: defaultValue.setPeerId,
+        reset
       }}
     >
       {children}

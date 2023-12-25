@@ -106,7 +106,6 @@ export const handleTextAreaChange = ({
   if (textAreaRef.current) {
     // Check if it's only 1 line
     const lineOfText = calculateNumLines(textAreaRef);
-    console.log(lineOfText);
     if (lineOfText <= 1) {
       return (textAreaRef.current.style.height = `${originalHeight}px`);
     }
@@ -121,4 +120,8 @@ export const handleTextAreaChange = ({
     textAreaRef.current.style.height = 'auto'; // Reset the height to auto to adjust to content
     textAreaRef.current.style.height = textAreaRef.current.scrollHeight + 'px'; // Set the height to the scrollHeight
   }
+};
+
+export const fileNameExtension = (file?: File): string => {
+  return file?.name.split('.').pop() || '';
 };
