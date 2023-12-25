@@ -1,6 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation } from '@tanstack/react-query';
-import { error } from 'console';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { profileApi } from 'src/apis/profile.api';
@@ -9,7 +8,6 @@ import Input from 'src/components/Input';
 import { ErrorResponse } from 'src/types/utils.type';
 import { schema } from 'src/utils/rules';
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils';
-import { Schema } from 'yup';
 
 interface FormData {
   currentPassword: string;
