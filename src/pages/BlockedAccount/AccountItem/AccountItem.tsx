@@ -24,6 +24,7 @@ export default function AccountItem({ accountId }: { accountId?: string }) {
         <div className='flex items-center justify-between'>
           <div className='flex flex-grow items-center'>
             <IconProfile
+              src={profile?.profilePicture}
               isImage
               className='h-12 w-12 shrink-0'
               classNameImage='h-12 w-12'
