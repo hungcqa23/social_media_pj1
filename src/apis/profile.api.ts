@@ -15,6 +15,7 @@ interface Search {
 interface Follower {
   _id: string;
   username: string;
+  fullname: string;
   profilePicture: string;
   userProfile: User;
 }

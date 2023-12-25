@@ -21,25 +21,35 @@ import Button from '../Button';
 import CopyButton from './CopyButton';
 import Modal from '../Modal';
 import { useForm } from 'react-hook-form';
+import IconProfile from '../IconProfile';
 
 interface States {
   openOptions: boolean;
   openDelete: boolean;
   openMenu: boolean;
+  openReactionsMenu: boolean;
   openComment: boolean;
+  openPostReactions: boolean;
+  openCommentReactions: boolean;
 }
 
 const initialState: States = {
   openMenu: false,
+  openReactionsMenu: false,
   openOptions: false,
   openDelete: false,
-  openComment: false
+  openComment: false,
+  openPostReactions: false,
+  openCommentReactions: false
 };
 
 enum ACTION_TYPES {
   OPEN_MENU = 'openMenu',
+  OPEN_REACTIONSMENU = 'openReactionsMenu',
   OPEN_OPTIONS = 'openOptions',
   OPEN_DELETE = 'openDelete',
+  OPEN_POSTREACTIONS = 'openPostReactions',
+  OPEN_COMMENTREACTIONS = 'openCommentReactions',
   CLOSE = 'close'
 }
 
@@ -59,6 +69,22 @@ function reducer(state: States, action: { type: string }): States {
         openDelete: true
       };
     }
+    case ACTION_TYPES.OPEN_POSTREACTIONS: {
+      return {
+        ...initialState,
+        openReactionsMenu: true,
+        openPostReactions: true
+      };
+    }
+
+    case ACTION_TYPES.OPEN_COMMENTREACTIONS: {
+      return {
+        ...initialState,
+        openReactionsMenu: true,
+        openCommentReactions: true
+      };
+    }
+
     case ACTION_TYPES.CLOSE: {
       return initialState;
     }
@@ -164,6 +190,7 @@ export default function PostItem({
     queryKey: ['reactions', post._id],
     queryFn: () => reactionApi.getPostReactions(post._id || '')
   });
+
   const reactions = reactionsData?.data.reactions;
   const liked =
     reactions?.some(reaction => reaction.username === profile?.username) ||
@@ -358,6 +385,54 @@ export default function PostItem({
               </button>
             </Dialog>
           )}
+          <Dialog
+            isOpen={state.openPostReactions}
+            setIsOpen={() =>
+              !state.openReactionsMenu
+                ? dispatch({ type: ACTION_TYPES.OPEN_POSTREACTIONS })
+                : dispatch({ type: ACTION_TYPES.CLOSE })
+            }
+            renderDialog={
+              <Modal
+                header={'Likes'}
+                onCloseModal={() => dispatch({ type: ACTION_TYPES.CLOSE })}
+              >
+                <section className='overflow-y-auto'>
+                  {List({
+                    as: 'ul',
+                    className: 'flex flex-col',
+                    listItems: reactions || [],
+                    mapFn: reaction => (
+                      <div
+                        className='my-1 flex items-center justify-between px-4'
+                        key={reaction._id}
+                      >
+                        <div className='flex items-center gap-1'>
+                          <IconProfile
+                            className='h-12 w-12'
+                            classNameImage='h-12 w-12'
+                            src={reaction.profilePicture}
+                            to={`/${reaction.userId}`}
+                            onClick={() =>
+                              dispatch({ type: ACTION_TYPES.CLOSE })
+                            }
+                          />
+
+                          <div className='flex flex-col text-sm'>
+                            <span className='text-sm font-medium text-black'>
+                              {reaction.username}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </section>
+              </Modal>
+            }
+          >
+            <></>
+          </Dialog>
         </div>
       </div>
 
@@ -424,7 +499,7 @@ export default function PostItem({
       )}
 
       {/* Interaction */}
-      <div className={`border-t border-gray-200 px-4`}>
+      <div className={`flex flex-col border-t border-gray-200 px-4 `}>
         <div className={`flex gap-1 py-3 ${true && 'border-b'}`}>
           {/* Likes */}
           <button
@@ -517,6 +592,18 @@ export default function PostItem({
             className='flex basis-4/12 items-center justify-center rounded hover:bg-gray-200'
           />
         </div>
+        {reactions && reactions?.length > 0 && (
+          <button
+            className='flex gap-1 border-b py-3'
+            onClick={() => dispatch({ type: ACTION_TYPES.OPEN_POSTREACTIONS })}
+          >
+            <span className='cursor-pointer font-medium text-gray-500'>
+              {reactions?.length > 1
+                ? `${reactions?.length} likes`
+                : `${reactions?.length} like`}
+            </span>
+          </button>
+        )}
       </div>
 
       {/* Comments */}

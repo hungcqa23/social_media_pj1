@@ -436,7 +436,7 @@ export default function Profile() {
                                         {follower.username}
                                       </span>
                                       <span className='text-[0.8125rem]'>
-                                        {follower.userProfile.fullname}
+                                        {follower.fullname}
                                       </span>
                                     </div>
                                   </div>
@@ -480,9 +480,7 @@ export default function Profile() {
                                         <span className='text-sm font-medium text-black'>
                                           {follower.username}
                                         </span>
-                                        <span>
-                                          {follower.userProfile.fullname}
-                                        </span>
+                                        <span>{follower.fullname}</span>
                                       </div>
                                     </div>
                                   </div>
