@@ -8,7 +8,7 @@ interface Props {
 }
 export default function SuggestedFriend(props: Props) {
   const [isFollowed, setIsFollowed] = useState(false);
-  
+
   return (
     <div className='flex items-center px-4 py-2'>
       <div className='mr-2'>

@@ -22,7 +22,7 @@ export default function CopyButton({ className, content }: Props) {
   return (
     <button
       onClick={handleCopyClick}
-      className={`${className} ease-normal relative transition-[background] duration-200`}
+      className={`${className} relative transition-[background] duration-200 ease-normal`}
     >
       <svg
         className={classNames('duration-400 absolute transition-opacity', {

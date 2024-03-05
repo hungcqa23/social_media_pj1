@@ -5,6 +5,8 @@ import PostItem from 'src/components/PostItem';
 import { Post } from 'src/types/post.type';
 import NotFound from '../NotFound';
 import Spinner from 'src/components/Spinner';
+import { Helmet } from 'react-helmet-async';
+import { convert } from 'html-to-text';
 
 export default function PostPage() {
   const { postId } = useParams<{
@@ -19,6 +21,15 @@ export default function PostPage() {
 
   return (
     <main className='ml-auto h-screen w-[calc(100%-4.5rem)] overflow-y-scroll lg:w-[calc(100%-14rem)]'>
+      <Helmet>
+        <title>{post._id}</title>
+        <meta
+          name='description'
+          content={convert(post?.post || '', {
+            wordwrap: 120
+          })}
+        />
+      </Helmet>
       <div className='flex w-full justify-center p-5'>
         {isError && <NotFound />}
         {isLoading && <Spinner />}

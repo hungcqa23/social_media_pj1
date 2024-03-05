@@ -6,6 +6,7 @@ import PostItem from 'src/components/PostItem';
 import SuggestedBar from 'src/pages/Main//SuggestedBar';
 import { useInView } from 'react-intersection-observer';
 import { useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 // const SuggestedBar = lazy(() => import('src/pages/Main/SuggestedBar'));
 export default function Main() {
@@ -42,6 +43,14 @@ export default function Main() {
 
   return (
     <>
+      <Helmet>
+        <title>Home - Instacloud</title>
+        <meta
+          name='description'
+          content='Home for project Instacloud include posts'
+        />
+      </Helmet>
+
       <main className='ml-auto h-screen w-[calc(100%-4.5rem)] overflow-y-scroll lg:w-[calc(100%-14rem)]'>
         <div className='flex w-full justify-center pt-5'>
           <div className='w-full max-w-[40rem]'>

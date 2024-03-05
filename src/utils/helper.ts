@@ -37,6 +37,7 @@ export const calculateTimeAgo = (inputDateString: string): string => {
     return years + 'y';
   }
 };
+
 export const formatSocialNumber = (number: number): string => {
   // Format to number social media
   return new Intl.NumberFormat('en-US', {

@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -65,6 +66,11 @@ export default function Register() {
 
   return (
     <>
+      <Helmet>
+        <title>Register</title>
+        <meta name='description' content='Register to Instacloud' />
+      </Helmet>
+
       <h1 className='mb-8 text-center font-cookie text-4xl font-semibold drop-shadow-font md:mb-10 md:text-5xl lg:-mx-40 lg:text-5xl'>
         Create account
       </h1>

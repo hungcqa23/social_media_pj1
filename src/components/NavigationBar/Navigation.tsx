@@ -3,7 +3,12 @@ import { iconsSvg } from 'src/constants/icons';
 import ButtonNav from '../ButtonNav/ButtonNav';
 import { isActiveRoute } from 'src/utils/utils';
 import Popover from '../Popover';
-import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient
+} from '@tanstack/react-query';
 import authApi from 'src/apis/auth.api';
 import { useAppContext } from 'src/contexts/app.contexts';
 import { clearLS } from 'src/utils/auth';

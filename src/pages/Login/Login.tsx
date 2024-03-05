@@ -12,6 +12,7 @@ import { isAxiosUnprocessableEntityError } from 'src/utils/utils';
 import { schema } from 'src/utils/rules';
 import { useAppContext } from 'src/contexts/app.contexts';
 import path from 'src/constants/path';
+import { Helmet } from 'react-helmet-async';
 
 interface FormData {
   username: string;
@@ -70,6 +71,10 @@ export default function Login() {
 
   return (
     <div>
+      <Helmet>
+        <title>Login</title>
+        <meta name='description' content='Login to Instacloud' />
+      </Helmet>
       <h1 className='lg:md-10 mb-8 text-center font-cookie text-4xl font-semibold drop-shadow-font md:text-5xl lg:text-6xl'>
         Instacloud
       </h1>
